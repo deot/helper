@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const commitRE = /^(revert: )?(fix|feat|docs|perf|test|types|build|chore|refactor|breaking change)(\(.+\))?: .{1,50}/;
 const mergeRE = /Merge branch /;

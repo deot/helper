@@ -5,26 +5,24 @@ import childProcess from 'node:child_process';
 import ora from 'ora';
 import fs from 'fs-extra';
 import { Prompt } from './add/prompt.js';
+import { Logger } from './shared/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const exec = util.promisify(childProcess.exec);
-const { log, info } = console;
 
 (async () => {
 	const { mode, dependentName, args, packageName, $packageName } = await new Prompt().run();
 
 	let shell = mode === 'dependent' 
 		? `lerna add ${dependentName} ${args.join(' ')} --scope=${$packageName}`
-		: `lerna create ${$packageName} --yes`
+		: `lerna create ${$packageName} --yes`;
 		
-	const spinner = ora(shell);
-
-	spinner.start();
+	const spinner = ora(shell).start();
 	const { stdout, stderr } = await exec(shell);
-	spinner.stop();
 
-	stdout && log(stdout);
-	stderr && info(stderr);
+	spinner.stop();
+	stdout && Logger.log(stdout);
+	stderr && Logger.info(stderr);
 
 	// 包名修改
 	if (mode === 'package') {

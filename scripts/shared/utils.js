@@ -20,7 +20,7 @@ export const host = (() => {
 })();
 
 const nms = [
-	resolve(__dirname, '../node_modules'),
+	resolve(__dirname, '../../node_modules'),
 	resolve(process.cwd(), './node_modules')
 	// ...module.paths
 ];
@@ -37,3 +37,12 @@ export const resolvePackage = (source, options) => {
 	return options.read ? fs.readFileSync(fullPath) : fullPath;
 };
 
+export const formatBytes = (size, suffix = 2) => { 
+    if (!size) return "0B"; 
+    const base = 1024; // 表示要被转化的容量大小，以字节为单
+    const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    const index = Math.floor(Math.log(size) / Math.log(base)); 
+
+    const value = parseFloat((size / Math.pow(base, index)).toFixed(suffix));
+    return value + units[index];
+}
