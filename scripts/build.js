@@ -52,6 +52,7 @@ class Builder {
 					include: [`packages/${name}/**/*`, 'packages/shims.d.ts'],
 					exclude: ['dist'],
 					compilerOptions: {
+						paths: null, // 设置为空编译不会被影响
 						outDir: `packages/${name}/dist`,
 						declaration: true,
 						declarationDir: './src' // packages/dist/src
@@ -94,7 +95,7 @@ class Builder {
 	}
 }
 
-(async () => {
+Utils.autoCatch(async () => {
 	const directory = path.resolve(__dirname, '../packages/');
 	const files = ['shared', ...fs.readdirSync(directory)]
 		.filter((i, index, source) => !['index'].includes(i) && source.indexOf(i) === index);
@@ -123,4 +124,4 @@ class Builder {
 			return preProcess;
 		}
 	}, Promise.resolve());
-})();
+});

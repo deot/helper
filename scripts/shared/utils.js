@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import os from 'os';
 import fs from 'fs-extra';
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const host = (() => {
 	const ips = [];
@@ -38,11 +38,25 @@ export const resolvePackage = (source, options) => {
 };
 
 export const formatBytes = (size, suffix = 2) => { 
-    if (!size) return "0B"; 
-    const base = 1024; // 表示要被转化的容量大小，以字节为单
-    const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-    const index = Math.floor(Math.log(size) / Math.log(base)); 
+	if (!size) return "0B"; 
+	const base = 1024; // 表示要被转化的容量大小，以字节为单
+	const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+	const index = Math.floor(Math.log(size) / Math.log(base)); 
 
-    const value = parseFloat((size / Math.pow(base, index)).toFixed(suffix));
-    return value + units[index];
-}
+	const value = parseFloat((size / (base ** index)).toFixed(suffix));
+	return value + units[index];
+};
+
+export const autoCatch = async (impl, options = {}) => { 
+	const { onError = console.error } = options;
+
+	let target = impl;
+	typeof target === 'function' && (target = target());
+
+	try {
+		const e = await target;
+		return e;
+	} catch (e) {
+		onError(e);
+	}
+};

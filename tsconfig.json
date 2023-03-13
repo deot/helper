@@ -4,7 +4,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "lib": ["esnext", "dom"],
-    "types": ["node"],
+    "types": ["node", "jest"],
     "jsx": "preserve",
     "strict": true,
     "sourceMap": true,
@@ -16,10 +16,15 @@
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@deot/helper-*": ["packages/*/src"]
+    }
   },
   "include": [
-    "packages/**/*",
+    "packages/shims.d.ts",
+    "packages/*/src"
   ],
   "exclude": [
     "node_modules/**/*",

@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 import autocomplete from 'inquirer-autocomplete-prompt';
 import fs from 'fs-extra';
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const { prompt, registerPrompt, Separator } = inquirer;
 const directory = resolve(__dirname, '../../packages/');

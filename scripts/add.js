@@ -1,28 +1,22 @@
-import util from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import childProcess from 'node:child_process';
 import ora from 'ora';
 import fs from 'fs-extra';
 import { Prompt } from './add/prompt.js';
-import { Logger } from './shared/index.js';
+import { Shell, Utils } from './shared/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const exec = util.promisify(childProcess.exec);
 
-(async () => {
+Utils.autoCatch(async () => {
 	const { mode, dependentName, args, packageName, $packageName } = await new Prompt().run();
 
-	let shell = mode === 'dependent' 
+	let command = mode === 'dependent' 
 		? `lerna add ${dependentName} ${args.join(' ')} --scope=${$packageName}`
 		: `lerna create ${$packageName} --yes`;
 		
-	const spinner = ora(shell).start();
-	const { stdout, stderr } = await exec(shell);
-
+	const spinner = ora(command).start();
+	await Shell.spawn(command);
 	spinner.stop();
-	stdout && Logger.log(stdout);
-	stderr && Logger.info(stderr);
 
 	// 包名修改
 	if (mode === 'package') {
@@ -49,4 +43,4 @@ const exec = util.promisify(childProcess.exec);
 			dependencies: {}
 		}, null, '\t'));
 	}
-})();
+});
