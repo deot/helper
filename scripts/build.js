@@ -21,31 +21,31 @@ class Builder {
 	}
 
 	async process() {
-		const { packageName } = this;
+		const { packageName, packageDir } = this;
 		const spinner = ora(`${packageName} Build ...`);
 		try {
 			spinner.start();
+			await fs.emptyDir(`${packageDir}/dist`);
 
-			const stat = await this.buildSource();
+			const stat1 = await this.buildSourceAsES();
+			const stat2 = await this.buildSourceAsUMD();
 			await this.buildTypes();
 
 			spinner.stop();
-			Logger.log(`${chalk.cyan(`${packageName}`)} ${chalk.green('Success')} ${Utils.formatBytes(stat.size)}`);
+			Logger.log(`${chalk.cyan(`${packageName}`)} ${chalk.green('Success')} ES: ${Utils.formatBytes(stat1.size)} UMD: ${Utils.formatBytes(stat2.size)}`); // eslint-disable-line
 		} catch (e) {
 			Logger.log('Error!', e);
 			throw e;
 		}
 	}
 
-	async buildSource() {
+	async buildSourceAsES() {
 		const { name, input, output } = this.config;
-		const { packageDir } = this;
-
-		await fs.emptyDir(`${packageDir}/dist`);
 		const builder = await rollupBuilder({
 			input,
 			external: [
-				/^lodash/
+				/^lodash/,
+				/^@deot\/helper-/
 			],
 			plugins: [
 				typescript({
@@ -61,12 +61,47 @@ class Builder {
 				commonjs({ extensions: ['.js', '.ts'] }),
 				nodeResolve(),
 				replace({
-					 preventAssignment: true
+					preventAssignment: true
 				})
 			]
 		});
 		await builder.write(output);
 		const stat = await fs.stat(output.file);
+
+		return stat;
+	}
+
+	async buildSourceAsUMD() {
+		const { packageName } = this;
+		const { name, input, output, fullpath } = this.config;
+		const builder = await rollupBuilder({
+			input,
+			external: [],
+			plugins: [
+				typescript({
+					include: [`packages/${name}/**/*`, 'packages/shims.d.ts'],
+					exclude: ['dist'],
+					compilerOptions: {
+						paths: null,
+						declaration: false
+					}
+				}),
+				commonjs({ extensions: ['.js', '.ts'] }),
+				nodeResolve(),
+				replace({
+					'process.env.NODE_ENV': `'production'`,
+					preventAssignment: true
+				})
+			]
+		});
+		const $output = {
+			...output,
+			file: fullpath + '/dist/index.umd.js',
+			format: 'umd',
+			name: packageName
+		};
+		await builder.write($output);
+		const stat = await fs.stat($output.file);
 
 		return stat;
 	}
@@ -108,13 +143,13 @@ Utils.autoCatch(async () => {
 		if (!(/(^_)/.test(file)) && stat.isDirectory()) {
 			return preProcess.then(() => {
 				const builder = new Builder({
+					fullpath,
 					name: file,
 					input: fullpath + '/src/index.ts',
 					output: {
 						file: fullpath + '/dist/index.js',
 						format: 'es',
 						exports: 'named',
-
 						sourcemap: true
 					} 
 				});
