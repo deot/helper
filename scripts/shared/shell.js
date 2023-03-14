@@ -6,7 +6,10 @@ export class Shell {
 	static exec = util.promisify(childProcess.exec);
 
 	static spawn = (command, args = []) => {
-		const [command$, ...args$] = (command + SPACE + args.join(SPACE)).replace(/\s+/g, SPACE).split(SPACE);
+		const [command$, ...args$] = (command + SPACE + args.join(SPACE))
+			.replace(/\s+/g, SPACE)
+			.split(SPACE)
+			.filter(i => !!i);
 		return new Promise((resolve, reject) => {
 			const emit = childProcess.spawn(
 				command$,
