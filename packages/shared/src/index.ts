@@ -1,3 +1,3 @@
 export * from './global.types';
 
-export { Utils } from './utils';
+export * as Utils from './utils';
