@@ -51,11 +51,11 @@ class Builder {
 				typescript({
 					include: [`packages/${name}/**/*`, 'packages/shims.d.ts'],
 					exclude: ['dist'],
+					
 					compilerOptions: {
-						paths: null, // 设置为空编译不会被影响
+						rootDir: '.', // packages/*/dist/packages/*/src
 						outDir: `packages/${name}/dist`,
-						declaration: true,
-						declarationDir: './src' // packages/dist/src
+						declaration: true
 					}
 				}),
 				commonjs({ extensions: ['.js', '.ts'] }),
@@ -126,7 +126,7 @@ class Builder {
 			process.exitCode = 1;
 		}
 
-		await fs.remove(`${packageDir}/dist/src`);
+		await fs.remove(`${packageDir}/dist/packages`);
 	}
 }
 
@@ -150,7 +150,7 @@ Utils.autoCatch(async () => {
 						file: fullpath + '/dist/index.js',
 						format: 'es',
 						exports: 'named',
-						sourcemap: true
+						sourcemap: false
 					} 
 				});
 				return builder.process();

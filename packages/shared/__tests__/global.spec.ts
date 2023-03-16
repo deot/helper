@@ -1,7 +1,6 @@
-import * as Utils from '../src';
 import type { AnyFunction } from '../src';
 
-describe('index.ts', () => {
+describe('global.types.ts', () => {
 	it('dts', () => {
 		type DTS = { 
 			fn?: AnyFunction;
@@ -10,9 +9,4 @@ describe('index.ts', () => {
 		const options: DTS = {};
 		expect(typeof options).toBe('object');
 	});
-
-	it('methods', () => {
-		expect(Utils.helper('')).toBe('');
-	});
 });
-

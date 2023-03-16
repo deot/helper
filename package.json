@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/deot/helper#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.34.4",
+    "@microsoft/api-extractor": "~7.34.4",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.2",
