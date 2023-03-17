@@ -1,4 +1,4 @@
-import { Utils } from '../src';
+import { Utils } from '@deot/helper-shared';
 
 describe('utils.ts', () => {
 	it('autoCatch', () => {

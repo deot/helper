@@ -19,6 +19,7 @@
       "node_modules/@types"
     ],
     "paths": {
+      "@deot/helper": ["packages/index/src"],
       "@deot/helper-*": ["packages/*/src"]
     }
   },

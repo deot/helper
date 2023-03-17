@@ -20,6 +20,7 @@ module.exports = {
 	// 匹配相关
 	moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
 	moduleNameMapper: {
+		'^@deot/helper$': '<rootDir>/packages/index/src',
 		'^@deot/helper-(.*?)$': '<rootDir>/packages/$1/src'
 	},
 	// 匹配规则很重要

@@ -18,7 +18,7 @@ Utils.autoCatch(async () => {
 
 	if (!watch) return;
 
-	Logger.log(packageName, '测试已通过');
+	Logger.log(packageName || '', '测试已通过');
 }, {
 	onError: (e) => {
 		if (typeof e === 'number' && e === 1) {

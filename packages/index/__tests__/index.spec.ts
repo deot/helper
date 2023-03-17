@@ -1,4 +1,4 @@
-import { Utils } from '../src';
+import { Utils } from '@deot/helper';
 
 describe('index.ts', () => {
 	it('any', () => {
