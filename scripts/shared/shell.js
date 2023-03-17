@@ -1,4 +1,4 @@
-import childProcess from 'node:child_process';
+import * as childProcess from 'node:child_process';
 import util from 'node:util';
 
 const SPACE = ' ';

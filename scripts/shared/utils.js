@@ -1,9 +1,12 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { createRequire } from "node:module";
 import os from 'os';
 import fs from 'fs-extra';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export const require = createRequire(import.meta.url);
 
 export const host = (() => {
 	const ips = [];

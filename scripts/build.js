@@ -17,6 +17,7 @@ class Builder {
 	constructor(config) {
 		this.packageDir = path.resolve(__dirname, `../packages/${config.name}`);
 		this.packageName = config.name === 'index' ? '@deot/helper' : `@deot/helper-${config.name}`;
+		this.packageOptions = Utils.require(`${this.packageDir}/package.json`); // eslint-disable-line
 		this.config = config;
 	}
 
@@ -40,12 +41,20 @@ class Builder {
 	}
 
 	async buildSourceAsES() {
+		const { packageOptions } = this;
 		const { name, input, output } = this.config;
+		const external = Object
+			.keys({ 
+				...packageOptions.dependencies, 
+				...packageOptions.peerDependencies 
+			})
+			.map(i => new RegExp(`^${i}$`));
+
 		const builder = await rollupBuilder({
 			input,
 			external: [
-				/^lodash/,
-				/^@deot\/helper-/
+				// /^[a-zA-Z@]/,
+				...external
 			],
 			plugins: [
 				typescript({
