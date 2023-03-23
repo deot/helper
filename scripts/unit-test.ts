@@ -2,7 +2,15 @@ import { Utils, Shell, Logger } from './shared';
 import { getOptions } from './unit-test/prompt';
 
 Utils.autoCatch(async () => {
-	const options = await getOptions();
+	let args = process.argv;
+	let options: any = {};
+	const packageNameIndex = args.findIndex(i => i === '--packageName');
+	if (packageNameIndex !== -1) {
+		options.packageName = args[packageNameIndex + 1] || '**';
+	} else {
+		options = await getOptions();
+	}
+	
 	const { packageName, watch } = options;
 
 	const command = `cross-env NODE_ENV=${process.env.NODE_ENV || 'TEST'} TEST_OPTIONS=${encodeURIComponent(JSON.stringify(options))} jest ` 
