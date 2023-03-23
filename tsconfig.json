@@ -24,11 +24,11 @@
     }
   },
   "include": [
+    "scripts/**/*",
     "packages/shims.d.ts",
     "packages/*/src"
   ],
   "exclude": [
-    "node_modules/**/*",
-    "scripts/**/*"
+    "node_modules/**/*"
   ]
 }

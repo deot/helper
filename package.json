@@ -14,11 +14,11 @@
     "lint": "esw packages --ext .js,.ts,.jsx,.tsx,.md --color",
     "lint:fix": "npm run lint -- --fix",
     "lint:watch": "npm run lint -- --watch --fix",
-    "link": "node ./scripts/link.js",
-    "dev": "node ./scripts/dev.js",
-    "build": "node --max_old_space_size=8192 ./scripts/build.js",
-    "test": "node ./scripts/unit-test.js",
-    "add": "node ./scripts/add.js"
+    "link": "tsx ./scripts/link.ts",
+    "dev": "tsx ./scripts/dev.ts",
+    "build": "tsx ./scripts/build.ts",
+    "test": "tsx ./scripts/unit-test.ts",
+    "add": "tsx ./scripts/add.ts"
   },
   "scripts-info": {
     "init": "首次安装",
@@ -67,6 +67,7 @@
     "ora": "^6.1.2",
     "rollup": "^3.18.0",
     "ts-jest": "^29.0.5",
+    "tsx": "^3.12.6",
     "typescript": "^4.9.5",
     "upath": "^2.0.1"
   },

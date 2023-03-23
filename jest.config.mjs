@@ -2,7 +2,7 @@ const options = JSON.parse(decodeURIComponent(process.env.TEST_OPTIONS || '{}'))
 const { packageName } = options;
 
 const userConfig = {};
-module.exports = {
+export default {
 	preset: 'ts-jest',
 	transform: {
 		'^.+\\.tsx?$': [

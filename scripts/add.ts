@@ -1,28 +1,24 @@
-import { fileURLToPath } from 'node:url';
-import { resolve, dirname } from 'node:path';
+import { resolve } from 'node:path';
 import ora from 'ora';
 import fs from 'fs-extra';
-import { Prompt } from './add/prompt.js';
-import { Shell, Utils } from './shared/index.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { getOptions } from './add/prompt';
+import { Utils, Shell, DIRECTORY } from './shared';
 
 Utils.autoCatch(async () => {
-	const { mode, dependentName, args, packageName, $packageName } = await new Prompt().run();
-
+	const { mode, dependentName, args, packageName, $packageName } = await getOptions();
 	let command = mode === 'dependent' 
 		? `lerna add ${dependentName} ${args.join(' ')} --scope=${$packageName}`
 		: `lerna create ${$packageName} --yes`;
-		
+	
 	const spinner = ora(command).start();
 	await Shell.spawn(command);
 	spinner.stop();
 
 	// 包名修改
 	if (mode === 'package') {
-		let dir = resolve(__dirname, `../packages`);
+		let dir = resolve(DIRECTORY);
 		fs.renameSync(
-			`${dir}/helper-${packageName}`,
+			`${dir}/${$packageName.split('/')[1]}`,
 			`${dir}/${packageName}`
 		);
 
@@ -31,16 +27,29 @@ Utils.autoCatch(async () => {
 		fs.removeSync(`${dir}/${packageName}/lib`);
 
 		fs.outputFileSync(`${dir}/${packageName}/README.md`, '// TODO');
-		fs.outputFileSync(`${dir}/${packageName}/index.ts`, '// TODO');
+		fs.outputFileSync(`${dir}/${packageName}/src/index.ts`, '// TODO');
 		fs.outputFileSync(`${dir}/${packageName}/package.json`, JSON.stringify({
 			name: $packageName,
 			version: '1.0.0',
 			main: 'dist/index.js',
+			types: "dist/index.d.ts",
+			type: "module",
+			files: [
+			  "dist"
+			],
 			license: 'MIT',
 			publishConfig: {
 				access: 'public'
 			},
 			dependencies: {}
+		}, null, '\t'));
+
+		fs.outputFileSync(`${dir}/${packageName}/api-extractor.json`, JSON.stringify({
+			extends: "../../api-extractor.json",
+			mainEntryPointFilePath: `./dist/packages/${packageName}/src/index.d.ts`,
+			dtsRollup: {
+				publicTrimmedFilePath: "./dist/index.d.ts"
+			}
 		}, null, '\t'));
 	}
 });
