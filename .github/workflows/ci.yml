@@ -25,5 +25,5 @@ jobs:
       - run: npm run init
 
       - name: Run unit tests
-        run: npm run test -- --packageName '**'
+        run: npm run test -- --package-name '**'
 

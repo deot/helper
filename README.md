@@ -43,7 +43,7 @@ $ npm run link
 $ npm run test
 
 # 或者 直接添加参数
-$ npm run test -- --packageName '**' --watch
+$ npm run test -- --package-name '**' --watch
 ```
 
 - 开发
@@ -52,7 +52,7 @@ $ npm run test -- --packageName '**' --watch
 $ npm run dev
 
 # 或者 直接添加参数
-$ npm run dev -- --packageName '**'
+$ npm run dev -- --package-name '**'
 ```
 
 - 打包
