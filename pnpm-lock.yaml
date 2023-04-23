@@ -5,8 +5,8 @@ importers:
   .:
     devDependencies:
       '@deot/dev-cli':
-        specifier: ^1.0.5
-        version: 1.0.5(@babel/eslint-parser@7.21.3)
+        specifier: ^1.0.7
+        version: 1.0.7(@babel/eslint-parser@7.21.3)
 
   packages/compress:
     dependencies:
@@ -1246,8 +1246,8 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@deot/dev-cli@1.0.5(@babel/eslint-parser@7.21.3):
-    resolution: {integrity: sha512-JpQErNjm5KyY5dWwy/LbcH2D7r+9FRRVi8e6cpJgvxxKKX6+weXyps50OmWoCgOEJWZdsT2K3J3T0T49YIWhRg==}
+  /@deot/dev-cli@1.0.7(@babel/eslint-parser@7.21.3):
+    resolution: {integrity: sha512-bCJ2Js5Yv3/KoKemU88AOPxdRRNmOaI7NO746YhDKPa4jbVMdaOLuHBrlRcJaigcKEkFT9kFjKKa+gIYRgcGuQ==}
     hasBin: true
     dependencies:
       '@babel/core': 7.21.4
