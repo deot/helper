@@ -1,4 +1,4 @@
-import options from '@deot/dev-cli/config/jest.config.js';
+import options from '@deot/dev-extract/jest.config.js';
 
 export default {
 	...options,

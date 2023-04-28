@@ -1,5 +1,5 @@
 {
-  "extends": "@deot/dev-cli/config/tsconfig.json",
+  "extends": "@deot/dev-extract/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "typeRoots": [
