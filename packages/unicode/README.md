@@ -1,4 +1,4 @@
-# @deot/-compress
+# @deot/-unicode
 
 公共方法
 

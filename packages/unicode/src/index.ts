@@ -16,7 +16,6 @@ import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate';
 
 /**
  * Unicode编码 + 压缩
- * 
  * @param {[string]} data value
  * @returns {[string]} base64
  */
@@ -29,7 +28,6 @@ export const utoa = (data: string): string => {
 
 /**
  * Unicode解码 + 解压
- * 
  * @param {[string]} base64 base64
  * @returns {[string]} value
  */

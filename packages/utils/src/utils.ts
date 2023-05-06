@@ -1,4 +1,4 @@
-import type { Options } from './global.types';
+import type { Options } from '@deot/helper-shared';
 
 export const autoCatch = async (impl: any, options: Options = {}) => { 
 	const { onError = console.error } = options;

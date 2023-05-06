@@ -1,4 +1,4 @@
-import { Unicode } from '@deot/helper-compress';
+import * as Unicode from '@deot/helper-unicode';
 
 const utoa = (data) => {
 	return btoa(unescape(encodeURIComponent(data)));
