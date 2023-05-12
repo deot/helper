@@ -64,11 +64,6 @@ on:
         default: ''
         type: string
 
-      customVersion:
-        description: 'Custom Version(x.x.x)'
-        default: ''
-        type: string
-
 jobs:
   publish:
     runs-on: ubuntu-latest
