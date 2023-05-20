@@ -6,4 +6,6 @@ import * as Utils from '@deot/helper-utils';
 import * as Shared from '@deot/helper-shared';
 import * as Unicode from '@deot/helper-unicode';
 
-export { Shared, Utils, Unicode };
+import { Emitter } from '@deot/helper-emitter';
+
+export { Shared, Utils, Unicode, Emitter };
