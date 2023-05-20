@@ -1,5 +1,6 @@
 /**
  * 函数组合
+ * compose :: (B -> C) -> (A -> B) -> (A -> C)
  * 
  * 参考：https://raw.githubusercontent.com/reduxjs/redux/master/src/compose.ts
  * 1. 增加对this的支持

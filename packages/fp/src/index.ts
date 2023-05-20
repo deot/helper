@@ -1,2 +1,2 @@
-export * from './curry';
-export * from './compose';
+export * from './pipeline';
+export * from './functor';

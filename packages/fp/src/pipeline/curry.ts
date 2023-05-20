@@ -1,3 +1,5 @@
+// https://www.30secondsofcode.org/js/s/curry/
+
 const PLACEHOLDER = {};
 const mergeArgs = (args: any[], nextArgs: any[]): any[] => {
 	args = args.map(arg => {
