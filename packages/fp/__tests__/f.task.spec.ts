@@ -21,5 +21,7 @@ describe('io.ts', () => {
 
 		await current.run();
 		expect(current.valueOf()).toBe('HELLO POINTEDS!');
+		expect(current.isComplete()).toBe(true);
+		expect(current.toString()).toMatch('Task');
 	}, 60000);
 });

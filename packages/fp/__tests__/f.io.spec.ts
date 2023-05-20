@@ -18,5 +18,6 @@ describe('io.ts', () => {
 
 		expect(current instanceof IO).toBe(true);
 		expect(current.valueOf()).toBe('HELLO POINTEDS!!!!');
+		expect(current.toString()).toMatch('IO(HELLO POINTEDS!!!!)');
 	});
 });

@@ -16,6 +16,6 @@ export class Pointed extends APointed {
 
 	// 返回一个当前结构的文本描述
 	toString() {
-		return `Pointed (${this.value})`;
+		return `Pointed(${this.value})`;
 	}
 }

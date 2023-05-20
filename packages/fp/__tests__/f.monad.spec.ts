@@ -16,6 +16,7 @@ describe('monad.ts', () => {
 			.map(R.identity);
 		expect(current instanceof Monad).toBe(true);
 		expect(current.flatMap(R.identity).valueOf()).toBe('HELLO MONADS!');
+		expect(current.flatMap(R.identity).toString()).toBe('Monad(HELLO MONADS!)');
 	});
 
 	it('flatMap', () => {

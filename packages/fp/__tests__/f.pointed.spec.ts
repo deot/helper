@@ -14,5 +14,6 @@ describe('monad.ts', () => {
 
 		expect(current instanceof Pointed).toBe(true);
 		expect(current.valueOf()).toBe('HELLO POINTEDS!');
+		expect(current.toString()).toBe('Pointed(HELLO POINTEDS!)');
 	});
 });
