@@ -1,7 +1,7 @@
 import * as Utils from '@deot/helper-utils';
 
-describe('utils.ts', () => {
-	it('autoCatch', () => {
+describe('auto-catch.ts', () => {
+	it('basic', () => {
 		const OUTPUT = new Error();
 		Utils.autoCatch(() => {
 			return Promise.reject(OUTPUT);
