@@ -52,6 +52,6 @@ export class Either extends AMonad {
 	}
 	
 	toString() {
-		return `Either.${this.isLeft ? 'Left' : 'Right'} (${this.value})`;
+		return `Either.${this.isLeft ? 'Left' : 'Right'}(${this.value})`;
 	}
 }

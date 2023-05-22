@@ -1,16 +1,14 @@
 import { AMonad } from './abstract';
 
-const TASK_UNCOMPLETE = Symbol('TASK_UNCOMPLETE');
+const UNCOMPLETE = Symbol('UNCOMPLETE');
 /**
- * 任务
- * TODO:
- * 1. fn里可能存在setTimeout
- * 2. catch处理
- * 3. 事件机制
+ * 串行任务，这里是最基本的Task，不含setTimeout取消，事件机制
+ * 其实map也可以用Generator*来设计
+ * 扩展参考Serial
  */
 export class Task extends AMonad {
 	static of(value: any) {
-		return new Task(Promise.resolve(value));
+		return new Task(value);
 	}
 
 	result: any;
@@ -18,13 +16,16 @@ export class Task extends AMonad {
 	constructor(value: any) {
 		super(value);
 
-		this.result = TASK_UNCOMPLETE;
+		this.result = UNCOMPLETE;
 	}
 
 	map(fn: Function) {
-		return new Task(
-			this.value
-				.then((x: any) => fn(x))
+		let v = this.value;
+		v = v && v.then 
+			? v
+			: Promise.resolve(v);
+		return Task.of(
+			v.then((x: any) => fn(x))
 		);
 	}
 
@@ -32,10 +33,12 @@ export class Task extends AMonad {
 		const v = await this.value;
 
 		this.result = v;
+
+		return this;
 	}
 
 	isComplete() {
-		return this.result !== TASK_UNCOMPLETE;
+		return this.result !== UNCOMPLETE;
 	}
 
 	toString() {
@@ -45,7 +48,4 @@ export class Task extends AMonad {
 	valueOf() {
 		return this.result;
 	}
-
-	// TODO: 事件机制
-	listen() {}
 }

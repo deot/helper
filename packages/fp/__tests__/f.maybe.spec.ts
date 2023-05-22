@@ -1,6 +1,6 @@
 import * as FP from '@deot/helper-fp';
 
-const { Maybe } = FP;
+const { Maybe, Monad } = FP;
 const R = {
 	toUpper: (x: string) => x.toUpperCase(),
 	addSuffix: (x: string) => x += '!',
@@ -36,5 +36,14 @@ describe('maybe.ts', () => {
 		expect(current.valueOf('other')).toBe('other');
 		expect(current.toString()).toBe(`Maybe.Nothing`);
 		expect(current.flatMap(R.identity).valueOf()).toBe(null);
+	});
+
+	it('Monadic: map / flatMap / valueOf / toString', () => {
+		let current = Maybe.of(Maybe.of(Monad.of(Maybe.of(null))))
+			.flatMap(R.toUpper)
+			.map(R.identity);
+
+		expect(current.valueOf()).toBe(null);
+		expect(current.toString()).toBe(`Maybe.Nothing`);
 	});
 });

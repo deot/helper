@@ -43,4 +43,13 @@ describe('monad.ts', () => {
 		);
 		expect(safeAdd('1')).toBe('123');
 	});
+
+	it('Monadic: map / flatMap / valueOf / toString', () => {
+		let current = Monad.of(Monad.of(Monad.of(Monad.of('Hello Monads!'))))
+			.flatMap(R.toUpper)
+			.map(R.identity);
+
+		expect(current.valueOf()).toBe('HELLO MONADS!');
+		expect(current.toString()).toMatch(`Monad(HELLO MONADS!)`);
+	});
 });

@@ -2,6 +2,8 @@
 export abstract class AMonad {
 	value: any;
 
+	uid: any;
+
 	constructor(value: any) {
 		this.value = value;
 	}
@@ -10,8 +12,12 @@ export abstract class AMonad {
 
 	abstract map(fn: Function): any;
 
+	// this.join().map()会导致不同Monadic混用时this出现问题
 	flatMap(fn: Function): any {
-		return this.join().map(fn);
+		let v = this.join();
+		
+		this.value = v.value;
+		return this.map(fn);
 	}
 
 	join(): any {

@@ -6,11 +6,17 @@ import { compose } from '../pipeline';
  */
 export class IO extends AMonad {
 	static of(value: any) {
-		return new IO(() => value);
+		return new IO(value);
 	}
 
 	map(fn: Function) {
-		return new IO(compose(fn, this.value));
+		let composed = compose(
+			fn, 
+			this.value._isIO ? this.value : () => this.value
+		);
+		// @ts-ignore
+		composed._isIO = true;
+		return IO.of(composed);
 	}
 
 	toString() {

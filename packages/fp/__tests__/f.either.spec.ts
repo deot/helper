@@ -1,6 +1,6 @@
 import * as FP from '@deot/helper-fp';
 
-const { Either } = FP;
+const { Either, Monad } = FP;
 const R = {
 	add: (base: any) => (x: any) => x + base,
 	identity: (x: any) => x,
@@ -56,5 +56,15 @@ describe('either.ts', () => {
 
 		run(parseJSON(json));
 		run(Either.of(() => R.parse(json)));
+	});
+
+	it('Monadic: map / flatMap / valueOf / toString', () => {
+		let current = Either.right(Either.right(Monad.of(Either.of(() => 1))))
+			.flatMap(R.add(1))
+			.map(R.add(1))
+			.map(R.identity);
+
+		expect(current.valueOf()).toBe(3);
+		expect(current.toString()).toBe(`Either.Right(3)`);
 	});
 });
