@@ -1,28 +1,31 @@
 import { ATask } from './abstract';
 import { Task } from './task';
 
+type Source = Task | (() => Promise<any>);
+
 export class Job extends ATask {
-	static of(task: Task, interval?: number) {
+	static of(task: Source, interval?: number) {
 		return new Job(task, interval);
 	}
 
-	original: Task;
+	original: Source;
 
-	task: Task;
+	task: Source;
 
 	interval: number;
 
 	isStart: boolean;
 
-	constructor(task: Task, interval?: number) {
+	constructor(task: Source, interval?: number) {
 		super();
+
 		this.task = task;
 		this.original = task;
 
 		this.interval = interval || 0;
 		this.isStart = false;
 
-		if (task.isStart) {
+		if (this.task instanceof Task && this.task.isStart) {
 			this.start();
 		}
 	}
@@ -32,13 +35,23 @@ export class Job extends ATask {
 		if (this.task !== leaf) {
 			this.task = leaf;
 		}
-		return Promise.resolve()
-			.then(() => (leaf.isCancel ? Promise.resolve() : leaf.value))
+
+		let interrupter = (v: any) => Promise.resolve(v)
 			.then((x: any) => this.suspend(x, new Promise((_) => { setTimeout(_, this.interval); })))
 			.then((x) => this.suspend(x, this.canceler))
-			.then((x: any) => this.suspend(x, this.pasuer))
-			.then(() => leaf.restart())
-			.then(v => this.process(v));
+			.then((x: any) => this.suspend(x, this.pasuer));
+
+		// Task可以更加细粒度的中断
+		return this.original instanceof Task
+			? Promise.resolve()
+				.then(() => (leaf.isCancel ? Promise.resolve() : leaf.value))
+				.then((x: any) => interrupter(x))
+				.then(() => leaf.restart())
+				.then(v => this.process(v))
+			: Promise.resolve()
+				.then(() => (this.original as Function)())
+				.then((x: any) => interrupter(x))
+				.then(v => this.process(v));
 	}
 
 	// 立即执行，先父后子
@@ -46,7 +59,10 @@ export class Job extends ATask {
 		if (this.isStart) return;
 		this.isStart = true;
 
-		if (!this.original.isStart) {
+		if (
+			this.original instanceof Task 
+			&& !this.original.isStart
+		) {
 			this.original.start();
 		}
 		
@@ -55,25 +71,34 @@ export class Job extends ATask {
 
 	// 暂停执行
 	pasue() {
-		this.task.pasue();
+		if (this.task instanceof Task) {
+			this.task.pasue();
+		}
 		this.setPasueStatus(true);
 	}
 
 	// 恢复执行
 	resume() {
-		this.task.resume();
+		if (this.task instanceof Task) {
+			this.task.resume();
+		}
 		this.setPasueStatus(false);
 	}
 
 	// 取消执行 先子后父
 	cancel() {
-		this.task.cancel();
+		if (this.task instanceof Task) {
+			this.task.cancel();
+		}
 		this.setCancelStatus(true);
 	}
 
 	restart() {
-		this.task.pasue();
-		this.task.cancel();
+		if (this.task instanceof Task) {
+			this.task.pasue();
+			this.task.cancel();
+		}
+		
 		this.setCancelStatus(false);
 		
 		this.isStart = false;

@@ -95,6 +95,50 @@ describe('job.ts', () => {
 		current$.cancel();
 	});
 
+	it('func', async () => {
+		let count$ = 0;
+		let record = 0;
+		const current$ = Job.of(
+			async () => {
+				await sleep(1);
+				count$++;
+			},
+			9
+		);
+		expect.assertions(6);
+		
+		// 开始
+		current$.start();
+		await sleep(30);
+		expect(count$).not.toBe(record);
+
+		// 暂停
+		current$.pasue();
+		record = count$;
+		await sleep(30);
+		expect(count$).toBe(record);
+
+		// 恢复
+		current$.resume();
+		await sleep(30);
+		expect(count$).not.toBe(record);
+		
+		// 取消
+		current$.cancel();
+		record = count$;
+		await sleep(30);
+		expect(count$).toBe(record);
+
+		// 重新开始
+		current$.restart();
+		await sleep(30);
+		expect(count$).not.toBe(record);
+
+		current$.cancel();
+
+		expect(count$).toBeGreaterThanOrEqual(9);
+	});
+
 	it('for coverage', async () => {
 		let count$ = 0;
 		const current$ = Job.of(
