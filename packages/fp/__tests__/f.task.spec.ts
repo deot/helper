@@ -118,48 +118,6 @@ describe('task.ts', () => {
 			});
 	});
 
-	it('job / loop', async () => {
-		expect.assertions(5);
-		let count = 0;
-		let record = count;
-		const current = Task.of('Hello Tasks!')
-			.map(R.toUpper)
-			.map((v: any) => {
-				count++;
-				return v;
-			})
-			.loop(9);
-
-		// 开始
-		current.start();
-		await sleep(30);
-		expect(count).not.toBe(record);
-
-		// 暂停
-		current.pasue();
-		record = count;
-		await sleep(30);
-		expect(count).toBe(record);
-
-		// 恢复
-		current.resume();
-		await sleep(30);
-		expect(count).not.toBe(record);
-		
-		// 取消
-		current.cancel();
-		record = count;
-		await sleep(30);
-		expect(count).toBe(record);
-
-		// 重新开始
-		current.restart();
-		await sleep(30);
-		expect(count).not.toBe(record);
-
-		current.cancel();
-	});
-
 	it('Monadic: map / flatMap / valueOf / toString', async () => {
 		expect.assertions(3);
 		let current = Task.of(Task.of(Task.of(Monad.of(Task.of('Hello Tasks!')))))

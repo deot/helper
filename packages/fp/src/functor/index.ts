@@ -10,3 +10,6 @@ export * from './task';
 
 // Pointed类型
 export * from './pointed';
+
+// 其他扩展
+export * from './job';
