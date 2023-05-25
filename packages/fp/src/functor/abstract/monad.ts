@@ -2,8 +2,6 @@
 export abstract class AMonad {
 	value: any;
 
-	uid: any;
-
 	constructor(value: any) {
 		this.value = value;
 	}

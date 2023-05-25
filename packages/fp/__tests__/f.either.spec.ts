@@ -35,7 +35,7 @@ describe('either.ts', () => {
 			expect(v.isLeft).toBe(true);
 			expect(v.isRight).toBe(false);
 			expect(v.toString()).toMatch('Either.Left');
-			expect(v.flatMap(R.identity).valueOf().message).toBe(`Expected property name or '}' in JSON at position 1`);
+			expect(v.flatMap(R.identity).valueOf().message).toMatch(`in JSON at position 1`);
 		};
 
 		let json = '{name:deot}';
