@@ -10,6 +10,7 @@ export abstract class ATask {
 	isPasue: boolean;
 
 	constructor() {
+		/* istanbul ignore next */
 		this._pasuer = () => {};
 		this.pasuer = Promise.resolve();
 		this.canceler = Promise.resolve();

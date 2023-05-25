@@ -48,6 +48,7 @@ export class Task extends AMonad {
 		this.isComplete = false;
 		this.isStart = parent?.isStart || false;
 
+		/* istanbul ignore next */
 		this._ready = () => {};
 
 		// 如果已经开始了, ready可以直接执行
@@ -57,6 +58,7 @@ export class Task extends AMonad {
 				this._ready = resolve;
 			});
 
+		/* istanbul ignore next */
 		this._pasuer = () => {};
 		this.pasuer = Promise.resolve();
 	}
@@ -182,7 +184,7 @@ export class Task extends AMonad {
 		let child = parent;
 
 		while (child && child.child) {
-			const [key, fn] = child.record || [];
+			const [key, fn] = child.record;
 			if (key) {
 				next = next[key](fn);	
 			}

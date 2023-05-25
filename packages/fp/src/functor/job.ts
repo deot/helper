@@ -12,15 +12,18 @@ export class Job extends ATask {
 
 	interval: number;
 
+	isStart: boolean;
+
 	constructor(task: Task, interval?: number) {
 		super();
 		this.task = task;
 		this.original = task;
 
 		this.interval = interval || 0;
+		this.isStart = false;
 
 		if (task.isStart) {
-			this.process();
+			this.start();
 		}
 	}
 
@@ -40,6 +43,9 @@ export class Job extends ATask {
 
 	// 立即执行，先父后子
 	start() {
+		if (this.isStart) return;
+		this.isStart = true;
+
 		if (!this.original.isStart) {
 			this.original.start();
 		}
@@ -69,6 +75,8 @@ export class Job extends ATask {
 		this.task.pasue();
 		this.task.cancel();
 		this.setCancelStatus(false);
+		
+		this.isStart = false;
 		this.process();
 	}
 }

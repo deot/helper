@@ -48,13 +48,17 @@ describe('task.ts', () => {
 	});
 
 	it('cancel / end', async () => {
-		Task.of('Hello Tasks!')
-			.map((x: any) => {
-				console.error('Need Skip');
+		const current = Task.of('Hello Tasks!')
+			.map(async (x: any) => {
+				await sleep(30);
 				return x;
 			})
-			.start()
-			.end();
+			.start();
+		await sleep(10);
+		current.cancel();
+		current.end();
+
+		expect(current.cancelHooks.length).toBe(1);
 	});
 
 	it('start / immediate', async () => {
@@ -116,6 +120,28 @@ describe('task.ts', () => {
 			.then((e: any) => {
 				expect(e).toBe(message);
 			});
+	});
+
+	it('restart', async () => {
+		expect.assertions(3);
+		
+		const current = Task.of('Hello Tasks!')
+			.map(R.toUpper)
+			.map(R.identity)
+			.cancel()
+			.restart();
+
+		await current.toPromise();
+
+		expect(current.valueOf()).toBe('HELLO TASKS!');
+
+		const noParent = Task.of('Hello Tasks!').restart();
+		expect(noParent.value).toBe('Hello Tasks!');
+
+		const noChild = Task.of('Hello Tasks!').map(R.toUpper).restart();
+		await noChild.toPromise();
+
+		expect(noChild.valueOf()).toBe('HELLO TASKS!');
 	});
 
 	it('Monadic: map / flatMap / valueOf / toString', async () => {
