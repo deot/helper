@@ -38,7 +38,7 @@ export class Job extends ATask {
 
 		let interrupter = (v: any) => Promise.resolve(v)
 			.then((x: any) => this.suspend(x, new Promise((_) => { setTimeout(_, this.interval); })))
-			.then((x) => this.suspend(x, this.canceler))
+			.then((x: any) => this.suspend(x, this.canceler))
 			.then((x: any) => this.suspend(x, this.pasuer));
 
 		// Task可以更加细粒度的中断

@@ -5,8 +5,8 @@
  */
 
 export class Emitter {
-	static of() {
-		return new Emitter();
+	static of(context?: any) {
+		return new Emitter(context);
 	}
 
 	events: object;
