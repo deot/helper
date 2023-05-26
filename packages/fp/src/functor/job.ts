@@ -39,7 +39,15 @@ export class Job extends ATask {
 		let interrupter = (v: any) => Promise.resolve(v)
 			.then((x: any) => this.suspend(x, new Promise((_) => { setTimeout(_, this.interval); })))
 			.then((x: any) => this.suspend(x, this.canceler))
-			.then((x: any) => this.suspend(x, this.pasuer));
+			.then((x: any) => this.suspend(x, this.pasuer))
+			.then((x: any) => {
+				this.emit('fulfilled', x);
+				return x;
+			})
+			.catch((x: any) => {
+				this.emit('rejected', x);
+				return x;
+			});
 
 		// Task可以更加细粒度的中断
 		return this.original instanceof Task

@@ -1,7 +1,8 @@
 import { ATask } from './abstract';
 import { Task } from './task';
 
-type Source = (() => Promise<any>);
+type Func = () => Promise<any>;
+type Source = Func | Func[];
 
 export class Parallel extends ATask {
 	static of(task: Source, concurrency?: number) {
@@ -18,22 +19,25 @@ export class Parallel extends ATask {
 
 	_target: any;
 
-	tasks: Array<any>;
+	tasks: Array<Promise<any>>;
 
 	// 同一时间并发数量
 	concurrency: number;
 
-	// 报错扔继续任务，默认true
-	infinite: boolean;
+	options: any;
 
-	constructor(task: Source, concurrency?: number) {
+	constructor(task: Source, concurrency?: number, options?: any) {
 		super();
 
+		this.options = {
+			skipError: true, // 报错扔继续任务，默认true
+			...options
+		};
+
 		this.task = task;
-		this.original = task;
+		this.original = task instanceof Array ? [...task] : task;
 
 		this.concurrency = concurrency || 0;
-		this.infinite = true;
 		this.isStart = false;
 
 		if (this.task instanceof Task && this.task.isStart) {
@@ -46,10 +50,33 @@ export class Parallel extends ATask {
 		this.tasks = [];
 	}
 
+	setConcurrency(value: number) {
+		if (typeof value !== 'undefined') {
+			this.concurrency = value;
+			if (this.target) {
+				this.process();
+			}
+		}
+		return this.concurrency;
+	}
+
 
 	process() {
-		while (this.tasks.length < this.concurrency) {
-			let leaf = this.task();
+		while (
+			this.tasks.length < this.concurrency
+			&& (
+				typeof this.task === 'function'
+				|| (this.task instanceof Array && this.task.length)
+			)
+		) {
+			let leaf: Promise<any>;
+
+			if (this.task instanceof Array) {
+				leaf = (this.task.pop() as Func)();
+			} else {
+				leaf = this.task();
+			}
+			
 			this.tasks.push(leaf);
 
 			Promise.resolve()
@@ -62,6 +89,16 @@ export class Parallel extends ATask {
 				})
 				.then(this.onFulfilled)
 				.catch(this.onRejected);
+		}
+
+		if (
+			this.task instanceof Array 
+			&& !this.task.length
+			&& this.tasks.length === 0
+		) {
+			this._target.resolve();
+			this.target = null;
+			this.tasks = [];
 		}
 	}
 
@@ -78,18 +115,23 @@ export class Parallel extends ATask {
 		this.emit('rejected', e);
 
 		// 允许继续执行, 这个时候要调用stop来停止程序
-		if (this.infinite) {
+		if (this.options.skipError) {
 			this.process();
 		} else {
-			this._target.reject(e || new Error('Unknown error'));
+			this._target.reject(new Error('Unknown error'));
 			this.target = null;
-			this._target = null;
 			this.tasks = [];
 		}
 	};
 
-	// 立即执行
-	start() {
+	/**
+	 * 立即执行
+	 * 返回一个Promise
+	 * 	then：执行结束（包含主动取消）
+	 * 	catch：异常时会中止程序（如果设置了skipError: faalse）
+	 * @returns {Promise} ~
+	 */
+	start(): Promise<any> {
 		if (this.target) return this.target;
 		this.target = new Promise((resolve: any, reject: any) => {
 			this._target = {
@@ -104,18 +146,19 @@ export class Parallel extends ATask {
 	/**
 	 * 取消
 	 * 取消那一刻开始不在有fulfilled/rejected事件
+	 * 不需要清理fulfilled/rejected的注册事件
+	 * 	如果用户是主动取消又重新开始, 可以*.off('fulfilled/rejected')处理
+	 *
+	 * 主动取消，不在执行start后then/catch
 	 */
 	async cancel() {
 		if (!this.target) return;
 		let tasks = this.tasks;
-		this._target.resolve();
 
 		this.setCancelStatus(true);
+
 		this.target = null;
 		this.tasks = [];
-
-		this.off('fulfilled');
-		this.off('rejected');
 
 		// 已经在栈中的任务
 		await Promise.allSettled(tasks);
@@ -138,5 +181,16 @@ export class Parallel extends ATask {
 	 */
 	resume() {
 		this.setPasueStatus(false);
+	}
+
+	async restart() {
+		await this.cancel();
+		this.setCancelStatus(false);
+
+		if (this.original instanceof Array) {
+			this.task = [...this.original];
+		}
+
+		return this.start();
 	}
 }
