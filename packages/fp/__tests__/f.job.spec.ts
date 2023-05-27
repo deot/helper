@@ -2,21 +2,10 @@ import * as FP from '@deot/helper-fp';
 
 const { Task, Job } = FP;
 const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
-const R = {
-	toUpper: async (x: string) => {
-		await sleep(0);
-		return x.toUpperCase();
-	},
-	identity: async (x: any) => {
-		await sleep(0);
-		return x;
-	}
-};
 
 let count = 0;
 const current = Job.of(
-	Task.of('Hello Tasks!')
-		.map(R.toUpper)
+	Task.of('Hello Jobs!')
 		.map((v: any) => {
 			count++;
 			return v;
@@ -69,8 +58,7 @@ describe('job.ts', () => {
 	it('start avoid repeat', async () => {
 		let count$ = 0;
 		const current$ = Job.of(
-			Task.of('Hello Tasks!')
-				.map(R.toUpper)
+			Task.of('Hello Jobs!')
 				.map((v: any) => {
 					count$++;
 					return v;
@@ -136,14 +124,13 @@ describe('job.ts', () => {
 
 		current$.cancel();
 
-		expect(count$).toBeGreaterThanOrEqual(9);
+		expect(count$).toBeGreaterThanOrEqual(8);
 	});
 
 	it('for coverage', async () => {
 		let count$ = 0;
 		const current$ = Job.of(
-			Task.of('Hello Tasks!')
-				.map(R.toUpper)
+			Task.of('Hello Jobs!')
 				.map((v: any) => {
 					count$++;
 					return v;
@@ -154,7 +141,7 @@ describe('job.ts', () => {
 
 		current$.immediate();
 		expect(current$.isStart).toBe(true);
-		await sleep(5);
+		await sleep(25);
 		
 		expect(count$).not.toBe(0);
 

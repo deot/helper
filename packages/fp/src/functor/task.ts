@@ -13,8 +13,10 @@ export class Task extends AMonad {
 
 	cancelHooks: Array<Function>;
 
+	// 已取消
 	isCancel: boolean;
 
+	// 已完成
 	isComplete: boolean;
 
 	isStart: boolean;
@@ -127,6 +129,7 @@ export class Task extends AMonad {
 
 	// 立即执行，先父后子
 	start() {
+		if (this.isStart) return this;
 		this.isStart = true;
 		this.parent?.start();
 		this._ready();
