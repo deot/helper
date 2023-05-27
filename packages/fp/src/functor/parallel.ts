@@ -5,8 +5,8 @@ type Func = () => Promise<any>;
 type Source = Task | Func | (Func | Task)[];
 
 export class Parallel extends ATask {
-	static of(task: Source, concurrency?: number) {
-		return new Parallel(task, concurrency);
+	static of(task: Source, concurrency?: number, options?: any) {
+		return new Parallel(task, concurrency, options);
 	}
 
 	original: Source;
@@ -37,12 +37,8 @@ export class Parallel extends ATask {
 		this.task = task;
 		this.original = task instanceof Array ? [...task] : task;
 
-		this.concurrency = concurrency || 0;
+		this.concurrency = concurrency || 1;
 		this.isStart = false;
-
-		if (this.task instanceof Task && this.task.isStart) {
-			this.start();
-		}
 
 		this.target = null;
 		this._target = null;
@@ -51,7 +47,7 @@ export class Parallel extends ATask {
 	}
 
 	setConcurrency(value: number) {
-		if (typeof value !== 'undefined') {
+		if (typeof value === 'number' && value > 0) {
 			this.concurrency = value;
 			if (this.target) {
 				this.process();
@@ -111,6 +107,7 @@ export class Parallel extends ATask {
 	}
 
 	onFulfilled = (e: any) => {
+		/* istanbul ignore next */
 		if (!this.target) return;
 
 		this.emit('fulfilled', e);
@@ -118,6 +115,7 @@ export class Parallel extends ATask {
 	};
 
 	onRejected = (e: any) => {
+		/* istanbul ignore next */
 		if (!this.target) return;
 
 		this.emit('rejected', e);
@@ -126,7 +124,7 @@ export class Parallel extends ATask {
 		if (this.options.skipError) {
 			this.process();
 		} else {
-			this._target.reject(new Error('Unknown error'));
+			this._target.reject(e);
 			this.target = null;
 			this.tasks = [];
 		}

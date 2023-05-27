@@ -22,8 +22,8 @@ export abstract class ATask extends Emitter {
 		this.isPasue = false;
 	}
 
-	async suspend(x: any, target?: Promise<any>) {
-		if (target) {
+	async suspend(x: any, target?: any) {
+		if (target && target.then) {
 			await target;
 		}
 		return x;

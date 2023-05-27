@@ -39,25 +39,21 @@ export class Job extends ATask {
 		let interrupter = (v: any) => Promise.resolve(v)
 			.then((x: any) => this.suspend(x, new Promise((_) => { setTimeout(_, this.interval); })))
 			.then((x: any) => this.suspend(x, this.canceler))
-			.then((x: any) => this.suspend(x, this.pasuer))
-			.then((x: any) => {
-				this.emit('fulfilled', x);
-				return x;
-			})
-			.catch((x: any) => {
-				this.emit('rejected', x);
-				return x;
-			});
-
+			.then((x: any) => this.suspend(x, this.pasuer));
+			
 		// Task可以更加细粒度的中断
 		return this.original instanceof Task
 			? Promise.resolve()
 				.then(() => (leaf.isCancel ? Promise.resolve() : leaf.value))
+				.then((x: any) => this.suspend(x, this.emit('fulfilled', x)))
+				.catch((x: any) => this.suspend(x, this.emit('rejected', x)))
 				.then((x: any) => interrupter(x))
 				.then(() => leaf.restart())
 				.then(v => this.process(v))
 			: Promise.resolve()
 				.then(() => (this.original as Function)())
+				.then((x: any) => this.suspend(x, this.emit('fulfilled', x)))
+				.catch((x: any) => this.suspend(x, this.emit('rejected', x)))
 				.then((x: any) => interrupter(x))
 				.then(v => this.process(v));
 	}

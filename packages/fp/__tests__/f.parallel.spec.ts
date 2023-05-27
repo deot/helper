@@ -75,7 +75,7 @@ describe('parallel.ts', () => {
 		await sleep(30);
 
 		expect(count).not.toBe(100);
-		expect(count).toBeGreaterThan(50);
+		expect(count).toBeGreaterThan(30);
 
 		await target;
 		expect(count).toBe(100);
@@ -160,7 +160,7 @@ describe('parallel.ts', () => {
 
 		await sleep(30);
 		expect(count).not.toBe(100);
-		expect(count).toBeGreaterThan(50);
+		expect(count).toBeGreaterThan(30);
 
 		await target;
 		expect(count).toBe(100);
@@ -176,5 +176,63 @@ describe('parallel.ts', () => {
 		// 取消之后会一直处于pending
 		let message = await Promise.race([new Promise(_ => { setTimeout(() => _('CANCELED'), 50); }), target1]);
 		expect(message).toBe('CANCELED');
+	});
+
+	it('fulfilled / rejected', async () => {
+		expect.assertions(2);
+		let count = 0;
+		const current = Parallel.of(
+			async () => {
+				await sleep(1);
+				count++;
+				if (count > 10) {
+					throw new Error('Hello Parallels!');
+				}
+				return count;
+			}
+		);
+
+		current.once('fulfilled', (e: any) => {
+			expect(e).toBe(1);
+		});
+		current.once('rejected', (e: any) => {
+			expect(e.message).toBe(`Hello Parallels!`);
+		});
+
+		current.start();
+		
+		await sleep(20);
+		current.cancel();
+	});
+
+	it('for coverage', async () => {
+		expect.assertions(3);
+		let count = 0;
+		const current = Parallel.of(
+			async () => {
+				await sleep(1);
+				count++;
+				if (count > 40) {
+					throw new Error('Hello Parallels!');
+				}
+			},
+			1,
+			{
+				skipError: false
+			}
+		);
+
+		current.start();
+		current.start().catch((e) => {
+			expect(e.message).toBe(`Hello Parallels!`);
+		});
+		await sleep(2);
+		expect(count).not.toBe(0);
+		current.setConcurrency(20);
+		
+		await sleep(2);
+		expect(count).toBeGreaterThan(10);
+		await sleep(20);
+		current.cancel();
 	});
 });

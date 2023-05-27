@@ -127,6 +127,61 @@ describe('job.ts', () => {
 		expect(count$).toBeGreaterThanOrEqual(8);
 	});
 
+	it('fulfilled / rejected', async () => {
+		expect.assertions(2);
+		let count$ = 0;
+		const current$ = Job.of(
+			Task.of('Hello Jobs!')
+				.map((v: any) => {
+					count$++;
+					if (count$ >= 2) {
+						throw new Error(v);
+					}
+					return count$;
+				}), 
+			10
+		);
+
+		current$.once('fulfilled', (e: any) => {
+			expect(e).toBe(1);
+		});
+
+		current$.once('rejected', (e: any) => {
+			expect(e.message).toBe(`Hello Jobs!`);
+		});
+
+		current$.start();
+		await sleep(25);
+		current$.end();
+	});
+
+	it('func - fulfilled / rejected', async () => {
+		expect.assertions(2);
+		let count$ = 0;
+		const current$ = Job.of(
+			async () => {
+				count$++;
+				if (count$ >= 2) {
+					throw new Error('Hello Jobs!');
+				}
+				return count$;
+			},
+			10
+		);
+
+		current$.once('fulfilled', (e: any) => {
+			expect(e).toBe(1);
+		});
+
+		current$.once('rejected', (e: any) => {
+			expect(e.message).toBe(`Hello Jobs!`);
+		});
+
+		current$.start();
+		await sleep(25);
+		current$.end();
+	});
+
 	it('for coverage', async () => {
 		let count$ = 0;
 		const current$ = Job.of(

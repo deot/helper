@@ -64,6 +64,7 @@ describe('task.ts', () => {
 	it('start / immediate', async () => {
 		expect.assertions(1);
 		let current = Task.of('Hello Tasks!')
+			.start()
 			.immediate()
 			.map(R.identity)
 			.map(R.toUpper)

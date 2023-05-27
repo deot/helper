@@ -100,7 +100,6 @@ export class Task extends AMonad {
 								}
 							}
 						})();
-
 					});
 				}),
 			this
