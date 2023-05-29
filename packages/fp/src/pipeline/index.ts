@@ -4,3 +4,6 @@ export * from './then';
 export * from './catch';
 export * from './memoize';
 export * from './partial';
+export * from './map';
+export * from './filter';
+export * from './reduce';
