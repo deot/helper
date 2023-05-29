@@ -3,3 +3,4 @@ export * from './compose';
 export * from './then';
 export * from './catch';
 export * from './memoize';
+export * from './partial';
