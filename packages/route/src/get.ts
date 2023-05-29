@@ -22,7 +22,7 @@ export const get = (
 	const original = loopDecodeURIComponent(url$);
 	const match = original
 		.substring(original.indexOf('?') + 1)
-		.match(new RegExp("(^|&)" + key + "=([^&]*)(&|$)"));
+		.match(new RegExp("(^|&)" + key + "=([^&]*)"));
 
 	const value = match != null ? match[2] : null;
 

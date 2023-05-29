@@ -1,3 +1,7 @@
+/**
+ * https://www.30secondsofcode.org/js/s/get-url-parameters/
+ * https://www.30secondsofcode.org/js/s/query-string-to-object/
+ */
 import { IS_SERVER } from '@deot/helper-shared';
 import { loopParse, loopDecodeURIComponent } from './_helper';
 
@@ -14,25 +18,27 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 
 	/* istanbul ignore next */
 	const url$ = options$.url || (IS_SERVER ? '' : `${window.location.pathname}${window.location.search}`);
+	const original = loopDecodeURIComponent(url$);
 
-	let path: string[] = [];
+	const [prefix, search] = original.split('?');
 	const query: { [key: string]: any } = {};
-	const urlArr = url$.split('?');
-	path = urlArr[0].split('/');
 
-	if (urlArr.length > 1) {
-		urlArr[1].split('&').forEach(str => {
-			const arr = str.split('=');
-			const key = arr[0];
-			const value = loopDecodeURIComponent(arr[1]);
-			query[key] = typeof options$.parse === 'function' 
-				? options$.parse(value) 
-				: value;
-		});
+	if (search) {
+		Array
+			.from((search.match(/([^?=&]+)(=([^&]*))/g) || []))
+			.forEach((v: string) => {
+				const [key, value] = v.split('=');
+				query[key] = typeof options$.parse === 'function' 
+					? options$.parse(value) 
+					: value;
+			});
 	}
 
+	const sIndex = prefix.indexOf('/');
+
 	return {
-		path,
+		origin: (sIndex !== -1 ? prefix.slice(0, sIndex) : prefix) || '',
+		path: prefix.slice(sIndex),
 		query
 	};
 };

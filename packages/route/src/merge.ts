@@ -2,6 +2,7 @@ import { loopDecodeURIComponent } from './_helper';
 
 
 interface Route {
+	origin?: string;
 	path?: string | string[];
 	query?: {
 		[key: string]: any;
@@ -10,11 +11,15 @@ interface Route {
 
 export const merge = (route: Route) => {
 	const {
+		origin = '',
 		path = '',
 		query
 	} = route;
-	let result = path instanceof Array 
-		? `/${path.join('/')}`
+	let result = origin;
+	result += path instanceof Array 
+		? path.length 
+			? `/${path.join('/')}` 
+			: ''
 		: path;
 
 	let queryArr: string[] = [];
