@@ -19,15 +19,15 @@ export const get = (
 	/* istanbul ignore next */
 	const url$ = options$.url || (IS_SERVER ? '' : window.location.search);
 
-	const original = loopDecodeURIComponent(url$);
-	const match = original
-		.substring(original.indexOf('?') + 1)
+	const match = url$
+		.substring(url$.indexOf('?') + 1)
 		.match(new RegExp("(^|&)" + key + "=([^&]*)"));
 
-	const value = match != null ? match[2] : null;
+	let value = match != null ? match[2] : null;
 
 	if (value === null) return null;
-	
+	value = loopDecodeURIComponent(value);
+
 	return typeof options$.parse === 'function' 
 		? options$.parse(value) 
 		: value;

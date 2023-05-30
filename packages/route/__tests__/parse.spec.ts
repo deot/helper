@@ -36,5 +36,10 @@ describe('parse.ts', () => {
 		const it = Route.parse('');
 		expect(it.origin).toBe('');
 	});
+
+	it('multiple', () => {
+		expect(Route.parse('?id=&_id=1').query._id).toBe(1);
+		expect(Route.parse('?id=a&_id=1').query._id).toBe(1);
+	});
 });
 

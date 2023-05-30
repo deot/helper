@@ -18,16 +18,16 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 
 	/* istanbul ignore next */
 	const url$ = options$.url || (IS_SERVER ? '' : `${window.location.pathname}${window.location.search}`);
-	const original = loopDecodeURIComponent(url$);
 
-	const [prefix, search] = original.split('?');
+	const [prefix, search] = url$.split('?');
 	const query: { [key: string]: any } = {};
 
 	if (search) {
 		Array
-			.from((search.match(/([^?=&]+)(=([^&]*))/g) || []))
+			.from((search.match(/[^?=&]+=[^&]*/g) || []))
 			.forEach((v: string) => {
-				const [key, value] = v.split('=');
+				let [key, value] = v.split('=');
+				value = loopDecodeURIComponent(value);
 				query[key] = typeof options$.parse === 'function' 
 					? options$.parse(value) 
 					: value;

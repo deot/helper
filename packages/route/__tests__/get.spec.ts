@@ -14,7 +14,6 @@ describe('get.ts', () => {
 		expect(Route.get('id', '?id=9007199254740991')).toBe(Number.MAX_SAFE_INTEGER);
 		expect(Route.get('id', '?id=9007199254740992')).toBe('9007199254740992');
 
-		expect(Route.get('id', '%3Fid%3D1')).toBe(1);
 		expect(Route.get('id', '?id=%25')).toBe('%');
 		expect(Route.get('id', '?id=%2525')).toBe('%');
 		expect(Route.get('id', '?id={"v":1}')).toEqual({ v: 1 });
@@ -30,6 +29,11 @@ describe('get.ts', () => {
 	it('multiple', () => {
 		expect(Route.get('_id', '?id=&_id=1')).toBe(1);
 		expect(Route.get('_id', '?id=a&_id=1')).toBe(1);
+	});
+
+	it('?&=', () => {
+		expect(Route.get('id', `?id=${encodeURIComponent(JSON.stringify({ '?&id=1': '?&id=1' }))}&_id=1`))
+			.toEqual({ "?&id=1": "?&id=1" });
 	});
 });
 

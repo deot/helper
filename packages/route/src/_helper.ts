@@ -1,3 +1,26 @@
+export const loopDecodeURIComponent = (value: string) => {
+	let need = true;
+	let safeCount = 1;
+	let parseValue = value;
+	while (need) {
+		/* istanbul ignore next */
+		if (safeCount > 1000) {
+			console.log(value);
+			throw new Error(value);
+		}
+		try {
+			let next = decodeURIComponent(parseValue);
+			if (parseValue === next) {
+				need = false;
+			}
+			parseValue = next;
+		} catch {
+			need = false;
+		}
+		safeCount++;
+	}
+	return parseValue;
+};
 
 /**
  * 格式转换
@@ -29,30 +52,6 @@ export const loopParse = (value: string): any => {
 		}
 		try {
 			let next = JSON.parse(parseValue);
-			if (parseValue === next) {
-				need = false;
-			}
-			parseValue = next;
-		} catch {
-			need = false;
-		}
-		safeCount++;
-	}
-	return parseValue;
-};
-
-export const loopDecodeURIComponent = (value: string) => {
-	let need = true;
-	let safeCount = 1;
-	let parseValue = value;
-	while (need) {
-		/* istanbul ignore next */
-		if (safeCount > 1000) {
-			console.log(value);
-			throw new Error(value);
-		}
-		try {
-			let next = decodeURIComponent(parseValue);
 			if (parseValue === next) {
 				need = false;
 			}
