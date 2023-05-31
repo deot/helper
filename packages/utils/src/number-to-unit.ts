@@ -37,7 +37,7 @@ const addWan = (integer: number, num: number, mutiple: number, decimalDigit: num
 	}
 };
 
-export const number2unit = (number: number, decimalDigit?: number) => {
+export const numberToUnit = (number: number, decimalDigit?: number) => {
 	if (number > Number.MAX_SAFE_INTEGER) {
 		number = Number.MAX_SAFE_INTEGER;
 	}
