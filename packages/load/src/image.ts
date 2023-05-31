@@ -19,8 +19,8 @@ export const image = (src: string) => {
 			resolve(value);
 		};
 
-		el.onerror = () => {
-			reject();
+		el.onerror = (e) => {
+			reject(e);
 		};
 	});
 
