@@ -1,10 +1,10 @@
 import { IS_SERVER } from '@deot/helper-shared';
-import { flattenJSONParse } from '@deot/helper-utils';
-import { Cache } from './cache';
+import { ACache } from './cache';
 import { MemoryStorage } from './memory-storage';
 
 const PREFIX_NAME = '@deot/helper/';
-const formatKey = (key: string, version: string) => {
+// Storage和Cookie不同，可以自定义key
+const formatKey = (key: string, version: string | number) => {
 	return `${version ? `${PREFIX_NAME}${version}:` : ''}${key}`;
 };
 
@@ -24,7 +24,7 @@ interface Options {
 	session?: boolean;
 }
 
-export class Storage extends Cache {
+class StorageStore extends ACache {
 
 	sessionStorage: MemoryStorage;
 
@@ -42,11 +42,12 @@ export class Storage extends Cache {
 			: 'localStorage';
 	}
 
-	setVersion(version: string) {
-		super.setVersion(version);
+	configure(options: ACache['options']) {
+		super.configure(options);
 		if (IS_SERVER) return;
 
 		if (!STORAGE_PERMISSION_ALLOW) return;
+		const { version } = this.options;
 		// 清除之前的缓存
 		Object.keys(window.localStorage).forEach((item) => {
 			if (
@@ -69,8 +70,8 @@ export class Storage extends Cache {
 		if (IS_SERVER) return;
 		let invoke = this.getInvoke(options);
 
-		key = formatKey(key, this.version);
-		value = typeof value === 'string' ? value : JSON.stringify(value);
+		key = formatKey(key, this.options.version);
+		value = this.options.set(typeof value === 'string' ? value : JSON.stringify(value));
 
 		try {
 			window[invoke].setItem(key, value);
@@ -90,10 +91,10 @@ export class Storage extends Cache {
 		if (IS_SERVER) return null;
 
 		let invoke = this.getInvoke(options);
-		key = formatKey(key, this.version);
+		key = formatKey(key, this.options.version);
 		
 		let value = this[invoke].getItem(key) || window[invoke].getItem(key);
-		return flattenJSONParse(value);
+		return this.options.get(value);
 	}
 
 	/**
@@ -108,6 +109,8 @@ export class Storage extends Cache {
 		let invoke = this.getInvoke(options);
 		
 		this[invoke].removeItem(key); 
-		window[invoke].removeItem(formatKey(key, this.version));
+		window[invoke].removeItem(formatKey(key, this.options.version));
 	}
 }
+
+export const Storage = new StorageStore();

@@ -84,7 +84,14 @@ importers:
         specifier: '*'
         version: link:../shared
 
-  packages/route: {}
+  packages/route:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+      '@deot/helper-utils':
+        specifier: '*'
+        version: link:../utils
 
   packages/shared: {}
 

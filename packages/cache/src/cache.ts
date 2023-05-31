@@ -1,15 +1,34 @@
 import { IS_SERVER } from '@deot/helper-shared';
+import { flattenJSONParse } from '@deot/helper-utils';
 
-export abstract class Cache {
-	version: string;
+interface Options {
+	[key: string]: any;
+	version?: string | number;
+
+	// 取值时，对值的转换
+	get: (v: any) => any;
+
+	// 设置值对值的转换
+	set: (v: string) => string;
+}
+
+export abstract class ACache {
+	options: Options;
 
 	constructor() {
-		this.version = '';
+		this.options = {
+			version: '',
+			get: (v: any) => flattenJSONParse(v),
+			set: (v: string) => v
+		};
 	}
 
-	setVersion(version: string) {
+	configure(options: Options) {
 		if (IS_SERVER) return;
-		this.version = version;
+		this.options = {
+			...this.options,
+			...options
+		};
 	}
 
 	abstract get(...args: any[]): any;

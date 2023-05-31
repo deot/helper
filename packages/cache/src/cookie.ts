@@ -1,6 +1,5 @@
 import { IS_SERVER } from '@deot/helper-shared';
-import { flattenJSONParse } from '@deot/helper-utils';
-import { Cache } from './cache';
+import { ACache } from './cache';
 
 interface Options {
 	// 时间：默认12小时、，单位：天
@@ -11,7 +10,7 @@ interface Options {
 	domain?: string;
 }
 
-export class Cookie extends Cache {
+class CookieStore extends ACache {
 	/**
 	 * 设置cookie
 	 * @param {string} key 保存的键值
@@ -24,7 +23,7 @@ export class Cookie extends Cache {
 		let m = window.document.cookie.match(r);
 		let value = !m ? null : decodeURIComponent(m[1]);
 
-		return flattenJSONParse(value);
+		return this.options.get(value);
 	}
 
 	/**
@@ -38,12 +37,12 @@ export class Cookie extends Cache {
 		if (IS_SERVER) return;
 
 		let { days, path, domain } = options || {}; 
-		let expire = new Date();
-		expire.setTime(expire.getTime() + (days ? 3600000 * 24 * days : 0.5 * 24 * 60 * 60 * 1000)); // 默认12小时
+		let expires = new Date();
+		expires.setTime(expires.getTime() + (days ? 3600000 * 24 * days : 0.5 * 24 * 60 * 60 * 1000)); // 默认12小时
 
-		value = typeof value === 'string' ? value : JSON.stringify(value);
+		value = this.options.set(typeof value === 'string' ? value : JSON.stringify(value));
 		// eslint-disable-next-line max-len
-		document.cookie = `${key}=${encodeURIComponent(value)};expires=${expire.toString()};path=${path || '/'};${domain ? `domain=${domain};` : ''}`;
+		document.cookie = `${key}=${encodeURIComponent(value)};expires=${expires.toString()};path=${path || '/'};${domain ? `domain=${domain};` : ''}`;
 	}
 
 	/**
@@ -60,3 +59,5 @@ export class Cookie extends Cache {
 		document.cookie = `${key}=;expires=${expires.toUTCString()};path=${(path || '/')};${domain ? `domain=${domain};` : ''}`;
 	}
 }
+
+export const Cookie = new CookieStore();
