@@ -7,36 +7,32 @@ export type ResizableElement = HTMLElement & {
 	__ro__?: ResizeObserver;
 };
 
-class ResizeManager {
-	events: any;
+export class Resize {
+	el: HTMLElement;
 
-	constructor() {
-		/**
-		 * TODO
-		 * 只传递element也可以销毁
-		 */
-		this.events = [];
+	static of(el: ResizableElement) {
+		return new Resize(el);
 	}
 
-	on(element: ResizableElement, fn: AnyFunction) {
-		if (IS_SERVER || !element) return;
-		if (!element.__resizeListeners__) {
-			element.__resizeListeners__ = [];
-			element.__ro__ = new ResizeObserver(this.handleResize);
-			element.__ro__.observe(element);
+	static on(el: ResizableElement, fn: AnyFunction) {
+		if (IS_SERVER || !el) return;
+		if (!el.__resizeListeners__) {
+			el.__resizeListeners__ = [];
+			el.__ro__ = new ResizeObserver(Resize.handleResize);
+			el.__ro__.observe(el);
 		}
-		element.__resizeListeners__.push(fn);
+		el.__resizeListeners__.push(fn);
 	}
 
-	off(element: ResizableElement, fn: AnyFunction) {
-		if (IS_SERVER || !element || !element.__resizeListeners__) return;
-		element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
-		if (!element.__resizeListeners__.length) {
-			element.__ro__?.disconnect();
+	static off(el: ResizableElement, fn: AnyFunction) {
+		if (IS_SERVER || !el || !el.__resizeListeners__) return;
+		el.__resizeListeners__.splice(el.__resizeListeners__.indexOf(fn), 1);
+		if (!el.__resizeListeners__.length) {
+			el.__ro__?.disconnect();
 		}
 	}
 
-	handleResize(entries: ResizeObserverEntry[]) {
+	static handleResize(entries: ResizeObserverEntry[]) {
 		for (let entry of entries) {
 			const listeners = (entry.target as ResizableElement).__resizeListeners__ || [];
 			if (listeners.length) {
@@ -44,6 +40,18 @@ class ResizeManager {
 			}
 		}
 	}
-}
 
-export const Resize = new ResizeManager();
+	constructor(el: HTMLElement) {
+		this.el = el;
+	}
+
+	on(fn: AnyFunction) {
+		Resize.on(this.el, fn);
+		return this;
+	}
+
+	off(fn: AnyFunction) {
+		Resize.off(this.el, fn);
+		return this;
+	}
+}
