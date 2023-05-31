@@ -9,6 +9,9 @@
 
 ## Monorepo
 
+[npm-cache-image]: https://img.shields.io/npm/v/@deot/helper-cache
+[npm-cache-url]: https://www.npmjs.com/package/@deot/helper-cache
+
 [npm-device-image]: https://img.shields.io/npm/v/@deot/helper-device
 [npm-device-url]: https://www.npmjs.com/package/@deot/helper-device
 
@@ -47,6 +50,7 @@
 
 | 包名                          | 版本                                           | 说明                                       |
 | --------------------------- | -------------------------------------------- | ---------------------------------------- |
+| [cache](packages/cache)     | [![npm][npm-cache-image]][npm-cache-url]     | 缓存管理（Storage / Cookit / IndexDB）         |
 | [device](packages/device)   | [![npm][npm-device-image]][npm-device-url]   | 设备ua                                     |
 | [dom](packages/dom)         | [![npm][npm-dom-image]][npm-dom-url]         | dom元素操作的一些方法                             |
 | [emitter](packages/emitter) | [![npm][npm-emitter-image]][npm-emitter-url] | 简单的发布订阅                                  |
