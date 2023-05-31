@@ -1,5 +1,5 @@
 import { IS_SERVER } from '@deot/helper-shared';
-import { loopParse, loopDecodeURIComponent } from './_helper';
+import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
 
 interface GetOptions {
 	url?: string;
@@ -12,7 +12,7 @@ export const get = (
 	options?: GetOptions
 ) => {
 	const options$ = {
-		parse: loopParse,
+		parse: flattenJSONParse,
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
@@ -26,7 +26,7 @@ export const get = (
 	let value = match != null ? match[2] : null;
 
 	if (value === null) return null;
-	value = loopDecodeURIComponent(value);
+	value = flattenDecodeURIComponent(value);
 
 	return typeof options$.parse === 'function' 
 		? options$.parse(value) 

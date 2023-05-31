@@ -1,27 +1,3 @@
-export const loopDecodeURIComponent = (value: string) => {
-	let need = true;
-	let safeCount = 1;
-	let parseValue = value;
-	while (need) {
-		/* istanbul ignore next */
-		if (safeCount > 1000) {
-			console.log(value);
-			throw new Error(value);
-		}
-		try {
-			let next = decodeURIComponent(parseValue);
-			if (parseValue === next) {
-				need = false;
-			}
-			parseValue = next;
-		} catch {
-			need = false;
-		}
-		safeCount++;
-	}
-	return parseValue;
-};
-
 /**
  * 格式转换
  * '1' -> 1
@@ -31,7 +7,9 @@ export const loopDecodeURIComponent = (value: string) => {
  * @param {[string]} value 输入
  * @returns {any} ~
  */
-export const loopParse = (value: string): any => {
+export const flattenJSONParse = (value: string | null): any => {
+	if (value === null) return null;
+	
 	let regex = /^\d+$/;
 	// 数字字符串长度超过17，JSON.parse()会将后面的数组变成0
 	if (

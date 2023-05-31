@@ -16,3 +16,5 @@ export * from './raf';
 export * from './random';
 export * from './sleep';
 export * from './throttle';
+export * from './flatten-decode-uri-component';
+export * from './flatten-json-parse';

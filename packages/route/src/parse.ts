@@ -3,7 +3,7 @@
  * https://www.30secondsofcode.org/js/s/query-string-to-object/
  */
 import { IS_SERVER } from '@deot/helper-shared';
-import { loopParse, loopDecodeURIComponent } from './_helper';
+import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
 
 interface ParseOptions {
 	url?: string;
@@ -11,7 +11,7 @@ interface ParseOptions {
 }
 export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 	const options$ = {
-		parse: loopParse,
+		parse: flattenJSONParse,
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
@@ -27,7 +27,7 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 			.from((search.match(/[^?=&]+=[^&]*/g) || []))
 			.forEach((v: string) => {
 				let [key, value] = v.split('=');
-				value = loopDecodeURIComponent(value);
+				value = flattenDecodeURIComponent(value);
 				query[key] = typeof options$.parse === 'function' 
 					? options$.parse(value) 
 					: value;
