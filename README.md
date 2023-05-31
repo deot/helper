@@ -5,7 +5,7 @@
 
 # deot/helper
 
-用于JS开发的工具集成
+用于JS开发的工具集成, 且遵守`tree-shaking`
 
 ## Monorepo
 
@@ -17,7 +17,7 @@
 
 ## Contributing
 
-这是一个[monorepo](https://en.wikipedia.org/wiki/Monorepo)仓库 ，使用[lerna](https://lerna.js.org/) 管理
+这是一个[monorepo](https://en.wikipedia.org/wiki/Monorepo)仓库 ，使用[pnpm](https://pnpm.io/) 管理
 
 - 安装环境
 

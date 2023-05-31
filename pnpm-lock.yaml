@@ -13,6 +13,12 @@ importers:
 
   packages/device: {}
 
+  packages/dom:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+
   packages/emitter: {}
 
   packages/fp:
@@ -30,6 +36,27 @@ importers:
 
   packages/index:
     dependencies:
+      '@deot/helper-device':
+        specifier: '*'
+        version: link:../device
+      '@deot/helper-dom':
+        specifier: '*'
+        version: link:../dom
+      '@deot/helper-emitter':
+        specifier: '*'
+        version: link:../emitter
+      '@deot/helper-fp':
+        specifier: '*'
+        version: link:../fp
+      '@deot/helper-load':
+        specifier: '*'
+        version: link:../load
+      '@deot/helper-resize':
+        specifier: '*'
+        version: link:../resize
+      '@deot/helper-route':
+        specifier: '*'
+        version: link:../route
       '@deot/helper-shared':
         specifier: '*'
         version: link:../shared
@@ -39,6 +66,9 @@ importers:
       '@deot/helper-utils':
         specifier: '*'
         version: link:../utils
+      '@deot/helper-wheel':
+        specifier: '*'
+        version: link:../wheel
 
   packages/load:
     dependencies:
