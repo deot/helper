@@ -55,4 +55,31 @@ describe('compose.ts', () => {
 		let g = compose(f);
 		expect(g(1, 2, 3)).toEqual([1, 2, 3]);
 	});
+
+	it('middlewares', () => {
+		let a = (next: any) => (options: any) => {
+			expect(options).toEqual({ b: 1, c: 1 });
+			return next({
+				...options,
+				a: 1
+			});
+		};
+		let b = (next: any) => (options: any) => {
+			expect(options).toEqual({ c: 1 });
+
+			return next({
+				...options,
+				b: 1
+			});
+		};
+
+		let page = (options: any) => {
+			return options;
+		};
+
+		let g = compose(b, a)(page);
+
+		expect(g({ c: 1 })).toEqual({ a: 1, b: 1, c: 1 });
+		expect(b(a(page))({ c: 1 })).toEqual({ a: 1, b: 1, c: 1 });
+	});
 });
