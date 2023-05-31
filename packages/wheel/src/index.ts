@@ -65,7 +65,7 @@ const getAngle = (start: number[], end: number[]) => {
 	return Math.abs((360 * Math.atan(dy / dx)) / (2 * Math.PI));
 };
 
-export default class WheelHandler {
+export class Wheel {
 	private scrollBehavior: boolean;
 
 	private needThresholdWait: boolean;
