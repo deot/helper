@@ -1,6 +1,7 @@
 import * as FP from '@deot/helper-fp';
 import * as R from 'ramda';
 
+const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
 const { compose, pipe } = FP; 
 describe('compose/pipe.ts', () => {
 	it('base', () => {
@@ -62,6 +63,10 @@ describe('compose/pipe.ts', () => {
 		let f = (a: any, b: any, c: any) => [a, b, c];
 		let g = compose(f);
 		expect(g(1, 2, 3)).toEqual([1, 2, 3]);
+
+		let f1 = (a: any) => (b: any, c: any) => [a, b, c];
+		let g2 = compose(f1);
+		expect(g2(1)(2, 3)).toEqual([1, 2, 3]);
 	});
 
 	it('middlewares', () => {
@@ -111,5 +116,115 @@ describe('compose/pipe.ts', () => {
 		 * 所以中间件这样的设计相当于传递
 		 */
 		expect(result).toEqual({ a: 1, b: 1, c: 1 });
+	});
+
+	it('mirco redux', async () => {
+		let createStore = (reducer: any, initialState = {}) => {
+			let currentState = initialState;
+			return {
+				dispatch: (action: any) => {
+					currentState = reducer(currentState, action);
+				},
+				getState: () => currentState
+			};
+		};
+
+		let applyMiddleware = (...middlewares: any[]) => {
+			return (next: any) => (reducer: any, initialState = {}) => {
+				let store = next(reducer, initialState);
+				let chain = middlewares.map((fn) => fn(store));
+
+				let _next = store.dispatch;
+				let _dispatch = compose(...chain)(_next);
+
+				return {
+					...store,
+					dispatch: _dispatch
+				};
+			};
+		};
+
+		// 由外部处理异步然后再触发dispatch
+		const thunk = (store: any) => (next: any) => (action: any) => {
+			if (typeof action === 'function') {
+				return action(store.dispatch, store.getState);
+			}
+
+			return next(action);
+		};
+
+		// 由中间件处理异步然后再触发dispatch变种action
+		const api = () => (next: any) => (action: any) => {
+			if (action.type === 'API') {
+				setTimeout(() => next({ type: 'REQUEST' }), 10);
+			} else {
+				next(action);
+			}
+		};
+
+		// devtools
+		const debug = (enable?: boolean) => {
+			if (!enable) {
+				return function (next: any) {
+					return function (...args: any[]) {
+						return next(...args);
+					};
+				};
+			} else {
+				return function (next: any) {
+					return function (reducer: any, initialState: any) {
+						let store = next(reducer, initialState);
+						let _dispatch = (action: any) => {
+							// 变化前`store.getState()`;
+							store.dispatch(action);
+							// 变化后`store.getState();`
+							return action;
+						};
+						return {
+							...store,
+							dispatch: _dispatch
+						};
+
+					};
+				};
+			}
+		};
+
+		let finalCreateStore = compose(
+			applyMiddleware(thunk, api),
+			debug(true),
+			debug(false),
+		)(createStore);
+
+		let reducer = (state: any, action: any) => {
+			if (action.type === 'REQUEST') {
+				state = {
+					...state,
+					request: ++state.request 
+				};
+			}
+
+			if (action.type === 'THUNK') {
+				state = {
+					...state,
+					thunk: ++state.thunk 
+				};
+			}
+
+			return state;
+		};
+		let store = finalCreateStore(reducer, { request: 0, thunk: 0 });
+
+		// 异步方式1
+		store.dispatch({ type: 'API' });
+
+		// 异步方式2
+		store.dispatch((dispatch: any) => {
+			setTimeout(() => dispatch({ type: 'THUNK' }), 10);
+		});
+
+		await sleep(30);
+
+		expect(store.getState()).toEqual({ request: 1, thunk: 1 });
 	});
 });
