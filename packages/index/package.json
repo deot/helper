@@ -12,8 +12,16 @@
     "access": "public"
   },
   "dependencies": {
+    "@deot/helper-device": "*",
+    "@deot/helper-dom": "*",
+    "@deot/helper-emitter": "*",
+    "@deot/helper-fp": "*",
+    "@deot/helper-load": "*",
+    "@deot/helper-resize": "*",
+    "@deot/helper-route": "*",
     "@deot/helper-shared": "*",
     "@deot/helper-unicode": "*",
-  	"@deot/helper-utils": "*"
+    "@deot/helper-utils": "*",
+    "@deot/helper-wheel": "*"
   }
 }

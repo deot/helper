@@ -18,5 +18,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@deot/helper-shared": "*",
+    "@deot/helper-utils": "*"
+  }
 }

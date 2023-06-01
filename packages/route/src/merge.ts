@@ -1,7 +1,8 @@
-import { loopDecodeURIComponent } from './_helper';
+import { flattenDecodeURIComponent } from '@deot/helper-utils';
 
 
 interface Route {
+	origin?: string;
 	path?: string | string[];
 	query?: {
 		[key: string]: any;
@@ -10,11 +11,15 @@ interface Route {
 
 export const merge = (route: Route) => {
 	const {
+		origin = '',
 		path = '',
 		query
 	} = route;
-	let result = path instanceof Array 
-		? `/${path.join('/')}`
+	let result = origin;
+	result += path instanceof Array 
+		? path.length 
+			? `/${path.join('/')}` 
+			: ''
 		: path;
 
 	let queryArr: string[] = [];
@@ -25,7 +30,7 @@ export const merge = (route: Route) => {
 			|| query[key] === false 
 			|| query[key] === 0
 		) {
-			let v = loopDecodeURIComponent(query[key]);
+			let v = flattenDecodeURIComponent(query[key]);
 			queryArr = [
 				...queryArr, 
 				`${key}=${encodeURIComponent(v)}`

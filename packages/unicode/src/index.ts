@@ -1,6 +1,7 @@
 import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate';
 
 /**
+ * https://developer.mozilla.org/zh-CN/docs/Glossary/Base64
  * a: ascii(ascii字符串), b: binary(二进制), u: unicode(统一码)
  * 
  * Unicode 解码和编码
@@ -11,7 +12,11 @@ import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate';
  * ↓↓↓↓↓↓ 补充转义 ↓↓↓↓↓↓
  * encodeURICompoent / decodeURICompoent
  * 转义/\?.:=| ASCII 标点字符
- * 
+ *
+ * 8位码: btoa('a') -> YQ==
+ * 16位编码: btoa('中') -> Character Out Of Range
+ * ↓↓↓↓↓↓↓↓↓↓↓↓
+ * utoa: UTF-16 字符串转换为 UTF-8 字符再进行编码
  */
 
 /**

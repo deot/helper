@@ -1,5 +1,5 @@
 import { IS_SERVER } from '@deot/helper-shared';
-import { loopParse, loopDecodeURIComponent } from './_helper';
+import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
 
 interface GetOptions {
 	url?: string;
@@ -12,22 +12,22 @@ export const get = (
 	options?: GetOptions
 ) => {
 	const options$ = {
-		parse: loopParse,
+		parse: flattenJSONParse,
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
 	/* istanbul ignore next */
 	const url$ = options$.url || (IS_SERVER ? '' : window.location.search);
 
-	const original = loopDecodeURIComponent(url$);
-	const match = original
-		.substring(original.indexOf('?') + 1)
-		.match(new RegExp("(^|&)" + key + "=([^&]*)(&|$)"));
+	const match = url$
+		.substring(url$.indexOf('?') + 1)
+		.match(new RegExp("(^|&)" + key + "=([^&]*)"));
 
-	const value = match != null ? match[2] : null;
+	let value = match != null ? match[2] : null;
 
 	if (value === null) return null;
-	
+	value = flattenDecodeURIComponent(value);
+
 	return typeof options$.parse === 'function' 
 		? options$.parse(value) 
 		: value;

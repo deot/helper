@@ -11,7 +11,23 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2
 
+  packages/cache: {}
+
+  packages/device: {}
+
+  packages/dom:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+
+  packages/emitter: {}
+
   packages/fp:
+    dependencies:
+      '@deot/helper-emitter':
+        specifier: '*'
+        version: link:../emitter
     devDependencies:
       lodash:
         specifier: ^4.17.21
@@ -22,6 +38,27 @@ importers:
 
   packages/index:
     dependencies:
+      '@deot/helper-device':
+        specifier: '*'
+        version: link:../device
+      '@deot/helper-dom':
+        specifier: '*'
+        version: link:../dom
+      '@deot/helper-emitter':
+        specifier: '*'
+        version: link:../emitter
+      '@deot/helper-fp':
+        specifier: '*'
+        version: link:../fp
+      '@deot/helper-load':
+        specifier: '*'
+        version: link:../load
+      '@deot/helper-resize':
+        specifier: '*'
+        version: link:../resize
+      '@deot/helper-route':
+        specifier: '*'
+        version: link:../route
       '@deot/helper-shared':
         specifier: '*'
         version: link:../shared
@@ -31,8 +68,30 @@ importers:
       '@deot/helper-utils':
         specifier: '*'
         version: link:../utils
+      '@deot/helper-wheel':
+        specifier: '*'
+        version: link:../wheel
 
-  packages/route: {}
+  packages/load:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+
+  packages/resize:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+
+  packages/route:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+      '@deot/helper-utils':
+        specifier: '*'
+        version: link:../utils
 
   packages/shared: {}
 
@@ -47,6 +106,15 @@ importers:
       '@deot/helper-shared':
         specifier: '*'
         version: link:../shared
+
+  packages/wheel:
+    dependencies:
+      '@deot/helper-shared':
+        specifier: '*'
+        version: link:../shared
+      normalize-wheel:
+        specifier: ^1.0.1
+        version: 1.0.1
 
 packages:
 
@@ -5983,6 +6051,10 @@ packages:
     resolution: {integrity: sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==}
     engines: {node: '>=10'}
     dev: true
+
+  /normalize-wheel@1.0.1:
+    resolution: {integrity: sha512-1OnlAPZ3zgrk8B91HyRj+eVv+kS5u+Z0SCsak6Xil/kmgEia50ga7zfkumayonZrImffAxPU/5WcyGhzetHNPA==}
+    dev: false
 
   /npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}

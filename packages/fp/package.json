@@ -18,7 +18,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@deot/helper-emitter": "*"
+  },
   "devDependencies": {
     "lodash": "^4.17.21",
     "ramda": "^0.29.0"
