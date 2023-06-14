@@ -1,8 +1,8 @@
 import * as FP from '@deot/helper-fp';
 
-describe('try-catch.ts', () => {
+describe('catch.ts', () => {
 	it('base', () => {
-		let safe = FP.tryCatch((e) => {
+		let safe = FP.catch$((e: any) => {
 			expect(e).toBe('error');
 		});
 

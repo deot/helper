@@ -1,1 +1,5 @@
-// TODO
+describe('dom.ts', () => {
+	it('any', () => {
+		
+	});
+});

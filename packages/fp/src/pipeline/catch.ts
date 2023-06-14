@@ -1,6 +1,6 @@
 import { curry } from './curry';
 
 // catchP :: f -> Promise -> Promise
-export const tryCatch = curry(function (f, promise) {
+export const catch$ = curry(function (f, promise) {
 	return promise.catch(f);
 });

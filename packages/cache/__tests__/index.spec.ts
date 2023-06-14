@@ -1,1 +1,5 @@
-// TODO
+describe('cache.ts', () => {
+	it('any', () => {
+		
+	});
+});

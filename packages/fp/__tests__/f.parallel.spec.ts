@@ -203,6 +203,7 @@ describe('parallel.ts', () => {
 		
 		await sleep(20);
 		current.cancel();
+		await sleep(0);
 	});
 
 	it('for coverage', async () => {

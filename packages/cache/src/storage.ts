@@ -4,7 +4,7 @@ import { MemoryStorage } from './memory-storage';
 
 const PREFIX_NAME = '@deot/helper/';
 // Storage和Cookie不同，可以自定义key
-const formatKey = (key: string, version: string | number) => {
+const formatKey = (key: string, version: string | number | undefined) => {
 	return `${version ? `${PREFIX_NAME}${version}:` : ''}${key}`;
 };
 

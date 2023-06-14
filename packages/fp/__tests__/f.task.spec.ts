@@ -106,6 +106,7 @@ describe('task.ts', () => {
 
 	it('catch / then', async () => {
 		expect.assertions(2);
+
 		
 		let message = 'ERROR';
 		Task.of('Hello Tasks!')
@@ -121,6 +122,8 @@ describe('task.ts', () => {
 			.then((e: any) => {
 				expect(e).toBe(message);
 			});
+
+		await sleep(0);
 	});
 
 	it('restart', async () => {
