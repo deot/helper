@@ -18,5 +18,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "fake-indexeddb": "^4.0.1"
+  }
 }

@@ -1,4 +1,3 @@
-import { IS_SERVER } from '@deot/helper-shared';
 import { ACache } from './cache';
 import { MemoryStorage } from './memory-storage';
 
@@ -8,14 +7,13 @@ const formatKey = (key: string, version: string | number | undefined) => {
 	return `${version ? `${PREFIX_NAME}${version}:` : ''}${key}`;
 };
 
-const STORAGE_PERMISSION_ALLOW = (() => {
-	if (IS_SERVER) return false;
+const ALLOW = (() => {
 	const test = 'test';
 	try {
 		window.localStorage.setItem(test, test);
 		window.localStorage.removeItem(test);
 		return true;
-	} catch (e) {
+	} catch {
 		return false;
 	}
 })();
@@ -44,12 +42,13 @@ class StorageStore extends ACache {
 
 	configure(options: ACache['options']) {
 		super.configure(options);
-		if (IS_SERVER) return;
 
-		if (!STORAGE_PERMISSION_ALLOW) return;
+		if (!ALLOW) return;
+
 		const { version } = this.options;
 		// 清除之前的缓存
 		Object.keys(window.localStorage).forEach((item) => {
+			/* istanbul ignore else -- @preserve */
 			if (
 				item.includes(PREFIX_NAME) 
 				&& !item.includes(`${PREFIX_NAME}${version}`)
@@ -67,17 +66,16 @@ class StorageStore extends ACache {
 	 * @returns {void} ~
 	 */
 	set(key: string, value: any, options?: Options): void {
-		if (IS_SERVER) return;
+		if (!ALLOW) return;
 		let invoke = this.getInvoke(options);
 
 		key = formatKey(key, this.options.version);
-		value = this.options.set(typeof value === 'string' ? value : JSON.stringify(value));
+		value = this.options.set!(typeof value === 'string' ? value : JSON.stringify(value));
 
 		try {
 			window[invoke].setItem(key, value);
 		} catch (error) {
 			this[invoke].setItem(key, value);
-			console.error(error);
 		}
 	}
 
@@ -88,13 +86,13 @@ class StorageStore extends ACache {
 	 * @returns {any} ~
 	 */
 	get(key: string, options?: Options): any {
-		if (IS_SERVER) return null;
+		if (!ALLOW) return null;
 
 		let invoke = this.getInvoke(options);
 		key = formatKey(key, this.options.version);
 		
 		let value = this[invoke].getItem(key) || window[invoke].getItem(key);
-		return this.options.get(value);
+		return this.options.get!(value);
 	}
 
 	/**
@@ -104,12 +102,13 @@ class StorageStore extends ACache {
 	 * @returns {void} ~
 	 */
 	remove(key: string, options?: Options): void {
-		if (IS_SERVER) return;
+		if (!ALLOW) return;
 
 		let invoke = this.getInvoke(options);
-		
+		key = formatKey(key, this.options.version);
+
 		this[invoke].removeItem(key); 
-		window[invoke].removeItem(formatKey(key, this.options.version));
+		window[invoke].removeItem(key);
 	}
 }
 

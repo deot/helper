@@ -6,10 +6,10 @@ interface Options {
 	version?: string | number;
 
 	// 取值时，对值的转换
-	get: (v: any) => any;
+	get?: (v: any) => any;
 
 	// 设置值对值的转换
-	set: (v: string) => string;
+	set?: (v: string) => string;
 }
 
 export abstract class ACache {
