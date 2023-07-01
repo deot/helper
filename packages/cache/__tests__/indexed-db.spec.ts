@@ -1,5 +1,5 @@
 import "fake-indexeddb/auto";
-import { IndexedDB } from '@deot/helper-cache';
+import { IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
 describe('indexed-db.ts', () => {
 	afterEach(async () => {
@@ -48,5 +48,25 @@ describe('indexed-db.ts', () => {
 
 		const data = await IndexedDB.search();
 		expect(data.length).toBe(8);
+	});
+
+	// 连续写入
+	it('batch', async () => {
+		const store = new IndexedDBStore({
+			name: 'db',
+			storeName: 'store'
+		});
+
+		let length = 100;
+		Array
+			.from({ length })
+			.forEach((_: any, index: number) => {
+				store.write({ value: index });
+			});
+
+		expect(store.pending.length).toBe(length);
+		await store.close();
+		const data = await store.search();
+		expect(data.length).toBe(length);
 	});
 });

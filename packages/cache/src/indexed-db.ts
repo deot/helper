@@ -15,12 +15,19 @@ interface State {
 	data?: any;
 }
 
-class IndexedDBStore extends ACache {
+/**
+ * 一个实例只打开1个db, 如需打开多个，可以实例化多个IndexedDBStore
+ */
+export class IndexedDBStore extends ACache {
 	timestramp: number;
 
 	count: number;
 
-	constructor() {
+	db: Promise<IDBDatabase> | null;
+
+	pending: Promise<any>[];
+
+	constructor(options?: ACache['options']) {
 		super();
 		this.options = {
 			...this.options,
@@ -30,8 +37,13 @@ class IndexedDBStore extends ACache {
 			version: 1.0
 		};
 
+		options && this.configure(options);
+
 		this.timestramp = new Date().getTime();
 		this.count = 0;
+
+		this.db = null;
+		this.pending = [];
 	}
 
 	getUid() {
@@ -46,54 +58,122 @@ class IndexedDBStore extends ACache {
 		}
 	}
 
-	// 打开xxx数据库。变更时候更新表
-	async openDatabase(): Promise<IDBDatabase> {
-		const { name, version, keyPath, storeName } = this.options;
-		const poll = () => new Promise((resolve, reject) => {
-			let request = window.indexedDB.open(name, version as number);
-			request.onsuccess = () => {
-				resolve(request.result);
-			};
-			request.onerror = /* istanbul ignore next */ () => {
-				reject(new Error('IndexedDB Open Failed. DeleteDatabase first!'));
-			};
-
-			// 如果指定版本大于数据库的实际版本号，先删除原来的表，再创建先表
-			request.onupgradeneeded = () => {
-				let db = request.result;
-
-				if (db.objectStoreNames.contains(storeName)) {
-					db.deleteObjectStore(storeName);
-				}
-
-				db.createObjectStore(storeName, { keyPath });
-			};
+	/**
+	 * 每次操作完要关闭
+	 * 	1. 浏览器上不关闭的话，删库操作会卡一会
+	 * 	2. fake-indexeddb不关闭会卡死
+	 * @param {Function} fn ~
+	 * @returns {Promise<any>} ~
+	 */
+	private concurrent<T = void>(fn: Function): Promise<T> {
+		let target = new Promise<T>((resolve, reject) => {
+			fn().then(resolve).catch(reject);
 		});
 
-		// 当版本不同时，会出现打开失败的情况
-		const maxTries = 3;
-		let db: any;
-		for (let tries = 0; tries < maxTries; tries++) {
-			try {
-				db = await poll();
-			} catch { /* empty */ }
-			/* istanbul ignore next -- @preserve */
-			if (db || tries === maxTries - 1) {
-				break;
-			}
-		}
-
-		/* istanbul ignore next -- @preserve */
-		if (!db) {
-			await this.deleteDatabase();
-			db = await poll();
-		}
-
-		return db as IDBDatabase;
+		this.pending.push(target);
+		target.finally(() => this.close(target));
+		return target;
 	}
 
-	// 打开表
-	async operateBefore(mode?: IDBTransactionMode) {
+	/**
+	 * 统一处理
+	 * @param {IDBRequest} request ~
+	 * @returns {Promise<any>} ~
+	 */
+	private async task(request: IDBRequest): Promise<any> {
+		return new Promise((resolve, reject) => {
+			request.onsuccess = resolve;
+			request.onerror = reject;
+		});
+	}
+
+
+	/**
+	 * @param {Promise<any>} target ~
+	 */
+	async close(target?: Promise<any>) {
+		if (target) {
+			this.pending = this.pending.filter(i => i !== target);
+		} else {
+			let done = async (pending: Promise<any>[]) => {
+				if (pending.length) {
+					await Promise.allSettled(pending);
+					await done(this.pending);
+				}
+			};
+			await done(this.pending);
+		}
+		
+		if (!this.pending.length && this.db) {
+			let db = this.db;
+			this.db = null;
+
+			(await db).close();
+		}
+	}
+
+	/**
+	 * 打开数据库。变更时候更新表
+	 * @returns {Promise<IDBDatabase>} ~
+	 */
+	openDatabase(): Promise<IDBDatabase> {
+		this.db = this.db || (async () => {
+			const { name, version, keyPath, storeName } = this.options;
+			const poll = () => new Promise((resolve, reject) => {
+				let request = window.indexedDB.open(name, version as number);
+				request.onsuccess = () => {
+					resolve(request.result);
+				};
+				request.onerror = /* istanbul ignore next */ () => {
+					reject(new Error('IndexedDB Open Failed. DeleteDatabase first!'));
+				};
+
+				// 如果指定版本大于数据库的实际版本号，先删除原来的表，再创建先表
+				request.onupgradeneeded = () => {
+					let db = request.result;
+
+					if (db.objectStoreNames.contains(storeName)) {
+						db.deleteObjectStore(storeName);
+					}
+
+					db.createObjectStore(storeName, { keyPath });
+				};
+			});
+
+			// 当版本不同时，会出现打开失败的情况
+			const maxTries = 3;
+			let db: any;
+			for (let tries = 0; tries < maxTries; tries++) {
+				try {
+					db = await poll();
+				} catch { /* empty */ }
+				/* istanbul ignore next -- @preserve */
+				if (db || tries === maxTries - 1) {
+					break;
+				}
+			}
+
+			/* istanbul ignore next -- @preserve */
+			if (!db) {
+				await this.deleteDatabase();
+				db = await poll();
+			}
+
+			return db as IDBDatabase;
+		})();
+
+		return this.db;
+	}
+
+	/**
+	 * 打开表
+	 * tip: db.close() 执行后
+	 * 	db打开后的表os对象仍可写入（浏览器支持，fake-indexeddb不支持）
+	 * 	不过正常理解也应该操作所有后再关闭，这里不修改`this.db -> this.os`的逻辑
+	 * @param {string} mode ~
+	 * @returns {IDBObjectStore} ~
+	 */
+	async openObjectStore(mode?: IDBTransactionMode): Promise<IDBObjectStore> {
 		const { storeName } = this.options;
 		const db = await this.openDatabase();
 
@@ -102,27 +182,12 @@ class IndexedDBStore extends ACache {
 			.transaction([storeName], mode || 'readwrite')
 			.objectStore(storeName);
 
-		return {
-			os,
-			db
-		};
+		return os;
 	}
 
-	// 每次操作完要关闭（浏览器上不关闭，不关闭的话，删库操作会卡一会），"fake-indexeddb/auto"不关闭会卡死
-	async operateAfter(operater: { os: IDBObjectStore; db: IDBDatabase }, request: IDBRequest) {
-		return new Promise((resolve, reject) => {
-			request.onsuccess = () => {
-				resolve(request);
-				operater.db.close();
-			};
-			request.onerror = /* istanbul ignore next */ (e) => {
-				reject(e);
-				operater.db.close();
-			};
-		});
-	}
-
-	// 删库
+	/**
+	 * 删库
+	 */
 	async deleteDatabase() {
 		const { name } = this.options;
 		const request = window.indexedDB.deleteDatabase(name);
@@ -133,71 +198,104 @@ class IndexedDBStore extends ACache {
 		});
 	}
 
-	// 新增数据指的是向对象仓库写入数据记录。这需要通过事务完成。
-	async write(data: any): Promise<State> {
-		const { keyPath } = this.options;
-		const operater = await this.operateBefore();
-		const state: State = {
-			[keyPath]: this.getUid(),
-			...data
-		};
-
-		const request = operater.os.add(state);
-		await this.operateAfter(operater, request);
-
-		return state;
-	}
-
-	// 读取数据也是通过事务完成。
-	async read(id: string): Promise<State | undefined> {
-		const operater = await this.operateBefore();
-		const request = operater.os.get(id);
-		await this.operateAfter(operater, request);
-
-		return request.result;
-	}
-
-	async update(id: string, data: object): Promise<State> {
-		const { keyPath } = this.options;
-		const operater = await this.operateBefore();
-		const state: State = {
-			[keyPath]: id,
-			...data
-		};
-		const request = operater.os.put(state);
-		await this.operateAfter(operater, request);
-
-		return state;
-	}
-
-	async delete(id: string): Promise<any> {
-		const operater = await this.operateBefore();
-		const request = operater.os.delete(id);
-
-		await this.operateAfter(operater, request);
-	}
-
-	async search(): Promise<any[]> {
-		const { os, db } = await this.operateBefore();
-		const request = os.openCursor();
-
-		let rowData: any[] = [];
-		return new Promise((resolve, reject) => {
-			request.onsuccess = () => {
-				let cursor = request.result;
-				if (cursor) {
-					rowData.push(cursor.value);
-					cursor.continue();
-				} else {
-					resolve(rowData);
-					db.close();
-				}
+	/**
+	 * 新增数据，通过事务完成。
+	 * @param  {any} data ~
+	 * @returns {Promise<State>} ~
+	 */
+	write(data: any): Promise<State> {
+		return this.concurrent<State>(async () => {
+			const { keyPath } = this.options;
+			const os = await this.openObjectStore();
+			const state: State = {
+				[keyPath]: this.getUid(),
+				...data
 			};
 
-			request.onerror = /* istanbul ignore next */ (e) => {
-				reject(e);
-				db.close();
+			const request = os.add(state);
+
+			await new Promise((resolve, reject) => {
+				request.onsuccess = resolve;
+				request.onerror = reject;
+			});
+
+			return state;
+		});
+	}
+
+	/**
+	 * 读取数据，通过事务完成。
+	 * @param  {string} id ~
+	 * @returns {Promise} ~
+	 */
+	read(id: string): Promise<State | undefined> {
+		return this.concurrent<State | undefined>(async () => {
+			const os = await this.openObjectStore();
+			const request = os.get(id);
+			await this.task(request);
+
+			return request.result;
+		});
+	}
+
+	/**
+	 * 更新数据，通过事务完成。
+	 * @param  {string} id ~
+	 * @param  {object} data ~
+	 * @returns {Promise<State>} ~
+	 */
+	update(id: string, data: object): Promise<State> {
+		return this.concurrent<State>(async () => {
+			const { keyPath } = this.options;
+			const os = await this.openObjectStore();
+			const state: State = {
+				[keyPath]: id,
+				...data
 			};
+			const request = os.put(state);
+			await this.task(request);
+
+			return state;
+		});
+	}
+
+	/**
+	 * 删除数据也是通过事务完成。
+	 * @param  {string} id ~
+	 * @returns {Promise<void>} ~
+	 */
+	async delete(id: string): Promise<void> {
+		return this.concurrent(async () => {
+			const os = await this.openObjectStore();
+			const request = os.delete(id);
+
+			await this.task(request);
+		});
+	}
+
+	/**
+	 * 搜索数据，通过事务完成。
+	 * @returns {Promise<State[]>} ~
+	 */
+	search(): Promise<State[]> {
+		return this.concurrent<State[]>(async () => {
+			const os = await this.openObjectStore();
+			const request = os.openCursor();
+
+			let rowData: State[] = [];
+			await new Promise((resolve, reject) => {
+				request.onsuccess = () => {
+					let cursor = request.result;
+					if (cursor) {
+						rowData.push(cursor.value);
+						cursor.continue();
+					} else {
+						resolve(rowData);
+					}
+				};
+				request.onerror = reject;
+			});
+			return rowData;
 		});
 	}
 
@@ -222,4 +320,5 @@ class IndexedDBStore extends ACache {
 	}
 }
 
+// 导出一个默认的，方便直接操作
 export const IndexedDB = new IndexedDBStore();
