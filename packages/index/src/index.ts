@@ -6,7 +6,6 @@ import * as Utils from '@deot/helper-utils';
 import * as Shared from '@deot/helper-shared';
 import * as Unicode from '@deot/helper-unicode';
 import * as FP from '@deot/helper-fp';
-import * as Device from '@deot/helper-device';
 import * as Load from '@deot/helper-load';
 import * as Route from '@deot/helper-route';
 import * as $ from '@deot/helper-dom';
@@ -14,8 +13,14 @@ import * as $ from '@deot/helper-dom';
 import { Emitter } from '@deot/helper-emitter';
 import { Resize } from '@deot/helper-resize';
 import { Wheel } from '@deot/helper-wheel';
+import { Device } from '@deot/helper-device';
+import { Cookie, Storage, IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
 export { 
+	Cookie,
+	Storage,
+	IndexedDB,
+	IndexedDBStore,
 	Shared,
 	Utils,
 	Unicode,
