@@ -9,7 +9,9 @@ export const composedPath = (e: Event): EventTarget[] => {
 	let path = (e.composedPath && e.composedPath()) || [];
 	if (path.length) return path;
 
-	let parent = (e.target as any).parentNode;
+	let parent = (e.target as any)?.parentNode;
+	
+	/* istanbul ignore next -- @preserve */
 	while (parent) {
 		path.push(parent);
 		parent = parent.parentNode;

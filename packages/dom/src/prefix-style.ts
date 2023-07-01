@@ -31,8 +31,7 @@ const prefix = (() => {
 })();
 
 export const prefixStyle = (v: string) => {
-	if (prefix === false) {
-		!IS_SERVER && !prefix && console.log('不支持style fix');
+	if (IS_SERVER || prefix === false) {
 		return {
 			camel: v,
 			kebab: v

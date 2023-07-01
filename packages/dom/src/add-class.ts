@@ -1,11 +1,11 @@
 import { IS_SERVER } from '@deot/helper-shared';
 import { hasClass } from './has-class';
 
-export const addClass = (el: HTMLElement, cls: string) => {
-	if (IS_SERVER) return;
+export const addClass = (el: HTMLElement, cls?: string) => {
+	if (IS_SERVER || !cls) return;
 
 	let curClass = el.className;
-	let classes = (cls || '').split(' ');
+	let classes = cls.split(' ');
 
 	for (let i = 0, j = classes.length; i < j; i++) {
 		let clsName = classes[i];
@@ -17,6 +17,7 @@ export const addClass = (el: HTMLElement, cls: string) => {
 			}
 		}
 	}
+
 	if (!el.classList) {
 		el.className = curClass;
 	}

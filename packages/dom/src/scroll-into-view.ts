@@ -4,7 +4,6 @@ interface Options {
 	from?: number;
 	to?: number;
 	duration?: number;
-	onEnd?: Function;
 }
 
 /**
@@ -15,20 +14,24 @@ interface Options {
  * @param {Options} options ~
  * @returns {void} ~
  */
-export const scrollIntoView = (
+export const scrollIntoView = async (
 	el: HTMLElement | Window, 
-	options: Options
-): void => {
+	options?: Options
+): Promise<any> => {
 	if (IS_SERVER) return;
 
-	let { from = 0, to = 0, duration = 300, onEnd } = options || {};
+	let { from = 0, to = 0, duration = 300 } = options || {};
 	
 	let difference = Math.abs(from - to);
 	let step = Math.ceil((difference / duration) * 50);
 
+	let onResolve: Function;
+	let target = new Promise((resolve) => {
+		onResolve = resolve;
+	});
 	const scroll = (start: number, end: number) => {
 		if (start === end) {
-			onEnd && onEnd();
+			onResolve();
 			return;
 		}
 
@@ -46,4 +49,6 @@ export const scrollIntoView = (
 	};
 
 	scroll(from, to);
+	
+	return target;
 };

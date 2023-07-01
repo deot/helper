@@ -1,10 +1,11 @@
 import { IS_SERVER } from '@deot/helper-shared';
 import { getStyle } from './get-style';
 
-export const isScroll = (el: HTMLElement, vertical: string) => {
-	if (IS_SERVER) return false;
+export const isScroll = (el?: HTMLElement, direction?: 'y' | 'x') => {
+	if (IS_SERVER || !el) return false;
 
-	let overflow = getStyle(el, `overflow-${vertical ? 'y' : 'x'}`);
+	let overflow = getStyle(el, `overflow-${direction ? 'y' : 'x'}`);
 	overflow = overflow || getStyle(el, 'overflow');
-	return overflow.match(/(scroll|auto)/);
+
+	return !!overflow.match(/(scroll|auto)/);
 };

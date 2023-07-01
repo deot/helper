@@ -1,12 +1,12 @@
 import { IS_SERVER } from '@deot/helper-shared';
 
-export const contains = (el: HTMLElement, child: HTMLElement) => {
+export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Document, child?: HTMLElement) => {
 	if (IS_SERVER || !child) return false;
 
 	let childRect = child.getBoundingClientRect();
 	let elRect: { top: number; right: number; bottom: number; left: number };
 
-	if ([window, document, document.documentElement, null, undefined].includes(el)) {
+	if (!el || [window, document, document.documentElement].includes(el)) {
 		elRect = {
 			top: 0,
 			right: window.innerWidth,
@@ -14,7 +14,7 @@ export const contains = (el: HTMLElement, child: HTMLElement) => {
 			left: 0
 		};
 	} else {
-		elRect = el.getBoundingClientRect();
+		elRect = (el as HTMLElement).getBoundingClientRect();
 	}
 
 	return childRect.top < elRect.bottom 

@@ -1,7 +1,7 @@
 import { IS_SERVER } from '@deot/helper-shared';
 
-export const getStyle = (el: HTMLElement, name: string) => {
-	if (IS_SERVER || !name) return null;
+export const getStyle = (el: HTMLElement, name?: string) => {
+	if (IS_SERVER || !name) return '';
 
 	if (name === 'float') {
 		name = 'cssFloat';
@@ -9,8 +9,8 @@ export const getStyle = (el: HTMLElement, name: string) => {
 
 	try {
 		let computed = (document.defaultView as any).getComputedStyle(el, '');
-		return el.style[name] || computed ? computed[name] : null;
+		return el.style[name] || (computed?.[name] || '');
 	} catch (e) {
-		return el.style[name];
+		return el.style[name] || '';
 	}
 };

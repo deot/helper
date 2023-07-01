@@ -1,8 +1,8 @@
 import { IS_SERVER } from '@deot/helper-shared';
 import { hasClass } from './has-class';
 
-export const removeClass = (el: HTMLElement, cls: string) => {
-	if (IS_SERVER) return;
+export const removeClass = (el: HTMLElement, cls?: string) => {
+	if (IS_SERVER || !cls) return;
 
 	let classes = cls.split(' ');
 	let curClass = ' ' + el.className + ' ';
@@ -12,7 +12,11 @@ export const removeClass = (el: HTMLElement, cls: string) => {
 		if (clsName) {
 			if (el.classList) {
 				el.classList.remove(clsName);
-			} else if (hasClass(el, clsName)) {
+				// eslint-disable-next-line no-continue
+				continue;
+			} 
+			/* istanbul ignore next -- @preserve */
+			if (hasClass(el, clsName)) { 
 				curClass = curClass.replace(' ' + clsName + ' ', ' ');
 			}
 		}
