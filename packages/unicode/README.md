@@ -1,7 +1,6 @@
-# @deot/-unicode
+# @deot/helper-unicode
 
-公共方法
-
+Unicode编码/解码 - 压缩
 
 ## Unicode
 
