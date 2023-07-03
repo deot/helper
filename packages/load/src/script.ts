@@ -12,13 +12,13 @@ export const script = (src: string, options?: LoadScriptOptions) => {
 
 	let target = new Promise((resolve, reject) => {
 		const el = document.createElement('script');
-		if (options?.async) {
+		const isNeedSync = options?.async === false;
+		if (!isNeedSync) {
 			el.src = src;
 			el.onload = () => resolve(1);
 			el.onerror = (e) => {
-				reject();
 				script.cache.delete(src);
-				console.error(e);
+				reject(e);
 			};
 		} else {
 			let xhr = new XMLHttpRequest();
@@ -28,7 +28,7 @@ export const script = (src: string, options?: LoadScriptOptions) => {
 		}
 		
 		document.getElementsByTagName("head")[0].appendChild(el);
-		!options?.async && resolve(1);
+		isNeedSync && resolve(1);
 	});
 
 	script.cache.set(src, target);

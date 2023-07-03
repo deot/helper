@@ -19,11 +19,11 @@ export const style = (value: string, options?: LoadStyleCodeOptions) => {
 	}
 
 	if (style.cache.has(value)) return;
-	style.cache.has(value);
 	style.cache.add(value);
 
 	let el = document.createElement('style');
 
+	/* istanbul ignore else -- @preserve */
 	if (options?.id && typeof options.id === 'string') {
 		el.setAttribute('id', options.id);
 	}
@@ -50,5 +50,6 @@ export const removeStyle = (id: string | HTMLElement) => {
 			style.cache.delete(code);
 		}
 	}
-}
+};
+
 style.cache = new Set();

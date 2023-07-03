@@ -14,14 +14,14 @@ export const link = (src: string) => {
 		el.href = src;
 		el.onload = () => resolve(1);
 		el.onerror = (e) => {
-			reject();
 			link.cache.delete(src);
-			console.error(e);
+			reject(e);
 		};
 
 		document.getElementsByTagName("head")[0].appendChild(el);
 	});
 	
+	link.cache.set(src, target);
 	return target;
 
 };

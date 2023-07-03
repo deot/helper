@@ -1,5 +1,6 @@
 import { IS_SERVER } from '@deot/helper-shared';
 
+// TODO: 增加maxTries
 export const image = (src: string) => {
 	if (IS_SERVER) return;
 	
@@ -20,13 +21,13 @@ export const image = (src: string) => {
 		};
 
 		el.onerror = (e) => {
+			image.cache.delete(src);
 			reject(e);
 		};
 	});
 
 	image.cache.set(src, target);
 	return target;
-
 };
 
 image.placeholder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
