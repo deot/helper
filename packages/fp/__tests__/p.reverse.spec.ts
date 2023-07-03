@@ -14,4 +14,9 @@ describe('reverse.ts', () => {
 	it('string', () => {
 		expect(reverse('123')).toBe('321');
 	});
+
+	it('object', () => {
+		let target = {} as any[];
+		expect(reverse(target)).toBe(target);
+	});
 });

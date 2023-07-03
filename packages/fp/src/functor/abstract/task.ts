@@ -1,7 +1,7 @@
 import { Emitter } from '@deot/helper-emitter';
 
 export abstract class ATask extends Emitter {
-	_pasuer: Function;
+	_pasuer!: Function;
 	
 	pasuer: Promise<any>;
 
@@ -13,8 +13,6 @@ export abstract class ATask extends Emitter {
 
 	constructor() {
 		super();
-		/* istanbul ignore next */
-		this._pasuer = () => {};
 		this.pasuer = Promise.resolve();
 		this.canceler = Promise.resolve();
 

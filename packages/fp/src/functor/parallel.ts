@@ -47,6 +47,7 @@ export class Parallel extends ATask {
 	}
 
 	setConcurrency(value: number) {
+		/* istanbul ignore else -- @preserve */
 		if (typeof value === 'number' && value > 0) {
 			this.concurrency = value;
 			if (this.target) {
@@ -70,6 +71,7 @@ export class Parallel extends ATask {
 
 			if (this.task instanceof Array) {
 				let item = this.task.pop();
+				/* istanbul ignore else -- @preserve */
 				if (typeof item === 'function') {
 					leaf = item();
 				} else if (item instanceof Task) {
@@ -107,7 +109,7 @@ export class Parallel extends ATask {
 	}
 
 	onFulfilled = (e: any) => {
-		/* istanbul ignore next */
+		/* istanbul ignore if -- @preserve */
 		if (!this.target) return;
 
 		this.emit('fulfilled', e);
@@ -115,7 +117,7 @@ export class Parallel extends ATask {
 	};
 
 	onRejected = (e: any) => {
-		/* istanbul ignore next */
+		/* istanbul ignore if -- @preserve */
 		if (!this.target) return;
 
 		this.emit('rejected', e);

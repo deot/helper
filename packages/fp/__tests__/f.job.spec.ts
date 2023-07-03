@@ -88,8 +88,8 @@ describe('job.ts', () => {
 		let record = 0;
 		const current$ = Job.of(
 			async () => {
-				await sleep(1);
 				count$++;
+				await sleep(1);
 			},
 			9
 		);
@@ -101,7 +101,7 @@ describe('job.ts', () => {
 		expect(count$).not.toBe(record);
 
 		// 暂停
-		current$.pasue();
+		current$.pasue(); // 可能存在正在就
 		record = count$;
 		await sleep(30);
 		expect(count$).toBe(record);

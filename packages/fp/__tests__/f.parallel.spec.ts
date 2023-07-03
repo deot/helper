@@ -147,8 +147,8 @@ describe('parallel.ts', () => {
 		let count = 0;
 		let gen = () => {
 			return async () => {
-				await sleep(1);
 				count++;
+				await sleep(1);
 			};
 		};
 		const current = Parallel.of(
@@ -167,7 +167,7 @@ describe('parallel.ts', () => {
 
 		const target1 = current.restart();
 		await sleep(25);
-		current.cancel();
+		await current.cancel();
 
 		expect(count).toBeGreaterThan(100);
 		expect(count).toBeLessThan(200);
@@ -201,9 +201,8 @@ describe('parallel.ts', () => {
 
 		current.start();
 		
-		await sleep(20);
-		current.cancel();
-		await sleep(0);
+		await sleep(30);
+		await current.cancel();
 	});
 
 	it('for coverage', async () => {

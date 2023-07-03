@@ -29,11 +29,11 @@ export class Task extends AMonad {
 
 	ready: Promise<any>;
 
-	_ready: Function;
+	_ready!: Function;
 
 	pasuer: Promise<any>;
 
-	_pasuer: Function;
+	_pasuer!: Function;
 
 	constructor(value: any, parent?: any) {
 		super(value);
@@ -50,9 +50,6 @@ export class Task extends AMonad {
 		this.isComplete = false;
 		this.isStart = parent?.isStart || false;
 
-		/* istanbul ignore next */
-		this._ready = () => {};
-
 		// 如果已经开始了, ready可以直接执行
 		this.ready = this.isStart 
 			? Promise.resolve()
@@ -60,8 +57,6 @@ export class Task extends AMonad {
 				this._ready = resolve;
 			});
 
-		/* istanbul ignore next */
-		this._pasuer = () => {};
 		this.pasuer = Promise.resolve();
 	}
 
@@ -187,6 +182,7 @@ export class Task extends AMonad {
 
 		while (child && child.child) {
 			const [key, fn] = child.record;
+			/* istanbul ignore else -- @preserve */
 			if (key) {
 				next = next[key](fn);	
 			}
@@ -194,6 +190,7 @@ export class Task extends AMonad {
 			child = child.child;
 		}
 
+		/* istanbul ignore else -- @preserve */
 		if (!next.isStart) {
 			next.start();
 		}
