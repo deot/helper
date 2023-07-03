@@ -1,4 +1,3 @@
-// import ResizeObserver from 'resize-observer-polyfill';
 import { IS_SERVER } from '@deot/helper-shared';
 import type { AnyFunction } from '@deot/helper-shared';
 
@@ -7,6 +6,7 @@ export type ResizableElement = HTMLElement & {
 	__ro__?: ResizeObserver;
 };
 
+// 检测DOM尺寸变化JS
 export class Resize {
 	el: HTMLElement;
 
@@ -27,6 +27,7 @@ export class Resize {
 	static off(el: ResizableElement, fn: AnyFunction) {
 		if (IS_SERVER || !el || !el.__resizeListeners__) return;
 		el.__resizeListeners__.splice(el.__resizeListeners__.indexOf(fn), 1);
+
 		if (!el.__resizeListeners__.length) {
 			el.__ro__?.disconnect();
 		}
@@ -34,10 +35,8 @@ export class Resize {
 
 	static handleResize(entries: ResizeObserverEntry[]) {
 		for (let entry of entries) {
-			const listeners = (entry.target as ResizableElement).__resizeListeners__ || [];
-			if (listeners.length) {
-				listeners.forEach((fn: any) => fn());
-			}
+			const listeners = (entry.target as ResizableElement).__resizeListeners__;
+			listeners?.forEach((fn: any) => fn());
 		}
 	}
 
@@ -47,7 +46,7 @@ export class Resize {
 
 	on(fn: AnyFunction) {
 		Resize.on(this.el, fn);
-		return this;
+		return () => this.off(fn);
 	}
 
 	off(fn: AnyFunction) {

@@ -20,5 +20,8 @@
   },
   "dependencies": {
     "@deot/helper-shared": "*"
+  },
+  "devDependencies": {
+    "resize-observer-polyfill": "^1.5.1"
   }
 }
