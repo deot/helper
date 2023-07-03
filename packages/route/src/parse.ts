@@ -16,7 +16,6 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 		...options
 	};
 
-	/* istanbul ignore next */
 	const url$ = options$.url || (IS_SERVER ? '' : `${window.location.pathname}${window.location.search}`);
 
 	const [prefix, search] = url$.split('?');

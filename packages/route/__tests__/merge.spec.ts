@@ -35,5 +35,11 @@ describe('merge.ts', () => {
 			}
 		})).toBe('?id=1&user=deot');
 	});
+
+	it('empty', () => {
+		expect(Route.merge({
+			query: {}
+		})).toBe('');
+	});
 });
 

@@ -1,6 +1,5 @@
 import { flattenDecodeURIComponent } from '@deot/helper-utils';
 
-
 interface Route {
 	origin?: string;
 	path?: string | string[];

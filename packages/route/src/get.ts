@@ -16,7 +16,7 @@ export const get = (
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
-	/* istanbul ignore next */
+	
 	const url$ = options$.url || (IS_SERVER ? '' : window.location.search);
 
 	const match = url$

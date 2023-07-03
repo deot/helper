@@ -41,5 +41,13 @@ describe('parse.ts', () => {
 		expect(Route.parse('?id=&_id=1').query._id).toBe(1);
 		expect(Route.parse('?id=a&_id=1').query._id).toBe(1);
 	});
+
+	it('coverage', () => {
+		expect(Route.parse('? ')).toEqual({
+			origin: '',
+			path: '',
+			query: {}
+		});
+	});
 });
 
