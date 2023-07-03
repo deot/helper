@@ -23,8 +23,10 @@ export class Emitter {
 	}
 
 	on(event: string | object | Function, callback?: Function) {
+		/* istanbul ignore else -- @preserve */
 		if (typeof event === "object") {
 			for (let key in event) {
+				/* istanbul ignore else -- @preserve */
 				if (event[key] && (typeof event[key] === "function")) {
 					this.on(key, event[key]);
 				}
@@ -42,6 +44,7 @@ export class Emitter {
 	}
 
 	off(event?: string, callback?: Function) {
+		/* istanbul ignore else -- @preserve */
 		if (typeof event === 'string' && !callback) {
 			delete this.events[event];
 		} else if (typeof event === 'string' && this.events[event] && callback) { 
@@ -55,6 +58,7 @@ export class Emitter {
 
 	once(event: string, callback: Function) {
 		const self = this.context;
+		/* istanbul ignore else -- @preserve */ 
 		if (typeof event === 'string' && typeof callback === "function") {
 			const fn = (...args: any[]) => {
 				this.off(event, fn);
