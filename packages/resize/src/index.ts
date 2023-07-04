@@ -1,56 +1,84 @@
-import { IS_SERVER } from '@deot/helper-shared';
-import type { AnyFunction } from '@deot/helper-shared';
+type ResizableListener = (...args: unknown[]) => unknown;
 
-export type ResizableElement = HTMLElement & {
-	__resizeListeners__?: Array<(...args: unknown[]) => unknown>;
-	__ro__?: ResizeObserver;
+type ResizableElement = HTMLElement & {
+	__rz__?: Resize;
 };
 
 // 检测DOM尺寸变化JS
 export class Resize {
-	el: HTMLElement;
+	el: ResizableElement;
 
 	static of(el: ResizableElement) {
 		return new Resize(el);
 	}
 
-	static on(el: ResizableElement, fn: AnyFunction) {
-		if (IS_SERVER || !el) return;
-		if (!el.__resizeListeners__) {
-			el.__resizeListeners__ = [];
-			el.__ro__ = new ResizeObserver(Resize.handleResize);
-			el.__ro__.observe(el);
-		}
-		el.__resizeListeners__.push(fn);
+	/**
+	 * Resize.of(el, fn);
+	 * @param {ResizableElement} el ~
+	 * @param {ResizableListener} fn ~
+	 * @returns {Function} off
+	 */
+	static on(el: ResizableElement, fn: ResizableListener): Function {
+		return new Resize(el).on(fn);
 	}
 
-	static off(el: ResizableElement, fn: AnyFunction) {
-		if (IS_SERVER || !el || !el.__resizeListeners__) return;
-		el.__resizeListeners__.splice(el.__resizeListeners__.indexOf(fn), 1);
-
-		if (!el.__resizeListeners__.length) {
-			el.__ro__?.disconnect();
-		}
+	/**
+	 * 要实现Resize.off(el)，el必须侵入式修改挂上__rz__
+	 * @param {ResizableElement} el ~
+	 * @param {ResizableListener} fn ~
+	 * @returns {void} ~
+	 */
+	static off(el: ResizableElement, fn?: ResizableListener): void {
+		return new Resize(el).off(fn);
 	}
 
-	static handleResize(entries: ResizeObserverEntry[]) {
-		for (let entry of entries) {
-			const listeners = (entry.target as ResizableElement).__resizeListeners__;
-			listeners?.forEach((fn: any) => fn());
-		}
-	}
+	listeners: ResizableListener[];
 
-	constructor(el: HTMLElement) {
+	ro: ResizeObserver | null;
+
+	constructor(el: ResizableElement) {
 		this.el = el;
+
+		this.listeners = [];
+		this.ro = null;
+
+		let rz = el.__rz__;
+		if (rz && rz instanceof Resize) {
+			this.listeners = rz.listeners;
+			this.ro = rz.ro;
+		}
 	}
 
-	on(fn: AnyFunction) {
-		Resize.on(this.el, fn);
+	handleResize = (entries: ResizeObserverEntry[]) => {
+		/* istanbul ignore else -- @preserve */
+		if (entries.some(i => i.target === this.el)) {
+			this.listeners?.forEach((fn: any) => fn());
+		}
+	};
+
+	on(fn: ResizableListener) {
+		if (typeof ResizeObserver === 'undefined') return () => {};
+		if (!this.listeners.length) {
+			this.ro = this.ro || new ResizeObserver(this.handleResize);
+			this.ro.observe(this.el);
+
+			this.el.__rz__ = this;
+		}
+
+		this.listeners.push(fn);
+
 		return () => this.off(fn);
 	}
 
-	off(fn: AnyFunction) {
-		Resize.off(this.el, fn);
-		return this;
+	off(fn?: ResizableListener) {
+		if (fn) {
+			this.listeners.splice(this.listeners.indexOf(fn), 1);
+		} else {
+			this.listeners = [];
+		}
+
+		if (!this.listeners.length && this.ro) {
+			this.ro.disconnect();
+		}
 	}
 }

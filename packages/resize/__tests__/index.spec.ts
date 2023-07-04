@@ -38,6 +38,7 @@ describe('resize.ts', () => {
 
 		Resize.off(el, handler);
 		off();
+		Resize.off(el);
 
 		window.dispatchEvent(new Event('resize'));
 		window.dispatchEvent(new Event('resize'));
