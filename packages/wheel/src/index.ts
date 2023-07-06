@@ -1,43 +1,70 @@
+/**
+ * 原生行为：
+ *  1. 同一时刻，上下左右仅一个方向滑动(如45°滑动，几乎是一个方向在移动)
+ *  2. 触底或触底时，需要松开后，父层才能继续再滑动（原生行为）
+ *
+ * Whell目的实现
+ * 1. 同一时刻，上下左右滑动的优化
+ *     - 调用(自由滑动)：`Wheel.of(el, { freedom: true }).enable()`）
+ *     - 调用(一个方向，对其做了优化)：`Wheel.of(el).enable()`）
+ * 2. 触底或触底时，可以不需要松开后，父层也能继续再滑动
+ * 		- 不需要松开后触发：Wheel.of(el, { native: false })
+ * 		- 需要松开后触发：Wheel.of(el, { native: true })
+ * 3. `overflow: hidden;` 这样可自定义滚动条样式
+ * 4. 对移动端也做了兼容处理，在`overflow: hidden;`的情况下也可滑动
+ */
 import normalizeWheel from 'normalize-wheel';
-import { IS_SERVER } from '@deot/helper-shared';
-import * as Utils from '@deot/helper-utils';
-import type { AnyFunction, Nullable, TimeoutHandle, Options } from '@deot/helper-shared';
 
-interface WheelOptions {
-	/**
-	 * 滚动回调
-	 */
-	onWheel: AnyFunction; 
+type WheelFunction<T = unknown> = (a: number, b: number) => T;
 
+export interface WheelOptions {
 	/**
 	 * 是否允许X轴方向滚动
 	 */
-	shouldWheelX?: AnyFunction | boolean;
+	shouldWheelX?: WheelFunction<boolean>;
 
 	/**
 	 * 是否允许Y轴方向滚动
 	 */ 
-	shouldWheelY?: AnyFunction | boolean; 
+	shouldWheelY?: WheelFunction<boolean>;
 
 	/**
 	 * 是否阻止冒泡
 	 */
-	stopPropagation?: AnyFunction;
+	stopPropagation?: WheelFunction<boolean>;
 
 	/**
-	 * 滚动行为
+	 * 原生的滚动行为，触底触底那一瞬间是否立即触发父层scroll事件
+	 * 默认: true
+	 * true：需要松开一下，才能继续滑动
+	 * false：不需要松开继续滑动
+	 *
+	 * 当`shouldWheelX() => true`或`shouldWheelY() => true`时，
+	 * el的父层的滚动都会被禁用（e.preventDefault()）
+	 * 
+	 * 所以只有当`shouldWheelX() => false`或`shouldWheelY() => false`
+	 * 才会考虑native值的影响
 	 */
-	behavior?: string; 
+	native?: boolean; 
+
+	/**
+	 * 自由滑动
+	 */
+	freedom?: boolean;
 }
 
-/**
- * 原生的scroll, 滑动到底部不会继续，需要放开再次滑动才能触发父层滑动
- */
+interface ScrollOptions {
+	x: number;
+	y: number;
+	angle: number;
+}
+
+// 实现`WheelOptions.native = true`行为
 const wait = 30;
 const timers = new Set();
 
-if (IS_SERVER) {
-	let handler = () => {
+if (typeof document !== 'undefined') {
+	let handleWheel = () => {
 		timers.forEach((context: any) => {
 			context.timer && clearTimeout(context.timer);
 			context.timer = setTimeout(() => {
@@ -47,16 +74,17 @@ if (IS_SERVER) {
 		});
 	};
 	const handleAddEvent = () => {
-		document.body.addEventListener('wheel', handler, true);
-		document.body.addEventListener('mousedown', handler, true);
+		document.body.addEventListener('wheel', handleWheel, true);
+		document.body.addEventListener('mousedown', handleWheel, true);
 	};
+
+	/* istanbul ignore else -- @preserve */
 	if (document.body) {
 		handleAddEvent();
 	} else {
 		window.addEventListener("DOMContentLoaded", handleAddEvent);
 	}
 }
-
 
 const getAngle = (start: number[], end: number[]) => {
 	let dx = end[0] - start[0];
@@ -66,69 +94,87 @@ const getAngle = (start: number[], end: number[]) => {
 };
 
 export class Wheel {
-	private scrollBehavior: boolean;
+	static of(el: HTMLElement, options?: WheelOptions) {
+		return new Wheel(el, options);
+	}
 
-	private needThresholdWait: boolean;
-
-	private animationFrameID: Nullable<number>;
-
-	private deltaX: number;
-
-	private deltaY: number;
-
-	private shouldWheelX: any;
-
-	private shouldWheelY: any;
-
-	private stopPropagation: any;
-
-	private onWheel: any;
-
-	private isTouching: boolean;
-
-	private startTime: Nullable<number>;
-
-	private startX: number;
-
-	private startY: number;
-
-	private moveX: number;
-
-	private moveY: number;
-
-	timer: Nullable<TimeoutHandle>;
-
-	constructor(options: WheelOptions) {
-		let { 
-			onWheel, 
-			shouldWheelX, 
-			shouldWheelY, 
-			stopPropagation,
-			behavior
-		} = options;
-
-		if (typeof shouldWheelX !== 'function') {
-			shouldWheelX = () => !!shouldWheelX;
+	static shouldWheelX = (el: HTMLElement, delta: number) => {
+		if (el.offsetWidth === el.scrollWidth) {
+			return false;
+		}
+		delta = Math.round(delta);
+		if (delta === 0) {
+			return false;
 		}
 
-		if (typeof shouldWheelY !== 'function') {
-			shouldWheelY = () => !!shouldWheelY;
+		return (
+			(delta < 0 && el.scrollLeft > 0) 
+			|| (delta >= 0 && el.scrollLeft < el.scrollWidth - el.offsetWidth)
+		);
+	};
+
+	static shouldWheelY = (el: HTMLElement, delta: number) => {
+		if (el.offsetHeight === el.scrollHeight) {
+			return false;
 		}
 
-		if (typeof stopPropagation !== 'function') {
-			stopPropagation = () => !!stopPropagation;
+		delta = Math.round(delta);
+		if (delta === 0) {
+			return false;
 		}
 
-		this.scrollBehavior = behavior === 'scroll';
+		return (
+			(delta < 0 && el.scrollTop > 0) 
+			|| (delta >= 0 && el.scrollTop < el.scrollHeight - el.offsetHeight)
+		);
+	};
+
+	el: HTMLElement;
+
+	needThresholdWait: boolean;
+
+	animationFrameID: number | null;
+
+	deltaX: number;
+
+	deltaY: number;
+
+	isTouching: boolean;
+
+	startTime: number | null;
+
+	startX: number;
+
+	startY: number;
+
+	moveX: number;
+
+	moveY: number;
+
+	listeners: WheelFunction[];
+
+	timer: any;
+
+	options: WheelOptions;
+
+	defaultOnWheel: WheelFunction | null; 
+
+	constructor(el: HTMLElement, options?: WheelOptions) {
+		this.el = el;
+		this.options = {
+			native: true,
+			freedom: false,
+			stopPropagation: () => false,
+			shouldWheelX: (deltaX) => Wheel.shouldWheelX(el, deltaX),
+			shouldWheelY: (deltaY) => Wheel.shouldWheelY(el, deltaY),
+			...options
+		};
+
 		this.needThresholdWait = false;
 		this.animationFrameID = null;
+
 		this.deltaX = 0;
 		this.deltaY = 0;
-		this.shouldWheelX = shouldWheelX;
-		this.shouldWheelY = shouldWheelY;
-		this.stopPropagation = stopPropagation;
-		this.onWheel = onWheel;
-		this.didWheel = this.didWheel.bind(this);
 	
 		this.timer = null;
 		this.isTouching = false;
@@ -140,58 +186,12 @@ export class Wheel {
 		this.moveX = 0;
 		this.moveY = 0;
 
-		this.handler = this.handler.bind(this);
-		this.handleTouchStart = this.handleTouchStart.bind(this);
-		this.handleTouchMove = this.handleTouchMove.bind(this);
-		this.handleTouchEnd = this.handleTouchEnd.bind(this);
-		this.handleMouseMove = this.handleMouseMove.bind(this);
+		this.listeners = [];
 
-		this.clear = this.clear.bind(this);
+		this.defaultOnWheel = null;
 	}
 
-	private didWheel() {
-		this.animationFrameID = null;
-		this.onWheel(this.deltaX, this.deltaY);
-		this.deltaX = 0;
-		this.deltaY = 0;
-	}
-
-	private operateDOMEvents(el: HTMLElement, type: string) {
-		if (typeof document === 'undefined') return;
-		let fn = (type === 'add' ? el.addEventListener : el.removeEventListener).bind(el);
-		if ('ontouchend' in document) {
-			// 让触控屏也能实现滑动(模拟)
-			fn('touchstart', this.handleTouchStart, false);
-			fn('touchmove', this.handleTouchMove, { passive: false });
-			fn('touchend', this.handleTouchEnd, false);
-		} else {
-			// 模拟鼠标滚轮点击
-			fn('mousemove', this.handleMouseMove, false);
-		}
-	}
-
-	clear() {
-		this.needThresholdWait = false;
-	}
-
-	add(el: HTMLElement) {
-		this.operateDOMEvents(el, 'add');
-	}
-
-	remove(el: HTMLElement) {
-		this.operateDOMEvents(el, 'remove');
-	}
-
-	handleMouseMove(e) {
-		if (e.which === 2) {
-			this.emitScroll(e, {
-				x: e.movementX, 
-				y: e.movementY
-			});
-		}
-	}
-
-	handleTouchStart(e) {
+	handleTouchStart = (e: TouchEvent) => {
 		this.isTouching = true;
 
 		const x = e.touches[0].screenX;
@@ -204,9 +204,9 @@ export class Wheel {
 		this.moveY = y;
 
 		this.startTime = Date.now();
-	}
+	};
 
-	handleTouchMove(e) {
+	handleTouchMove = (e: TouchEvent) => {
 		if (!this.isTouching) return;
 		const x = e.touches[0].screenX;
 		const y = e.touches[0].screenY;
@@ -222,9 +222,9 @@ export class Wheel {
 			y: dy,
 			angle: getAngle([this.startX, this.startY], [this.moveX, this.moveY])
 		});
-	}
+	};
 
-	handleTouchEnd(e) {
+	handleTouchEnd = (e: TouchEvent) => {
 		this.isTouching = false;
 
 		const x = e.changedTouches[0].screenX;
@@ -250,16 +250,79 @@ export class Wheel {
 				}, i);
 			}
 		}
-	}
+	};
 
-	// 滚轮事件触发
-	handler(e: MouseEvent) {
+	// 鼠标滚轮按住滑动
+	handleMouseMove = (e: MouseEvent) => {
+		if (e.which === 2) {
+			this.emitScroll(e, {
+				x: e.movementX, 
+				y: e.movementY,
+				angle: getAngle([0, 0], [e.movementX, e.movementY])
+			});
+		}
+	};
+
+	// 滚轮事件
+	handleWheel = (e: WheelEvent) => {
 		let { pixelX, pixelY } = normalizeWheel(e);
 		
 		this.emitScroll(e, {
 			x: pixelX, 
-			y: pixelY
+			y: pixelY,
+			angle: getAngle([this.deltaX, this.deltaY], [this.deltaX + pixelX, this.deltaX + pixelY])
 		});
+	};
+
+	clear = () => {
+		this.needThresholdWait = false;
+	};
+
+	didWheel = () => {
+		this.listeners?.forEach((fn: any) => fn(this.deltaX, this.deltaY));
+
+		this.animationFrameID = null;
+		this.deltaX = 0;
+		this.deltaY = 0;
+	};
+
+	/**
+	 * 阻止X，Y轴上的滚动时，父层滚动（mac下的父层滚动越界会带有回弹）
+	 * 以下两种情况需要阻止
+	 * 1. 容器内在滚动：shouldWheelX = true 或 shouldWheelY = true
+	 * 2. X和Y都都不能滚动：判断是否需要native行为
+	 * 	如果是则需要停顿，用户松开后再滑动父层才动
+	 * 	如果不是则不阻止父层滑动，直接滚动
+	 * @param {Event} e ~
+	 * @param {boolean} shouldWheelX ~
+	 * @param {boolean} shouldWheelY ~
+	 * @returns {boolean} 是否可继续
+	 */
+	private preventParentScroll(e: Event, shouldWheelX: boolean, shouldWheelY: boolean): boolean {
+		// 第2种场景
+		if (!shouldWheelX && !shouldWheelY) {
+			if (this.options.native && this.needThresholdWait) {
+				e.cancelable && e.preventDefault();
+				this.timer && clearTimeout(this.timer);
+				this.timer = setTimeout(this.clear, wait);
+				timers.add(this);
+			}
+			return true;
+		}
+
+		// 第1种场景
+		e.cancelable && e.preventDefault();
+
+		/* istanbul ignore else -- @preserve */
+		if (this.options.native) {
+			/* istanbul ignore next -- @preserve */ 
+			if (this.timer) {
+				clearTimeout(this.timer);
+			}
+			this.needThresholdWait = true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -267,51 +330,96 @@ export class Wheel {
 	 * 滑动手势X轴偏移小于30度夹角，禁止移动Y轴 -> pixelY = 0
 	 * 滑动手势Y轴偏移小于30度夹角，禁止移动X轴 -> pixelX = 0
 	 * @param {Event} e ~
-	 * @param {Options} options ~
+	 * @param {ScrollOptions} options ~
 	 * @returns {void} ~
 	 */
-	emitScroll(e: Event, options: Options): void {
-		let { x: pixelX, y: pixelY, angle } = options || {};
+	private emitScroll(e: Event, options: ScrollOptions): void {
+		let { x: pixelX, y: pixelY, angle } = options;
 
-		if (typeof angle !== 'undefined') {
+		if (!this.options.freedom) {
 			angle < 30 && (pixelY = 0);
 			angle > 60 && (pixelX = 0);
 		}
 
 		let deltaX = this.deltaX + pixelX;
 		let deltaY = this.deltaY + pixelY;
-		let shouldWheelX = this.shouldWheelX(deltaX, deltaY);
-		let shouldWheelY = this.shouldWheelY(deltaY, deltaX);
-		if (!shouldWheelX && !shouldWheelY) {
-			if (this.scrollBehavior && this.needThresholdWait) {
-				e.cancelable && e.preventDefault();
-				this.timer && clearTimeout(this.timer);
-				this.timer = setTimeout(this.clear, wait);
-				timers.add(this);
-			}
-			return;
-		}
+		let shouldWheelX = this.options.shouldWheelX!(deltaX, deltaY);
+		let shouldWheelY = this.options.shouldWheelY!(deltaY, deltaX);
 
-		if (this.scrollBehavior) {
-			this.timer && clearTimeout(this.timer);
-			this.needThresholdWait = true;
-		}
+		if (this.preventParentScroll(e, shouldWheelX, shouldWheelY)) return;
 
 		this.deltaX += shouldWheelX ? pixelX : 0;
 		this.deltaY += shouldWheelY ? pixelY : 0;
-		// 阻止X，Y轴上的滚动时，父层滚动（mac下的父层滚动越界会带有回弹）
-		e.cancelable && e.preventDefault();
 
-		let changed = false;
+		/* istanbul ignore else -- @preserve */
 		if (this.deltaX !== 0 || this.deltaY !== 0) {
-			if (this.stopPropagation()) {
+			if (this.options.stopPropagation!(this.deltaX, this.deltaY)) {
 				e.stopPropagation();
 			}
-			changed = true;
+			if (this.animationFrameID === null) {
+				this.animationFrameID = window.requestAnimationFrame(this.didWheel);
+			}
 		}
 
-		if (changed === true && this.animationFrameID === null) {
-			this.animationFrameID = Utils.raf(this.didWheel);
+		
+	}
+
+	private operateDOMEvents(type: string) {
+		if (typeof window === 'undefined') return;
+		let fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
+
+		fn(normalizeWheel.getEventType(), this.handleWheel, false);
+
+		// 让触控屏也能实现滑动(模拟) 不用'ontouchend' in document，主要考虑测试
+		if (document.ontouchend || document.ontouchend === null) {
+			fn('touchstart', this.handleTouchStart, false);
+			fn('touchmove', this.handleTouchMove, { passive: false });
+			fn('touchend', this.handleTouchEnd, false);
+		} else {
+			// 模拟鼠标滚轮点击
+			fn('mousemove', this.handleMouseMove, false);
 		}
+	}
+
+	on(fn: WheelFunction) {
+		if (!this.listeners.length) {
+			this.operateDOMEvents('add');
+		}
+		this.listeners.push(fn);
+
+		return () => this.off(fn);
+	}
+
+	off(fn?: WheelFunction) {
+		if (fn) {
+			this.listeners.splice(this.listeners.indexOf(fn), 1);
+		} else {
+			this.listeners = [];
+		}
+
+		if (!this.listeners.length) {
+			this.operateDOMEvents('remove');
+		}
+	}
+
+	enable() {
+		this.defaultOnWheel && this.off(this.defaultOnWheel);
+
+		this.defaultOnWheel = /* istanbul ignore next -- @preserve */ (deltaX: number, deltaY: number) => {
+			if (deltaY && this.el.scrollHeight > this.el.offsetHeight) {
+				this.el.scrollTop = Math.min(
+					Math.max(0, this.el.scrollTop + deltaY),
+					this.el.scrollHeight - this.el.offsetHeight
+				);
+			} 
+			if (deltaX && this.el.scrollWidth > this.el.offsetWidth) {
+				this.el.scrollLeft = Math.min(
+					Math.max(0, this.el.scrollLeft + deltaX),
+					this.el.scrollWidth - this.el.offsetWidth
+				);
+			}
+		};
+
+		return this.on(this.defaultOnWheel);
 	}
 }

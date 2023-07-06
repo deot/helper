@@ -19,7 +19,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-shared": "*",
     "normalize-wheel": "^1.0.1"
   }
 }
