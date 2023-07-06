@@ -1,10 +1,9 @@
-import { IS_SERVER } from '@deot/helper-shared';
-import type { AnyFunction } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 export const off = (
 	el: HTMLElement, 
 	event: string, 
-	handler: AnyFunction, 
+	handler: (...args: unknown[]) => unknown, 
 	options?: boolean | AddEventListenerOptions
 ) => { 
 	if (IS_SERVER) return;

@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 import { hasClass } from './has-class';
 
 export const addClass = (el: HTMLElement, cls?: string) => {

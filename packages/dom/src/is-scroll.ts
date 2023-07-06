@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 import { getStyle } from './get-style';
 
 export const isScroll = (el?: HTMLElement, direction?: 'y' | 'x') => {

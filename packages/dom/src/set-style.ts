@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 export const setStyle = (el: HTMLElement, name?: object | string, value?: any) => {
 	if (IS_SERVER || !name) return;

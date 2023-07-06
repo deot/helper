@@ -20,11 +20,7 @@ importers:
 
   packages/device: {}
 
-  packages/dom:
-    dependencies:
-      '@deot/helper-shared':
-        specifier: '*'
-        version: link:../shared
+  packages/dom: {}
 
   packages/emitter: {}
 
@@ -77,17 +73,9 @@ importers:
         specifier: '*'
         version: link:../wheel
 
-  packages/load:
-    dependencies:
-      '@deot/helper-shared':
-        specifier: '*'
-        version: link:../shared
+  packages/load: {}
 
   packages/resize:
-    dependencies:
-      '@deot/helper-shared':
-        specifier: '*'
-        version: link:../shared
     devDependencies:
       resize-observer-polyfill:
         specifier: ^1.5.1
@@ -118,9 +106,6 @@ importers:
 
   packages/wheel:
     dependencies:
-      '@deot/helper-shared':
-        specifier: '*'
-        version: link:../shared
       normalize-wheel:
         specifier: ^1.0.1
         version: 1.0.1

@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 // TODO: 增加maxTries
 export const image = (src: string) => {

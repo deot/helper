@@ -1,7 +1,7 @@
-import { IS_SERVER } from '@deot/helper-shared';
-import type { AnyFunction } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 import { on } from './on';
 
+type AnyFunction = (...args: unknown[]) => unknown;
 export const once = (
 	el: HTMLElement, 
 	event: string, 

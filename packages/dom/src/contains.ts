@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Document, child?: HTMLElement) => {
 	if (IS_SERVER || !child) return false;

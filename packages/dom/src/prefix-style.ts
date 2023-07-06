@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 const $target = IS_SERVER ? {} : document.createElement('div').style;
 const prefix = (() => {

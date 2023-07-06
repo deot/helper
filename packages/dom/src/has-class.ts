@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 export const hasClass = (el: HTMLElement, cls?: string) => {
 	if (IS_SERVER || !cls) return false;

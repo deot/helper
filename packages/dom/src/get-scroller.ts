@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 import { isScroll } from './is-scroll';
 
 export const getScroller = (el?: HTMLElement, direction?: 'y' | 'x') => {

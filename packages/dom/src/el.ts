@@ -1,4 +1,4 @@
-import { IS_SERVER } from '@deot/helper-shared';
+import { IS_SERVER } from './_constants';
 
 export const el = (v: string | HTMLElement) => {
 	if (IS_SERVER) return null;
