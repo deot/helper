@@ -24,8 +24,7 @@ export const flattenJSONParse = (value: string | null): any => {
 	let safeCount = 1;
 	let parseValue: any = value;
 	while (need) {
-		/* istanbul ignore next */
-		if (safeCount > 1000) {
+		if (safeCount > 10) {
 			throw new Error(value);
 		}
 		try {

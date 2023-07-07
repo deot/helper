@@ -23,9 +23,13 @@ export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 
 	for (let len = keyArr.length; i < len - 1; ++i) {
 		let key = keyArr[i];
-		if (key in o) {
-			o = o[key];
-		} else {
+		try {
+			if (key in o) {
+				o = o[key];
+			} else {
+				throw new Error();
+			}
+		} catch {
 			throw new Error('无效路径!');
 		}
 	}
@@ -33,6 +37,6 @@ export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 	return {
 		o,
 		k: keyArr[i],
-		v: target[keyArr[i]]
+		v: o[keyArr[i]]
 	};
 };

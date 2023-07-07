@@ -24,7 +24,7 @@ export interface CompressOptions {
 	encoderOptions?: any;
 }
 
-export const compressImage = (file: File, options: CompressOptions) => {
+export const compressImage = (file: File, options?: CompressOptions): Promise<{ dataURL: string, file: File }> => {
 	const { width, height, filetype = 'image/jpeg', encoderOptions } = options || {};
 	return new Promise((resolve, reject) => {
 		// 压缩图片需要的元素和对象

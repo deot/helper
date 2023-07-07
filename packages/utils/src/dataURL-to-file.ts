@@ -11,9 +11,9 @@ export const dataURLToFile = (
 	dataURL: string, 
 	filename?: string,
 	filetype?: string
-) => {
-	const hasSuffix = /data:[^;]+;[^,]+,/g.test(dataURL);
-	if (!hasSuffix) {
+): File => {
+	const hasPrefix = /data:[^;]+;[^,]+,/g.test(dataURL);
+	if (!hasPrefix) {
 		dataURL = `data:${filetype || getMime(filename)};base64,${dataURL}`;
 	}
 

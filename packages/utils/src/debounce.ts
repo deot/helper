@@ -5,8 +5,8 @@ interface Options {
 }
 // leading: 指定在延迟开始前调用。
 // trailing: 指定在延迟结束后调用。
-export const debounce = (original: Function, wait: number, options: Options) => {
-	const { leading, trailing, throttle } = options || {};
+export const debounce = (original: Function, wait?: number, options?: Options) => {
+	const { leading, trailing = true, throttle } = options || {};
 	let timer: ReturnType<typeof global.setTimeout> | null;
 	let invoke: Function | null;
 

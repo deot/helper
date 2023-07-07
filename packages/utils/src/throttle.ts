@@ -5,8 +5,8 @@ interface Options {
 	trailing?: boolean;
 }
 
-export const throttle = (original: Function, wait: number, options: Options) => {
-	const { leading, trailing } = options || {};
+export const throttle = (original: Function, wait?: number, options?: Options) => {
+	const { leading = true, trailing = true } = options || {};
 	return debounce(
 		original,
 		wait, 

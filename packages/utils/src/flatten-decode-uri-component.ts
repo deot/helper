@@ -3,9 +3,7 @@ export const flattenDecodeURIComponent = (value: string) => {
 	let safeCount = 1;
 	let parseValue = value;
 	while (need) {
-		/* istanbul ignore next */
 		if (safeCount > 1000) {
-			console.log(value);
 			throw new Error(value);
 		}
 		try {

@@ -1,1 +1,1 @@
-export const isObj = (target: any) => typeof target === 'object';
+export const isObj = (target?: any) => typeof target === 'object';
