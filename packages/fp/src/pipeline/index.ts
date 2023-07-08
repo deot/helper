@@ -8,3 +8,7 @@ export * from './map';
 export * from './filter';
 export * from './reduce';
 export * from './reverse';
+export * from './add';
+export * from './subtract';
+export * from './divide';
+export * from './multiply';
