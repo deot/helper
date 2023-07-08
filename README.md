@@ -50,14 +50,14 @@
 
 | 包名                          | 版本                                           | 说明                                       |
 | --------------------------- | -------------------------------------------- | ---------------------------------------- |
-| [cache](packages/cache)     | [![npm][npm-cache-image]][npm-cache-url]     | 缓存管理（Storage / Cookit / IndexDB）         |
+| [cache](packages/cache)     | [![npm][npm-cache-image]][npm-cache-url]     | 缓存管理（`Storage` / `Cookie` / `IndexDB`）         |
 | [device](packages/device)   | [![npm][npm-device-image]][npm-device-url]   | 设备ua                                     |
 | [dom](packages/dom)         | [![npm][npm-dom-image]][npm-dom-url]         | dom元素操作的一些方法                             |
 | [emitter](packages/emitter) | [![npm][npm-emitter-image]][npm-emitter-url] | 简单的发布订阅                                  |
 | [fp](packages/fp)           | [![npm][npm-fp-image]][npm-fp-url]           | 函数式工具，主要用`Task`函子延伸的`Job`，`Parallel`任务管理 |
-| [load](packages/load)       | [![npm][npm-load-image]][npm-load-url]       | 加载脚本、样式（link&style）、图片                   |
+| [load](packages/load)       | [![npm][npm-load-image]][npm-load-url]       | 加载脚本、样式（`link`&`style`）、图片                   |
 | [resize](packages/resize)   | [![npm][npm-resize-image]][npm-resize-url]   | 元素变化监听                                   |
-| [route](packages/route)     | [![npm][npm-route-image]][npm-route-url]     | 类URL/URLSearchParams相关取值                 |
+| [route](packages/route)     | [![npm][npm-route-image]][npm-route-url]     | 类`URL`/`URLSearchParams`相关取值                 |
 | [shared](packages/shared)   | [![npm][npm-shared-image]][npm-shared-url]   | 共享类型和常量                                  |
 | [unicode](packages/unicode) | [![npm][npm-unicode-image]][npm-unicode-url] | 用于字符串压缩                                  |
 | [utils](packages/utils)     | [![npm][npm-utils-image]][npm-utils-url]     | 工具方法                                     |

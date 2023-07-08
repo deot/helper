@@ -158,7 +158,7 @@ describe('parallel.ts', () => {
 
 		const target = current.start();
 
-		await sleep(30);
+		await sleep(25);
 		expect(count).not.toBe(100);
 		expect(count).toBeGreaterThan(30);
 
