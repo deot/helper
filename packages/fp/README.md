@@ -1,3 +1,14 @@
+# @deot/helper-fp
+
+### `FP`
+```js
+import * as FP from '@deot/helper-fp';
+
+// or
+import { FP } from '@deot/helper';
+
+```
+
 - pipeline 函数管道，配合函数链的函数式工具
 - combinator 函数组合子，配合函数链的控制流
 - functor 函子，用于形成函数链，配合异常异步等行为

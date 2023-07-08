@@ -1,3 +1,71 @@
+# @deot/helper-route
+
+### `Route` 
+
+```js
+import * as Route from "@deot/helper-route";
+
+// or
+import { Route } from "@deot/helper";
+```
+
+---
+
+#### `merge`
+
+`Route.merge(route: object, options: object)`
+
+基于规则构建新的url
+
++ **route**: 路由规则
++ **options**: 可配置参数
+
+*rule:* 规则:
++ **path**: *string, string[]* 路径
++ **query**: *object* 参数
+
+**示例**
+```js
+Route.merge({
+	// path: '/home',
+	path: ['/', 'home'],
+	query: { name: 'wya-team' }
+});
+```
+
+---
+
+#### `parse`
+
+`Route.parse(url: string, options: object)`
+
+解析当前路由 -> `{ query: {}, path: [] }`
+
++ **url**: 路径，默认值：当前路由
++ **options**: 可配置参数
+
+**示例**
+```js
+Route.parse();
+```
+
+---
+
+#### `get`
+
+`Route.get(key: string, url: string, options: object)`
+
+设置版本号
+
++ **key**: 参数键值
++ **url**: 路径，默认值：当前路由
++ **options**: 可配置参数
+
+**示例**
+```javascript
+Route.get('name');
+```
+
 ### 约定
 
 ```
