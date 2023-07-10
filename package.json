@@ -16,6 +16,7 @@
     "link": "ddc link",
     "dev": "ddc dev",
     "build": "ddc build --script-formats=es,cjs,umd,iife",
+    "update": "ddc update",
     "test": "ddc test",
     "add": "ddc add",
     "release": "ddc release"
@@ -26,6 +27,7 @@
     "add": "创建新包或者给包添加依赖",
     "dev": "开发模式",
     "build": "打包模式",
+    "update": "更新 devDependencies 和 dependencies",
     "test": "执行测试, 可选择单个包或全部"
   },
   "repository": {
@@ -39,6 +41,6 @@
   },
   "homepage": "https://github.com/deot/helper#readme",
   "devDependencies": {
-    "@deot/dev": "^2.1.0"
+    "@deot/dev": "^2.2.2"
   }
 }

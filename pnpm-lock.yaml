@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@deot/dev':
-        specifier: ^2.1.0
-        version: 2.1.0(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
+        specifier: ^2.2.2
+        version: 2.2.2(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
 
   packages/cache:
     devDependencies:
@@ -95,8 +95,8 @@ importers:
   packages/unicode:
     dependencies:
       fflate:
-        specifier: 0.7.4
-        version: 0.7.4
+        specifier: ^0.8.0
+        version: 0.8.0
 
   packages/utils:
     dependencies:
@@ -380,10 +380,10 @@ packages:
       postcss-selector-parser: 6.0.13
     dev: true
 
-  /@deot/dev-adder@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-fHsIfP5BzDMdzIefst0bsF+ouxRuCxNm75C29lr2Xc1OkgJajXl9mTmTD5LLu4iEjLLNrKPj6uTqTxTIJowedw==}
+  /@deot/dev-adder@2.2.0(typescript@5.1.6):
+    resolution: {integrity: sha512-SQPKCGMS+IClq8Z1En68I8WTtfrArfo6un3BvqR/0rzQ0eHJGEw63HW0m9/9b5xRVBpzfJEEytMp2KzYHGCFQQ==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       fs-extra: 11.1.1
       inquirer: 9.2.7
       inquirer-autocomplete-prompt: 3.0.0(inquirer@9.2.7)(typescript@5.1.6)
@@ -392,15 +392,15 @@ packages:
       - typescript
     dev: true
 
-  /@deot/dev-builder@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-Pu/1Bbmt7wt+LguhtNVOYZJsbTemPurxGUNc5s60M9KzaxCFGqf5GEk9UKMNlhHhpLZEmPTyi9vB02S59PiXxw==}
+  /@deot/dev-builder@2.2.0(typescript@5.1.6):
+    resolution: {integrity: sha512-CLsOSVArURUVkhH0GMoVSZ8++bzu9c9TCCDnTM/4SGqBDecl/YPfKr2xYW/M9F6HgxLfsokXWO5NgHkLUEQPnQ==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
       typescript:
         optional: true
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       '@microsoft/api-extractor': 7.36.1
       autoprefixer: 10.4.14(postcss@8.4.25)
       chalk: 5.3.0
@@ -423,16 +423,17 @@ packages:
       - terser
     dev: true
 
-  /@deot/dev-cli@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-55d/4drSZ6ATOoVZfAnIr4IoPpDRRRlkgh3XZPMw/HufUqURw3Q5adWuSw+/S2xDNcxJARZG93ie6t5LgBCscA==}
+  /@deot/dev-cli@2.2.2(typescript@5.1.6):
+    resolution: {integrity: sha512-ZCiIfnkpXM8Tr3hWLSyJtQi4ubdftgZs91QINSkzR8ROqC8pUOexMnFAyxH+0b2c/ulnbrGg177qjuhXd/hu3g==}
     hasBin: true
     dependencies:
-      '@deot/dev-adder': 2.1.0(typescript@5.1.6)
-      '@deot/dev-builder': 2.1.0(typescript@5.1.6)
-      '@deot/dev-linker': 2.1.0
-      '@deot/dev-releaser': 2.1.0(typescript@5.1.6)
-      '@deot/dev-shared': 2.1.0
-      '@deot/dev-tester': 2.1.0(typescript@5.1.6)
+      '@deot/dev-adder': 2.2.0(typescript@5.1.6)
+      '@deot/dev-builder': 2.2.0(typescript@5.1.6)
+      '@deot/dev-linker': 2.2.0
+      '@deot/dev-releaser': 2.2.1(typescript@5.1.6)
+      '@deot/dev-shared': 2.2.0
+      '@deot/dev-tester': 2.2.0(typescript@5.1.6)
+      '@deot/dev-updater': 2.2.2
       commander: 10.0.1
     transitivePeerDependencies:
       - '@edge-runtime/vm'
@@ -472,12 +473,12 @@ packages:
       - supports-color
     dev: true
 
-  /@deot/dev-dever@2.1.0:
-    resolution: {integrity: sha512-YJbe4GbloT6iZ7CKSAthAjgD6RTsV/XziQvMvtVF4vjliwKYy56cL+PS/d/KIkSBJIT7NxwSg8PlSJz4XFfY2Q==}
+  /@deot/dev-dever@2.2.0:
+    resolution: {integrity: sha512-66F7T9gNph6H6+hZMwzmhScW/hMjFC3M98TImBYfrVwYHKyU/+fj+8pjZ0nWAxcqoxgelKo9jkUsOh/x/Dws6g==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       ejs: 3.1.9
-      vite: 4.4.2(@types/node@20.3.1)
+      vite: 4.4.2(@types/node@20.4.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -507,18 +508,18 @@ packages:
       - typescript
     dev: true
 
-  /@deot/dev-linker@2.1.0:
-    resolution: {integrity: sha512-9TMxeKaCclw/PXItNAajGEdoCM8x60CZob9rpaFDlNC7/7QOQGLjokQCh+XmHA7c1KzPMXU4dItswCaFf1CyaQ==}
+  /@deot/dev-linker@2.2.0:
+    resolution: {integrity: sha512-ASKp+x9JeA9FhuM+dOkVnSOW/ZRVzJJBWxVtBcUdknFFOV6hvqSvj7Fu2NI2bZ5LrW3B9asGktUV9dGpXOAn+Q==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       chalk: 5.3.0
       ora: 6.3.1
     dev: true
 
-  /@deot/dev-releaser@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-AkLTECu9bGLZqXR+BT4uwVlOx6BPArk/VHzjN3rqI/kTM0ieVG3ES+WY77Gy3c7m9vDJcxeaCFpJoCTudnQUrg==}
+  /@deot/dev-releaser@2.2.1(typescript@5.1.6):
+    resolution: {integrity: sha512-Htgpoh1n43xcCcMUT3rOBQs2CGy4wS/vSUaFcMRhePrGgv5JHolBwy3iwsPSCNEjhG2WM0dT2byQsbe7vrTchw==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       chalk: 5.3.0
       conventional-commits-parser: 4.0.0
       fs-extra: 11.1.1
@@ -529,14 +530,14 @@ packages:
       - typescript
     dev: true
 
-  /@deot/dev-shared@2.1.0:
-    resolution: {integrity: sha512-2e/6B/ZV5KZgGxkdFFYb6yA50VY/bdSDYRzvvbZ2X4o5yApvd/3s8oRGp3JMEX0RB708tUaohwkeH73GkiMPmQ==}
+  /@deot/dev-shared@2.2.0:
+    resolution: {integrity: sha512-TkzbkgmHTfq/Pj7Ae/RK723Euyo5GHi3tTTIJ78wxhgf1aUzyRWMOxCKjBuJoNDngwqvOzF/Xc+fv33/xUtDRA==}
     dev: true
 
-  /@deot/dev-test@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-fcvKFV4WjreI/c/jKaMZpThlemhp/pWQuPux2P/5CezilVEgljKVLo+wOGfYVj2KHAW74Mj/5tMjgTjntu8jgQ==}
+  /@deot/dev-test@2.2.0(typescript@5.1.6):
+    resolution: {integrity: sha512-uak1BjWkrxeufW1N8uCjd1EXrkyyVsDpTuHK32m19Nz6h955AVycadU0HDmxNQLG7Oey18rNsImhrtfozUDfog==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       puppeteer: 20.8.0(typescript@5.1.6)
     transitivePeerDependencies:
       - bufferutil
@@ -546,10 +547,10 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@deot/dev-tester@2.1.0(typescript@5.1.6):
-    resolution: {integrity: sha512-MDUUOIvc8WCWip/m8bKBzlct9EflwiNq8m12ROGSFci4cJAyOXXTpGchW+//i/9wEC7dvWHlzJeI6mKQJ5fsUw==}
+  /@deot/dev-tester@2.2.0(typescript@5.1.6):
+    resolution: {integrity: sha512-308B9oqBcrZDww10FSRluvqkUqbfZqYQ8Vs3hWA2E4CVQYwm1l6pxkV1qzsceWNimhV/sJh+2Hx2ua97uB+3Tw==}
     dependencies:
-      '@deot/dev-shared': 2.1.0
+      '@deot/dev-shared': 2.2.0
       '@vitest/coverage-istanbul': 0.33.0(vitest@0.33.0)
       cross-env: 7.0.3
       inquirer: 9.2.7
@@ -577,20 +578,31 @@ packages:
       - webdriverio
     dev: true
 
-  /@deot/dev@2.1.0(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6):
-    resolution: {integrity: sha512-xYaQDvuWeoDbYxWcuz5Qb7YZp3IPh8XRM/ni85YAQMI4FU62qvFv5PtbKXIq/0FzA8S4FnOuLb0OfauZicBhvQ==}
+  /@deot/dev-updater@2.2.2:
+    resolution: {integrity: sha512-VMDMQWWfKbQx2nKZitjikDIGOXH3nYVzAZ4gC4Gm4JKUaNkOvMWs79zEVj5o88Sd036J8zUt4UrW54f5jysF1A==}
     dependencies:
-      '@deot/dev-adder': 2.1.0(typescript@5.1.6)
-      '@deot/dev-builder': 2.1.0(typescript@5.1.6)
-      '@deot/dev-cli': 2.1.0(typescript@5.1.6)
+      '@deot/dev-shared': 2.2.0
+      chalk: 5.3.0
+      fs-extra: 11.1.1
+      ora: 6.3.1
+      semver: 7.5.4
+    dev: true
+
+  /@deot/dev@2.2.2(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6):
+    resolution: {integrity: sha512-KlrOB0CyWkLTFF5OFHM1Sj2z3ulZMTQQBfwtCUVakHX5jpuvDyoV2AzJlG42aNGgnoc+s5APUd5ri60wmeczgA==}
+    dependencies:
+      '@deot/dev-adder': 2.2.0(typescript@5.1.6)
+      '@deot/dev-builder': 2.2.0(typescript@5.1.6)
+      '@deot/dev-cli': 2.2.2(typescript@5.1.6)
       '@deot/dev-deps': 2.1.0
-      '@deot/dev-dever': 2.1.0
+      '@deot/dev-dever': 2.2.0
       '@deot/dev-eslint': 2.1.0(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
-      '@deot/dev-linker': 2.1.0
-      '@deot/dev-releaser': 2.1.0(typescript@5.1.6)
-      '@deot/dev-shared': 2.1.0
-      '@deot/dev-test': 2.1.0(typescript@5.1.6)
-      '@deot/dev-tester': 2.1.0(typescript@5.1.6)
+      '@deot/dev-linker': 2.2.0
+      '@deot/dev-releaser': 2.2.1(typescript@5.1.6)
+      '@deot/dev-shared': 2.2.0
+      '@deot/dev-test': 2.2.0(typescript@5.1.6)
+      '@deot/dev-tester': 2.2.0(typescript@5.1.6)
+      '@deot/dev-updater': 2.2.2
     transitivePeerDependencies:
       - '@babel/eslint-parser'
       - '@edge-runtime/vm'
@@ -1317,10 +1329,6 @@ packages:
 
   /@types/minimist@1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
-    dev: true
-
-  /@types/node@20.3.1:
-    resolution: {integrity: sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==}
     dev: true
 
   /@types/node@20.4.1:
@@ -2865,7 +2873,7 @@ packages:
       lodash.isequal: 4.5.0
       lodash.kebabcase: 4.1.1
       lodash.unionwith: 4.6.0
-      optionator: 0.9.1
+      optionator: 0.9.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3065,8 +3073,8 @@ packages:
       pend: 1.2.0
     dev: true
 
-  /fflate@0.7.4:
-    resolution: {integrity: sha512-5u2V/CDW15QM1XbbgS+0DfPxVB+jUKhWEKuuFuHncbk3tEEqzmoXL+2KyOFuKGqOnmdIy0/davWF1CkuwtibCw==}
+  /fflate@0.8.0:
+    resolution: {integrity: sha512-FAdS4qMuFjsJj6XHbBaZeXOgaypXp8iw/Tpyuq/w3XA41jjLHT8NPA+n7czH/DDhdncq0nAyDZmPeWXh2qmdIg==}
     dev: false
 
   /figures@5.0.0:
@@ -4559,18 +4567,6 @@ packages:
       levn: 0.3.0
       prelude-ls: 1.1.2
       type-check: 0.3.2
-      word-wrap: 1.2.3
-    dev: true
-
-  /optionator@0.9.1:
-    resolution: {integrity: sha512-74RlY5FCnhq4jRxVUPKDaRwrVNXMqsGsiW6AJw4XK8hmtm10wC0ypZBLw5IIp85NZMr91+qd1RvvENwg7jjRFw==}
-    engines: {node: '>= 0.8.0'}
-    dependencies:
-      deep-is: 0.1.4
-      fast-levenshtein: 2.0.6
-      levn: 0.4.1
-      prelude-ls: 1.2.1
-      type-check: 0.4.0
       word-wrap: 1.2.3
     dev: true
 
@@ -6245,7 +6241,7 @@ packages:
     engines: {node: '>= 0.10'}
     dev: true
 
-  /vite-node@0.33.0(@types/node@20.3.1):
+  /vite-node@0.33.0(@types/node@20.4.1):
     resolution: {integrity: sha512-19FpHYbwWWxDr73ruNahC+vtEdza52kA90Qb3La98yZ0xULqV8A5JLNPUff0f5zID4984tW7l3DH2przTJUZSw==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -6255,7 +6251,7 @@ packages:
       mlly: 1.4.0
       pathe: 1.1.1
       picocolors: 1.0.0
-      vite: 4.4.2(@types/node@20.3.1)
+      vite: 4.4.2(@types/node@20.4.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -6267,7 +6263,7 @@ packages:
       - terser
     dev: true
 
-  /vite@4.4.2(@types/node@20.3.1):
+  /vite@4.4.2(@types/node@20.4.1):
     resolution: {integrity: sha512-zUcsJN+UvdSyHhYa277UHhiJ3iq4hUBwHavOpsNUGsTgjBeoBlK8eDt+iT09pBq0h9/knhG/SPrZiM7cGmg7NA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6295,7 +6291,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.3.1
+      '@types/node': 20.4.1
       esbuild: 0.18.11
       postcss: 8.4.25
       rollup: 3.26.2
@@ -6372,7 +6368,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.5
       '@types/chai-subset': 1.3.3
-      '@types/node': 20.3.1
+      '@types/node': 20.4.1
       '@vitest/expect': 0.33.0
       '@vitest/runner': 0.33.0
       '@vitest/snapshot': 0.33.0
@@ -6392,8 +6388,8 @@ packages:
       strip-literal: 1.0.1
       tinybench: 2.5.0
       tinypool: 0.6.0
-      vite: 4.4.2(@types/node@20.3.1)
-      vite-node: 0.33.0(@types/node@20.3.1)
+      vite: 4.4.2(@types/node@20.4.1)
+      vite-node: 0.33.0(@types/node@20.4.1)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
