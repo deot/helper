@@ -9,45 +9,36 @@ export class Task extends AMonad {
 		return new Task(v, parent);
 	}
 
-	result: any;
+	result: any = '';
 
-	cancelHooks: Array<Function>;
+	cancelHooks: Function[] = [];
 
 	// 已取消
-	isCancel: boolean;
+	isCancel = false;
 
 	// 已完成
-	isComplete: boolean;
+	isComplete = false;
 
 	isStart: boolean;
 
 	parent: Task | null;
 
-	child: Task | null;
+	child: Task | null = null;
 
-	record: [string, Function] | null;
+	record: [string, Function] | null = null;
 
 	ready: Promise<any>;
 
 	_ready!: Function;
 
-	pasuer: Promise<any>;
+	pasuer = Promise.resolve();
 
 	_pasuer!: Function;
 
 	constructor(value: any, parent?: any) {
 		super(value);
 
-		this.result = '';
-		this.cancelHooks = [];
-
 		this.parent = parent;
-		this.child = null;
-		this.record = null;
-
-
-		this.isCancel = false;
-		this.isComplete = false;
 		this.isStart = parent?.isStart || false;
 
 		// 如果已经开始了, ready可以直接执行
@@ -56,8 +47,6 @@ export class Task extends AMonad {
 			: new Promise((resolve) => {
 				this._ready = resolve;
 			});
-
-		this.pasuer = Promise.resolve();
 	}
 
 	map(this: any, fn: Function) {

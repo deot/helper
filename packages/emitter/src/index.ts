@@ -9,16 +9,13 @@ export class Emitter {
 		return new Emitter(context);
 	}
 
-	events: object;
+	events: Record<string, Function[]> = {};
 
-	listeners: Array<Function>;
+	listeners: Function[] = [];
 
 	context: any;
 
 	constructor(context?: any) {
-		this.events = {};
-		this.listeners = [];
-
 		this.context = context || null;
 	}
 

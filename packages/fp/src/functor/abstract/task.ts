@@ -3,22 +3,13 @@ import { Emitter } from '@deot/helper-emitter';
 export abstract class ATask extends Emitter {
 	_pasuer!: Function;
 	
-	pasuer: Promise<any>;
+	pasuer = Promise.resolve();
 
-	canceler: Promise<any>;
+	canceler = Promise.resolve();
 
-	isCancel: boolean;
+	isCancel = false;
 
-	isPasue: boolean;
-
-	constructor() {
-		super();
-		this.pasuer = Promise.resolve();
-		this.canceler = Promise.resolve();
-
-		this.isCancel = false;
-		this.isPasue = false;
-	}
+	isPasue = false;
 
 	async suspend(x: any, target?: any) {
 		if (target && target.then) {

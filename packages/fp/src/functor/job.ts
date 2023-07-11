@@ -14,7 +14,7 @@ export class Job extends ATask {
 
 	interval: number;
 
-	isStart: boolean;
+	isStart = false;
 
 	constructor(task: Source, interval?: number) {
 		super();
@@ -23,7 +23,6 @@ export class Job extends ATask {
 		this.original = task;
 
 		this.interval = interval || 0;
-		this.isStart = false;
 
 		if (this.task instanceof Task && this.task.isStart) {
 			this.start();

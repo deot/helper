@@ -24,15 +24,9 @@ interface Options {
 
 class StorageStore extends ACache {
 
-	sessionStorage: MemoryStorage;
+	sessionStorage = new MemoryStorage();
 
-	localStorage: MemoryStorage;
-
-	constructor() {
-		super();
-		this.sessionStorage = new MemoryStorage();
-		this.localStorage = new MemoryStorage();
-	}
+	localStorage = new MemoryStorage();
 
 	getInvoke(options?: Options) {
 		return options?.session 

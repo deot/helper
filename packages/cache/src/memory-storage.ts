@@ -1,9 +1,5 @@
 export class MemoryStorage {
-	store: object;
-
-	constructor() {
-		this.store = {};
-	}
+	store: Record<string, any> = {};
 
 	getItem(key: string) {
 		return this.store[key] || null;

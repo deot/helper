@@ -32,15 +32,12 @@ export class Resize {
 		return new Resize(el).off(fn);
 	}
 
-	listeners: ResizableListener[];
+	listeners: ResizableListener[] = [];
 
-	ro: ResizeObserver | null;
+	ro: ResizeObserver | null = null;
 
 	constructor(el: ResizableElement) {
 		this.el = el;
-
-		this.listeners = [];
-		this.ro = null;
 
 		let rz = el.__rz__;
 		if (rz && rz instanceof Resize) {

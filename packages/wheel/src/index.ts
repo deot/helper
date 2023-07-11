@@ -131,33 +131,33 @@ export class Wheel {
 
 	el: HTMLElement;
 
-	needThresholdWait: boolean;
+	needThresholdWait = false;
 
-	animationFrameID: number | null;
+	animationFrameID: number | null = null;
 
-	deltaX: number;
+	deltaX = 0;
 
-	deltaY: number;
+	deltaY = 0;
 
-	isTouching: boolean;
+	isTouching = false;
 
-	startTime: number | null;
+	startTime = 0;
 
-	startX: number;
+	startX = 0;
 
-	startY: number;
+	startY = 0;
 
-	moveX: number;
+	moveX = 0;
 
-	moveY: number;
+	moveY = 0;
 
-	listeners: WheelFunction[];
+	listeners: WheelFunction[] = [];
 
-	timer: any;
+	timer: any = null;
 
 	options: WheelOptions;
 
-	defaultOnWheel: WheelFunction | null; 
+	defaultOnWheel: WheelFunction | null = null; 
 
 	constructor(el: HTMLElement, options?: WheelOptions) {
 		this.el = el;
@@ -169,26 +169,6 @@ export class Wheel {
 			shouldWheelY: (deltaY) => Wheel.shouldWheelY(el, deltaY),
 			...options
 		};
-
-		this.needThresholdWait = false;
-		this.animationFrameID = null;
-
-		this.deltaX = 0;
-		this.deltaY = 0;
-	
-		this.timer = null;
-		this.isTouching = false;
-		this.startTime = null;
-
-		this.startX = 0;
-		this.startY = 0;
-
-		this.moveX = 0;
-		this.moveY = 0;
-
-		this.listeners = [];
-
-		this.defaultOnWheel = null;
 	}
 
 	handleTouchStart = (e: TouchEvent) => {

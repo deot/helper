@@ -13,13 +13,13 @@ export class Parallel extends ATask {
 
 	task: Source;
 
-	isStart: boolean;
+	isStart = false;
 
-	target: any;
+	target: any = null;
 
-	_target: any;
+	_target: any = null;
 
-	tasks: Array<Promise<any> | Task>;
+	tasks: Array<Promise<any> | Task> = [];
 
 	// 同一时间并发数量
 	concurrency: number;
@@ -38,12 +38,6 @@ export class Parallel extends ATask {
 		this.original = task instanceof Array ? [...task] : task;
 
 		this.concurrency = concurrency || 1;
-		this.isStart = false;
-
-		this.target = null;
-		this._target = null;
-
-		this.tasks = [];
 	}
 
 	setConcurrency(value: number) {

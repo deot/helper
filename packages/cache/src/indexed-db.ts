@@ -19,13 +19,13 @@ interface State {
  * 一个实例只打开1个db, 如需打开多个，可以实例化多个IndexedDBStore
  */
 export class IndexedDBStore extends ACache {
-	timestramp: number;
+	timestramp = new Date().getTime();
 
-	count: number;
+	count = 0;
 
-	db: Promise<IDBDatabase> | null;
+	db: Promise<IDBDatabase> | null = null;
 
-	pending: Promise<any>[];
+	pending: Promise<any>[] = [];
 
 	constructor(options?: ACache['options']) {
 		super();
@@ -38,12 +38,6 @@ export class IndexedDBStore extends ACache {
 		};
 
 		options && this.configure(options);
-
-		this.timestramp = new Date().getTime();
-		this.count = 0;
-
-		this.db = null;
-		this.pending = [];
 	}
 
 	getUid() {
