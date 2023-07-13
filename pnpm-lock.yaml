@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@deot/dev':
-        specifier: ^2.2.2
-        version: 2.2.2(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
+        specifier: ^2.2.3
+        version: 2.2.3(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
 
   packages/cache:
     devDependencies:
@@ -103,6 +103,8 @@ importers:
       '@deot/helper-shared':
         specifier: '*'
         version: link:../shared
+
+  packages/validator: {}
 
   packages/wheel:
     dependencies:
@@ -392,8 +394,8 @@ packages:
       - typescript
     dev: true
 
-  /@deot/dev-builder@2.2.0(typescript@5.1.6):
-    resolution: {integrity: sha512-CLsOSVArURUVkhH0GMoVSZ8++bzu9c9TCCDnTM/4SGqBDecl/YPfKr2xYW/M9F6HgxLfsokXWO5NgHkLUEQPnQ==}
+  /@deot/dev-builder@2.2.1(typescript@5.1.6):
+    resolution: {integrity: sha512-kNbDlGEsf7f07Yl2YBf+GKVmq5N1ig2ChFdlE0ZRpRRT2iQFSf3GaqJ9eIG/ZMv6BrGZLwnivssJuB4xeIFkGQ==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -423,12 +425,12 @@ packages:
       - terser
     dev: true
 
-  /@deot/dev-cli@2.2.2(typescript@5.1.6):
-    resolution: {integrity: sha512-ZCiIfnkpXM8Tr3hWLSyJtQi4ubdftgZs91QINSkzR8ROqC8pUOexMnFAyxH+0b2c/ulnbrGg177qjuhXd/hu3g==}
+  /@deot/dev-cli@2.2.3(typescript@5.1.6):
+    resolution: {integrity: sha512-zRv1xfz/FSih9fuuiGXytuGLVZd8KmaWoeSnfIjVxpZKuoN2nVz0SaDRszOAjuyu8s16UbKmX7yTL2dfb/UUrA==}
     hasBin: true
     dependencies:
       '@deot/dev-adder': 2.2.0(typescript@5.1.6)
-      '@deot/dev-builder': 2.2.0(typescript@5.1.6)
+      '@deot/dev-builder': 2.2.1(typescript@5.1.6)
       '@deot/dev-linker': 2.2.0
       '@deot/dev-releaser': 2.2.1(typescript@5.1.6)
       '@deot/dev-shared': 2.2.0
@@ -588,12 +590,12 @@ packages:
       semver: 7.5.4
     dev: true
 
-  /@deot/dev@2.2.2(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6):
-    resolution: {integrity: sha512-KlrOB0CyWkLTFF5OFHM1Sj2z3ulZMTQQBfwtCUVakHX5jpuvDyoV2AzJlG42aNGgnoc+s5APUd5ri60wmeczgA==}
+  /@deot/dev@2.2.3(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6):
+    resolution: {integrity: sha512-yx+b0xIfo9maMyKks+RCqAeJUXNXW+l8qxZn2XfHDIPl+02sRCOdopgWkH69a/I3qty9RngtbP7ohCFId2T/Ig==}
     dependencies:
       '@deot/dev-adder': 2.2.0(typescript@5.1.6)
-      '@deot/dev-builder': 2.2.0(typescript@5.1.6)
-      '@deot/dev-cli': 2.2.2(typescript@5.1.6)
+      '@deot/dev-builder': 2.2.1(typescript@5.1.6)
+      '@deot/dev-cli': 2.2.3(typescript@5.1.6)
       '@deot/dev-deps': 2.1.0
       '@deot/dev-dever': 2.2.0
       '@deot/dev-eslint': 2.1.0(@babel/eslint-parser@7.21.8)(eslint@8.44.0)(typescript@5.1.6)
@@ -6404,6 +6406,7 @@ packages:
   /vm2@3.9.19:
     resolution: {integrity: sha512-J637XF0DHDMV57R6JyVsTak7nIL8gy5KH4r1HiwWLf/4GBbb5MKL5y7LpmF4A8E2nR6XmzpmMFQ7V7ppPTmUQg==}
     engines: {node: '>=6.0'}
+    deprecated: The library contains critical security issues and should not be used for production! The maintenance of the project has been discontinued. Consider migrating your code to isolated-vm.
     hasBin: true
     dependencies:
       acorn: 8.10.0
