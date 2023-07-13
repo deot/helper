@@ -1,4 +1,4 @@
-import type { ValidatorRule } from './validator';
+import type { ValidatorRule } from '../validator';
 
 export const required = (message: string): ValidatorRule => {
 	return [
