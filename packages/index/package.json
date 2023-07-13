@@ -19,6 +19,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@deot/helper-cache": "*",
     "@deot/helper-device": "*",
     "@deot/helper-dom": "*",
     "@deot/helper-emitter": "*",
@@ -29,6 +30,7 @@
     "@deot/helper-shared": "*",
     "@deot/helper-unicode": "*",
     "@deot/helper-utils": "*",
+    "@deot/helper-validator": "*",
     "@deot/helper-wheel": "*"
   }
 }

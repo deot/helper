@@ -1,4 +1,3 @@
-import { IS_SERVER } from '@deot/helper-shared';
 import { flattenJSONParse } from '@deot/helper-utils';
 
 interface Options {
@@ -24,7 +23,7 @@ export abstract class ACache {
 	}
 
 	configure(options: Options) {
-		if (IS_SERVER) return;
+		if (typeof window === 'undefined') return;
 		this.options = {
 			...this.options,
 			...options

@@ -1,5 +1,4 @@
 import { IS_SERVER } from './_constants';
-import type { AnyFunction } from '@deot/helper-shared';
 
 export const on = (
 	el: HTMLElement, 

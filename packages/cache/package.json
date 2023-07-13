@@ -18,6 +18,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@deot/helper-utils": "*"
+  },
   "devDependencies": {
     "fake-indexeddb": "^4.0.1"
   }

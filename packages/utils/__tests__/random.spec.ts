@@ -3,7 +3,7 @@ import * as Utils from '@deot/helper-utils';
 describe('random.ts', () => {
 	it('range', () => {
 		const result = {};
-		const total = 10000000;
+		const total = 20000000;
 		const min = 1;
 		const max = 100;
 		for (let i = 0; i <= total; i++) {

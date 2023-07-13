@@ -2,7 +2,6 @@
  * https://www.30secondsofcode.org/js/s/get-url-parameters/
  * https://www.30secondsofcode.org/js/s/query-string-to-object/
  */
-import { IS_SERVER } from '@deot/helper-shared';
 import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
 
 interface ParseOptions {
@@ -16,7 +15,7 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 		...options
 	};
 
-	const url$ = options$.url || (IS_SERVER ? '' : `${window.location.pathname}${window.location.search}`);
+	const url$ = options$.url || (typeof window === 'undefined' ? '' : `${window.location.pathname}${window.location.search}`);
 
 	const [prefix, search] = url$.split('?');
 	const query: { [key: string]: any } = {};

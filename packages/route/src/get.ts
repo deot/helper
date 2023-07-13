@@ -1,4 +1,3 @@
-import { IS_SERVER } from '@deot/helper-shared';
 import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
 
 interface GetOptions {
@@ -17,7 +16,7 @@ export const get = (
 		...options
 	};
 	
-	const url$ = options$.url || (IS_SERVER ? '' : window.location.search);
+	const url$ = options$.url || (typeof window === 'undefined' ? '' : window.location.search);
 
 	const match = url$
 		.substring(url$.indexOf('?') + 1)

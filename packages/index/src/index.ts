@@ -14,6 +14,7 @@ import { Emitter } from '@deot/helper-emitter';
 import { Resize } from '@deot/helper-resize';
 import { Wheel } from '@deot/helper-wheel';
 import { Device } from '@deot/helper-device';
+import { Validator, RegExps, RuleHelper } from '@deot/helper-validator';
 import { Cookie, Storage, IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
 export { 
@@ -31,5 +32,8 @@ export {
 	Device,
 	Load,
 	Route,
-	$
+	$,
+	Validator, 
+	RegExps, 
+	RuleHelper
 };
