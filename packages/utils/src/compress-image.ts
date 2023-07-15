@@ -1,6 +1,6 @@
 import { dataURLToFile } from './dataURL-to-file';
 
-export interface CompressOptions {
+export interface CompressImageOptions {
 	/**
 	 * 图片缩放最大宽度，不传默认源图片宽度
 	 */
@@ -24,7 +24,7 @@ export interface CompressOptions {
 	encoderOptions?: any;
 }
 
-export const compressImage = (file: File, options?: CompressOptions): Promise<{ dataURL: string; file: File }> => {
+export const compressImage = (file: File, options?: CompressImageOptions): Promise<{ dataURL: string; file: File }> => {
 	const { width, height, filetype = 'image/jpeg', encoderOptions } = options || {};
 	return new Promise((resolve, reject) => {
 		// 压缩图片需要的元素和对象
