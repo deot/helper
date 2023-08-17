@@ -1,5 +1,21 @@
 # @deot/helper ChangeLog
 
+## v1.0.2
+
+_2023-08-17_
+
+### Bugfixes
+
+- fix(utils): type namespace adjust ([e063492](https://github.com/deot/helper/commit/e063492e529f95516661cc58cea8c5733fa6e972))
+- fix(shared): incorrect build & relation build by `@deot/dev@2.3.3` ([59cd683](https://github.com/deot/helper/commit/59cd683d73630d99ef8a96ba2f843769c0eafa1d))
+
+### Features
+
+- feat: `@deot/helper-is` exposed ([f2f89f8](https://github.com/deot/helper/commit/f2f89f8e516194a505ec6a404702f6c32a5e945f))
+- feat(utils): `flattenDecodeURIComponent` ->  `flatten` ([3ae2955](https://github.com/deot/helper/commit/3ae29553e06a0309c227075551543dd3179173a7))
+- feat(utils): remove `isObj` method ([57f8ce2](https://github.com/deot/helper/commit/57f8ce2b36878a22cfecba67a57df4d752b04bd2))
+- feat(is): coverage & completion ([b57e914](https://github.com/deot/helper/commit/b57e91404072fc0b8eb91e004cd579f582ebe571))
+
 ## v1.0.1
 
 _2023-07-13_

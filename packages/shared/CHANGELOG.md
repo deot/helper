@@ -1,5 +1,13 @@
 # @deot/helper-shared ChangeLog
 
+## v1.0.2
+
+_2023-08-17_
+
+### Bugfixes
+
+- fix: incorrect build & relation build by `@deot/dev@2.3.3` ([59cd683](https://github.com/deot/helper/commit/59cd683d73630d99ef8a96ba2f843769c0eafa1d))
+
 ## v1.0.1
 
 _2023-07-13_

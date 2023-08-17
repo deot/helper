@@ -15,7 +15,7 @@ importers:
   packages/cache:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../utils
     devDependencies:
       fake-indexeddb:
@@ -44,7 +44,7 @@ importers:
   packages/index:
     dependencies:
       '@deot/helper-cache':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../cache
       '@deot/helper-device':
         specifier: ^1.0.1
@@ -59,7 +59,7 @@ importers:
         specifier: ^1.0.1
         version: link:../fp
       '@deot/helper-is':
-        specifier: '*'
+        specifier: ^1.0.1
         version: link:../is
       '@deot/helper-load':
         specifier: ^1.0.1
@@ -68,16 +68,16 @@ importers:
         specifier: ^1.0.1
         version: link:../resize
       '@deot/helper-route':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../route
       '@deot/helper-shared':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../shared
       '@deot/helper-unicode':
         specifier: ^1.0.1
         version: link:../unicode
       '@deot/helper-utils':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../utils
       '@deot/helper-validator':
         specifier: ^1.0.1
@@ -99,7 +99,7 @@ importers:
   packages/route:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.0.1
+        specifier: ^1.0.2
         version: link:../utils
 
   packages/shared: {}
