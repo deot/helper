@@ -58,6 +58,9 @@ importers:
       '@deot/helper-fp':
         specifier: ^1.0.1
         version: link:../fp
+      '@deot/helper-is':
+        specifier: '*'
+        version: link:../is
       '@deot/helper-load':
         specifier: ^1.0.1
         version: link:../load
@@ -82,6 +85,8 @@ importers:
       '@deot/helper-wheel':
         specifier: ^1.0.1
         version: link:../wheel
+
+  packages/is: {}
 
   packages/load: {}
 
