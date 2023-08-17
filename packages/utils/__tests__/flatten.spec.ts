@@ -1,6 +1,6 @@
 import * as Utils from '@deot/helper-utils';
 
-describe('flatten-decode-uri-component.ts', () => {
+describe('flatten.ts', () => {
 	it('basic', () => {
 		let v1 = '我';
 		let v2 = v1;
@@ -8,7 +8,7 @@ describe('flatten-decode-uri-component.ts', () => {
 			v2 = encodeURIComponent(v2);
 		});
 
-		expect(Utils.flattenDecodeURIComponent(v2)).toBe(v1);
+		expect(Utils.flatten(v2)).toBe(v1);
 	});
 
 	it('maxTries: 1000', () => {
@@ -18,18 +18,18 @@ describe('flatten-decode-uri-component.ts', () => {
 			v2 = encodeURIComponent(v2);
 		});
 		try {
-			Utils.flattenDecodeURIComponent(v2);
+			Utils.flatten(v2);
 		} catch (e: any) {
 			expect(v2).toBe(e.message);
 		}
 	});
 
 	it('error input', () => {
-		expect(Utils.flattenDecodeURIComponent('%')).toBe('%');
+		expect(Utils.flatten('%')).toBe('%');
 	});
 
 	it('error input', () => {
-		expect(Utils.flattenDecodeURIComponent('%')).toBe('%');
+		expect(Utils.flatten('%')).toBe('%');
 		
 		let v1 = '我%';
 		let v2 = v1;
@@ -37,7 +37,7 @@ describe('flatten-decode-uri-component.ts', () => {
 			v2 = encodeURIComponent(v2);
 		});
 
-		expect(Utils.flattenDecodeURIComponent(v2)).toBe(v1);
+		expect(Utils.flatten(v2)).toBe(v1);
 	});
 });
 

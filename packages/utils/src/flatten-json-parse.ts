@@ -1,3 +1,5 @@
+import { flatten } from './flatten';
+
 /**
  * 格式转换
  * '1' -> 1
@@ -20,23 +22,5 @@ export const flattenJSONParse = (value: string | null): any => {
 		return value;
 	}
 
-	let need = true;
-	let safeCount = 1;
-	let parseValue: any = value;
-	while (need) {
-		if (safeCount > 10) {
-			throw new Error(value);
-		}
-		try {
-			let next = JSON.parse(parseValue);
-			if (parseValue === next) {
-				need = false;
-			}
-			parseValue = next;
-		} catch {
-			need = false;
-		}
-		safeCount++;
-	}
-	return parseValue;
+	return flatten(value, JSON.parse);
 };

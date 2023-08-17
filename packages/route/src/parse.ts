@@ -2,7 +2,7 @@
  * https://www.30secondsofcode.org/js/s/get-url-parameters/
  * https://www.30secondsofcode.org/js/s/query-string-to-object/
  */
-import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
+import { flattenJSONParse, flatten } from '@deot/helper-utils';
 
 interface ParseOptions {
 	url?: string;
@@ -25,7 +25,7 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 			.from((search.match(/[^?=&]+=[^&]*/g) || []))
 			.forEach((v: string) => {
 				let [key, value] = v.split('=');
-				value = flattenDecodeURIComponent(value);
+				value = flatten(value);
 				query[key] = typeof options$.parse === 'function' 
 					? options$.parse(value) 
 					: value;

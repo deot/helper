@@ -1,4 +1,4 @@
-import { flattenJSONParse, flattenDecodeURIComponent } from '@deot/helper-utils';
+import { flattenJSONParse, flatten } from '@deot/helper-utils';
 
 interface GetOptions {
 	url?: string;
@@ -25,9 +25,9 @@ export const get = (
 	let value = match != null ? match[2] : null;
 
 	if (value === null) return null;
-	value = flattenDecodeURIComponent(value);
+	value = flatten(value);
 
 	return typeof options$.parse === 'function' 
-		? options$.parse(value) 
+		? options$.parse(value as string) 
 		: value;
 };

@@ -1,4 +1,4 @@
-export const flattenDecodeURIComponent = (value: string) => {
+export const flatten = (value: any, parser?: ((x: any) => any)) => {
 	let need = true;
 	let safeCount = 1;
 	let parseValue = value;
@@ -7,7 +7,7 @@ export const flattenDecodeURIComponent = (value: string) => {
 			throw new Error(value);
 		}
 		try {
-			let next = decodeURIComponent(parseValue);
+			let next = (parser || decodeURIComponent)(parseValue);
 			if (parseValue === next) {
 				need = false;
 			}

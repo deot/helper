@@ -1,4 +1,4 @@
-import { flattenDecodeURIComponent } from '@deot/helper-utils';
+import { flatten } from '@deot/helper-utils';
 
 interface Route {
 	origin?: string;
@@ -29,7 +29,7 @@ export const merge = (route: Route) => {
 			|| query[key] === false 
 			|| query[key] === 0
 		) {
-			let v = flattenDecodeURIComponent(query[key]);
+			let v = flatten(query[key]);
 			queryArr = [
 				...queryArr, 
 				`${key}=${encodeURIComponent(v)}`
