@@ -48,6 +48,9 @@
 [npm-validator-image]: https://img.shields.io/npm/v/@deot/helper-validator
 [npm-validator-url]: https://www.npmjs.com/package/@deot/helper-validator
 
+[npm-is-image]: https://img.shields.io/npm/v/@deot/helper-is
+[npm-is-url]: https://www.npmjs.com/package/@deot/helper-is
+
 [npm-image]: https://img.shields.io/npm/v/@deot/helper
 [npm-url]: https://www.npmjs.com/package/@deot/helper
 
@@ -65,9 +68,9 @@
 | [unicode](packages/unicode)     | [![npm][npm-unicode-image]][npm-unicode-url]     | 用于字符串压缩                                  |
 | [utils](packages/utils)         | [![npm][npm-utils-image]][npm-utils-url]         | 工具方法                                     |
 | [wheel](packages/wheel)         | [![npm][npm-wheel-image]][npm-wheel-url]         | 滚轮                                       |
-| [validator](packages/validator) | [![npm][npm-validator-image]][npm-validator-url] | 验证器，常用正则                                   |
+| [validator](packages/validator) | [![npm][npm-validator-image]][npm-validator-url] | 验证器，常用正则                                 |
+| [is](packages/is)               | [![npm][npm-is-image]][npm-is-url]               | 类型判断                                     |
 | [index](packages/index)         | [![npm][npm-image]][npm-url]                     | 当前所有包的合集                                 |
-
 
 ## Contributing
 

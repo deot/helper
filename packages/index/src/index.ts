@@ -9,6 +9,7 @@ import * as FP from '@deot/helper-fp';
 import * as Load from '@deot/helper-load';
 import * as Route from '@deot/helper-route';
 import * as $ from '@deot/helper-dom';
+import * as Is from '@deot/helper-is';
 
 import { Emitter } from '@deot/helper-emitter';
 import { Resize } from '@deot/helper-resize';
@@ -33,6 +34,7 @@ export {
 	Load,
 	Route,
 	$,
+	Is,
 	Validator, 
 	RegExps, 
 	RuleHelper

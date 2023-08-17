@@ -24,6 +24,7 @@
     "@deot/helper-dom": "^1.0.1",
     "@deot/helper-emitter": "^1.0.1",
     "@deot/helper-fp": "^1.0.1",
+    "@deot/helper-is": "*",
     "@deot/helper-load": "^1.0.1",
     "@deot/helper-resize": "^1.0.1",
     "@deot/helper-route": "^1.0.1",

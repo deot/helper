@@ -38,21 +38,30 @@
 [npm-wheel-image]: https://img.shields.io/npm/v/@deot/helper-wheel
 [npm-wheel-url]: https://www.npmjs.com/package/@deot/helper-wheel
 
+[npm-validator-image]: https://img.shields.io/npm/v/@deot/helper-validator
+[npm-validator-url]: https://www.npmjs.com/package/@deot/helper-validator
+
+[npm--image]: https://img.shields.io/npm/v/@deot/helper-
+[npm--url]: https://www.npmjs.com/package/@deot/helper-
+
 [npm-image]: https://img.shields.io/npm/v/@deot/helper
 [npm-url]: https://www.npmjs.com/package/@deot/helper
 
-| 包名                          | 版本                                           | 说明                                       |
-| --------------------------- | -------------------------------------------- | ---------------------------------------- |
-| [cache](../cache)     | [![npm][npm-cache-image]][npm-cache-url]     | 缓存管理（`Storage` / `Cookie` / `IndexDB`）         |
-| [device](../device)   | [![npm][npm-device-image]][npm-device-url]   | 设备ua                                     |
-| [dom](../dom)         | [![npm][npm-dom-image]][npm-dom-url]         | dom元素操作的一些方法                             |
-| [emitter](../emitter) | [![npm][npm-emitter-image]][npm-emitter-url] | 简单的发布订阅                                  |
-| [fp](../fp)           | [![npm][npm-fp-image]][npm-fp-url]           | 函数式工具，主要用`Task`函子延伸的`Job`，`Parallel`任务管理 |
-| [load](../load)       | [![npm][npm-load-image]][npm-load-url]       | 加载脚本、样式（`link`&`style`）、图片                   |
-| [resize](../resize)   | [![npm][npm-resize-image]][npm-resize-url]   | 元素变化监听                                   |
-| [route](../route)     | [![npm][npm-route-image]][npm-route-url]     | 类`URL`/`URLSearchParams`相关取值                 |
-| [shared](../shared)   | [![npm][npm-shared-image]][npm-shared-url]   | 共享类型和常量                                  |
-| [unicode](../unicode) | [![npm][npm-unicode-image]][npm-unicode-url] | 用于字符串压缩                                  |
-| [utils](../utils)     | [![npm][npm-utils-image]][npm-utils-url]     | 工具方法                                     |
-| [wheel](../wheel)     | [![npm][npm-wheel-image]][npm-wheel-url]     | 滚轮                                       |
-| [index](../index)     | [![npm][npm-image]][npm-url]                 | 当前所有包的合集                                 |
+| 包名                              | 版本                                               | 说明                                       |
+| ------------------------------- | ------------------------------------------------ | ---------------------------------------- |
+| [cache](../cache)               | [![npm][npm-cache-image]][npm-cache-url]         | 缓存管理（`Storage` / `Cookie` / `IndexDB`）   |
+| [device](../device)             | [![npm][npm-device-image]][npm-device-url]       | 设备ua                                     |
+| [dom](../dom)                   | [![npm][npm-dom-image]][npm-dom-url]             | dom元素操作的一些方法                             |
+| [emitter](../emitter)           | [![npm][npm-emitter-image]][npm-emitter-url]     | 简单的发布订阅                                  |
+| [fp](../fp)                     | [![npm][npm-fp-image]][npm-fp-url]               | 函数式工具，主要用`Task`函子延伸的`Job`，`Parallel`任务管理 |
+| [load](../load)                 | [![npm][npm-load-image]][npm-load-url]           | 加载脚本、样式（`link`&`style`）、图片               |
+| [resize](../resize)             | [![npm][npm-resize-image]][npm-resize-url]       | 元素变化监听                                   |
+| [route](../route)               | [![npm][npm-route-image]][npm-route-url]         | 类`URL`/`URLSearchParams`相关取值             |
+| [shared](../shared)             | [![npm][npm-shared-image]][npm-shared-url]       | 共享类型和常量                                  |
+| [unicode](../unicode)           | [![npm][npm-unicode-image]][npm-unicode-url]     | 用于字符串压缩                                  |
+| [utils](../utils)               | [![npm][npm-utils-image]][npm-utils-url]         | 工具方法                                     |
+| [wheel](../wheel)               | [![npm][npm-wheel-image]][npm-wheel-url]         | 滚轮                                       |
+| [validator](packages/validator) | [![npm][npm-validator-image]][npm-validator-url] | 验证器，常用正则                                 |
+| [is](packages/is)               | [![npm][npm-is-image]][npm-is-url]               | 类型判断                                     |
+| [index](../index)               | [![npm][npm-image]][npm-url]                     | 当前所有包的合集                                 |
+
