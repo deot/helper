@@ -9,7 +9,6 @@ export * from './def';
 export * from './get-prop-by-path';
 export * from './get-uid';
 export * from './has-own';
-export * from './is-obj';
 export * from './number-to-unit';
 export * from './pre-zero';
 export * from './raf';

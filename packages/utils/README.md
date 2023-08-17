@@ -24,7 +24,6 @@ import { Utils } from '@deot/helper';
 | [getPropByPath][./src/get-prop-by-path.ts]                         | 根据路径找值            |
 | [getUid][./src/get-uid.ts]                                         | 生成唯一id            |
 | [hasOwn][./src/has-own.ts]                                         | 是否在原型上            |
-| [isObj][./src/is-obj.ts]                                           | 是否对象              |
 | [numberToUnit][./src/number-to-unit.ts]                            | 大数据转成中文单位         |
 | [preZero][./src/pre-zero.ts]                                       | 加零                |
 | [raf][./src/raf.ts]                                                | raf               |
