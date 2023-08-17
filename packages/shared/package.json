@@ -1,7 +1,7 @@
 {
   "name": "@deot/helper-shared",
   "version": "1.0.1",
-  "main": "dist/index.es.js",
+  "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "exports": {
