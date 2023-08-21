@@ -12,6 +12,7 @@ export * from './bool';
 export * from './array';
 export * from './array-buffer';
 export * from './array-buffer-view';
+export * from './typed-array';
 export * from './date';
 export * from './blob';
 export * from './file';
