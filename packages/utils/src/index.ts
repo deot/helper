@@ -17,3 +17,4 @@ export * from './sleep';
 export * from './throttle';
 export * from './flatten';
 export * from './flatten-json-parse';
+export * from './generate-string';

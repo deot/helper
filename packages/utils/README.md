@@ -30,3 +30,4 @@ import { Utils } from '@deot/helper';
 | [random][./src/random.ts]                                          | `range` 和 `probs` |
 | [sleep][./src/sleep.ts]                                            | 等待                |
 | [throttle][./src/throttle.ts]                                      | 节流                |
+| [genterateString][./src/genterate-string.ts]                       | 随机生成指定长度的字符串      |
