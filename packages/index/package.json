@@ -1,6 +1,6 @@
 {
   "name": "@deot/helper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -19,18 +19,18 @@
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-cache": "^1.0.2",
+    "@deot/helper-cache": "^1.0.3",
     "@deot/helper-device": "^1.0.1",
     "@deot/helper-dom": "^1.0.1",
     "@deot/helper-emitter": "^1.0.1",
     "@deot/helper-fp": "^1.0.1",
-    "@deot/helper-is": "^1.0.1",
+    "@deot/helper-is": "^1.0.2",
     "@deot/helper-load": "^1.0.1",
     "@deot/helper-resize": "^1.0.1",
-    "@deot/helper-route": "^1.0.2",
+    "@deot/helper-route": "^1.0.3",
     "@deot/helper-shared": "^1.0.2",
     "@deot/helper-unicode": "^1.0.1",
-    "@deot/helper-utils": "^1.0.2",
+    "@deot/helper-utils": "^1.0.3",
     "@deot/helper-validator": "^1.0.1",
     "@deot/helper-wheel": "^1.0.1"
   }

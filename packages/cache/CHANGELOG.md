@@ -1,5 +1,13 @@
 # @deot/helper-cache ChangeLog
 
+## v1.0.3
+
+_2023-08-21_
+
+### Features
+
+- feat(utils): add `genterateString` ([5341a3e](https://github.com/deot/helper/commit/5341a3e04d87258d062ac4b6b931b54e4a4629a1))
+
 ## v1.0.2
 
 _2023-08-17_

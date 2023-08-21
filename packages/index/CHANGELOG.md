@@ -1,5 +1,14 @@
 # @deot/helper ChangeLog
 
+## v1.0.3
+
+_2023-08-21_
+
+### Features
+
+- feat(utils): add `genterateString` ([5341a3e](https://github.com/deot/helper/commit/5341a3e04d87258d062ac4b6b931b54e4a4629a1))
+- feat(is): add `typedArray` ([9327863](https://github.com/deot/helper/commit/93278638c56545d62a645ffb8f270ae5d3a8a3c3))
+
 ## v1.0.2
 
 _2023-08-17_
