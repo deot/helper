@@ -25,7 +25,7 @@ describe('random.ts', () => {
 		const sum = probs.reduce((a, b) => a + b);
 
 		const result = {};
-		const total = 1000000;
+		const total = process.env.CI ? 10000000 : 1000000;
 		for (let i = 0; i <= total; i++) {
 			let key = Utils.probs(probs);
 			if (!result[key]) result[key] = 0;
