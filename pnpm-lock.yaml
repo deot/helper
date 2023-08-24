@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@deot/dev':
-        specifier: ^2.3.3
-        version: 2.3.3(@babel/eslint-parser@7.21.8)(eslint@8.47.0)(stylelint@15.10.2)(typescript@5.1.6)
+        specifier: ^2.3.4
+        version: 2.3.4(@babel/eslint-parser@7.21.8)(eslint@8.47.0)(stylelint@15.10.2)(typescript@5.1.6)
 
   packages/cache:
     dependencies:
@@ -390,8 +390,8 @@ packages:
       postcss-selector-parser: 6.0.13
     dev: true
 
-  /@deot/dev-adder@2.3.1(typescript@5.1.6):
-    resolution: {integrity: sha512-drPKWansOEmSYDOGljJqOZJdmMiJb7CYBqbuTYxO/eE26FoAYzsyRoCQlOSFVUlIp6I2F4FbQLAJ5igLCvNwhw==}
+  /@deot/dev-adder@2.3.2(typescript@5.1.6):
+    resolution: {integrity: sha512-O06DjXPI0M9Iog0eXWFiu94sOrNaP72hClxvqUj4/kQg47RnFFVW0qAS25LW5UjzQ1lrD+wyQcNZ1WOh4j1ftw==}
     dependencies:
       '@deot/dev-shared': 2.3.0
       fs-extra: 11.1.1
@@ -433,11 +433,11 @@ packages:
       - terser
     dev: true
 
-  /@deot/dev-cli@2.3.3(typescript@5.1.6):
-    resolution: {integrity: sha512-iBGe1o+G7dW8cmAxH060sE2GDSZG/OZCPADIDqQoFnucWAtcrVnDaisFDSfc+B/UFfGiR/AZmwqrU8+xPqVooA==}
+  /@deot/dev-cli@2.3.4(typescript@5.1.6):
+    resolution: {integrity: sha512-IcNhVO5BcNbjQlh23zL1nVPkQXGff3tu4lxzVS+9JKNMJx1k190oe1dc7JtjTi0dnhllrLXPYU9F6Movpl035g==}
     hasBin: true
     dependencies:
-      '@deot/dev-adder': 2.3.1(typescript@5.1.6)
+      '@deot/dev-adder': 2.3.2(typescript@5.1.6)
       '@deot/dev-builder': 2.3.3(typescript@5.1.6)
       '@deot/dev-linker': 2.3.1
       '@deot/dev-releaser': 2.3.1(typescript@5.1.6)
@@ -606,12 +606,12 @@ packages:
       semver: 7.5.4
     dev: true
 
-  /@deot/dev@2.3.3(@babel/eslint-parser@7.21.8)(eslint@8.47.0)(stylelint@15.10.2)(typescript@5.1.6):
-    resolution: {integrity: sha512-CCebEToYEAA/DKjrA3CQ7hPfeSwmunkdfC45m+V6O7D5zIL0habLPhEhQT7gWE7qp/Ivbju37b8EpgApRicj+g==}
+  /@deot/dev@2.3.4(@babel/eslint-parser@7.21.8)(eslint@8.47.0)(stylelint@15.10.2)(typescript@5.1.6):
+    resolution: {integrity: sha512-Wc7MFaWjzFciwKzUgTkGMRfjkaOkHp1z/6n8dqL48NI/WjgnAzNLkv2iCBEd9VzK0zz44ve6Tp6zYC/SskNK/A==}
     dependencies:
-      '@deot/dev-adder': 2.3.1(typescript@5.1.6)
+      '@deot/dev-adder': 2.3.2(typescript@5.1.6)
       '@deot/dev-builder': 2.3.3(typescript@5.1.6)
-      '@deot/dev-cli': 2.3.3(typescript@5.1.6)
+      '@deot/dev-cli': 2.3.4(typescript@5.1.6)
       '@deot/dev-deps': 2.3.2
       '@deot/dev-dever': 2.3.2
       '@deot/dev-eslint': 2.3.1(@babel/eslint-parser@7.21.8)(eslint@8.47.0)(typescript@5.1.6)
