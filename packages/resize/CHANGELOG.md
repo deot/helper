@@ -1,5 +1,13 @@
 # @deot/helper-resize ChangeLog
 
+## v1.1.0
+
+_2023-08-24_
+
+### Force Update Package
+
+- `1.0.1` -> `1.1.0`
+
 ## v1.0.1
 
 _2023-07-13_

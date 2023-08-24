@@ -1,5 +1,13 @@
 # @deot/helper-route ChangeLog
 
+## v1.1.0
+
+_2023-08-24_
+
+### Updates
+
+- chore(utils): force-publish `1.0.3` -> `1.1.0`
+
 ## v1.0.3
 
 _2023-08-21_

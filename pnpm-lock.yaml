@@ -15,7 +15,7 @@ importers:
   packages/cache:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: link:../utils
     devDependencies:
       fake-indexeddb:
@@ -31,7 +31,7 @@ importers:
   packages/fp:
     dependencies:
       '@deot/helper-emitter':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../emitter
     devDependencies:
       lodash:
@@ -44,46 +44,46 @@ importers:
   packages/index:
     dependencies:
       '@deot/helper-cache':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: link:../cache
       '@deot/helper-device':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../device
       '@deot/helper-dom':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../dom
       '@deot/helper-emitter':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../emitter
       '@deot/helper-fp':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../fp
       '@deot/helper-is':
-        specifier: ^1.0.2
+        specifier: ^1.1.0
         version: link:../is
       '@deot/helper-load':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../load
       '@deot/helper-resize':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../resize
       '@deot/helper-route':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: link:../route
       '@deot/helper-shared':
-        specifier: ^1.0.2
+        specifier: ^1.1.0
         version: link:../shared
       '@deot/helper-unicode':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../unicode
       '@deot/helper-utils':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: link:../utils
       '@deot/helper-validator':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../validator
       '@deot/helper-wheel':
-        specifier: ^1.0.1
+        specifier: ^1.1.0
         version: link:../wheel
 
   packages/is: {}
@@ -99,7 +99,7 @@ importers:
   packages/route:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: link:../utils
 
   packages/shared: {}
