@@ -18,3 +18,4 @@ export * from './throttle';
 export * from './flatten';
 export * from './flatten-json-parse';
 export * from './generate-string';
+export * from './to-promise';
