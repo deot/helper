@@ -30,6 +30,33 @@ describe('validator.ts', () => {
 		}
 	});
 
+	it('string', async () => {
+		expect.assertions(2);
+		const message1 = 'age < 30';
+		const message2 = 'age > 16';
+		const validator = new Validator({
+			age: [
+				{
+					validate: (value) => {
+						return value < 30 || message1;
+					} 
+				},
+				{
+					validate: (value) => {
+						return value > 16 || message2;
+					} 
+				}
+			]
+		});
+
+		try {
+			await validator.validate({ age: 10 });
+		} catch (e: any) {
+			expect(e.length).toBe(1);
+			expect(e[0].message).toBe(message2);
+		}
+	});
+
 	it('promise', async () => {
 		expect.assertions(2);
 		const message = 'age > 16';

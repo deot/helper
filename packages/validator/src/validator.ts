@@ -33,7 +33,7 @@ export interface ValidateContext {
 	paths: Path[];
 }
 export type Transform = (value: any, context: ValidateContext) => any;
-export type Validate = (value: any, context: ValidateContext) => Promise<any> | boolean | void;
+export type Validate = (value: any, context: ValidateContext) => Promise<any> | boolean | string | void;
 
 export interface ValidateOptions {
 	// 规则的名称需要是trigger。如果为空，将验证所有规则
@@ -181,6 +181,9 @@ export class Validator {
 						result = false;
 						message$ = e.message || e;
 					}
+				} else if (typeof result === 'string') {
+					message$ = result;
+					result = false;
 				}
 
 				if (result === false) {
