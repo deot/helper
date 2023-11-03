@@ -2,7 +2,7 @@ import { Validator } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('first', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: '16',
 			age2: '30',

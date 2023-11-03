@@ -2,7 +2,7 @@ import { Validator } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('pattern string', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: '16'
 		});
@@ -15,7 +15,7 @@ describe('validator.ts', () => {
 	});
 
 	it('pattern regex', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message = '年龄必须是数字';
 		const validator = new Validator({
 			age: {

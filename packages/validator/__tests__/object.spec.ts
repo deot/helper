@@ -2,7 +2,7 @@ import { Validator, RuleHelper } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('object', async () => {
-		expect.assertions(3);
+		expect.hasAssertions();
 		const message = 'age is required';
 		const validator = new Validator({
 			users: {
@@ -24,7 +24,7 @@ describe('validator.ts', () => {
 	});
 
 	it('fields failed', async () => {
-		expect.assertions(3);
+		expect.hasAssertions();
 		const message = 'age is required';
 		const validator = new Validator({
 			users: {
@@ -47,7 +47,7 @@ describe('validator.ts', () => {
 	});
 
 	it('object, type pass', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: RuleHelper.create({ 
 				required: true

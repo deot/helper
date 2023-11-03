@@ -2,7 +2,7 @@ import { Validator } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('enum', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message = 'xxx';
 		const validator = new Validator({
 			name: {

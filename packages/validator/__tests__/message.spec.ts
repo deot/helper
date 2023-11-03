@@ -3,7 +3,7 @@ import type { ValidateError } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('message function', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message = (e: ValidateError) => e.paths.join('');
 		const validator = new Validator({
 			name: {

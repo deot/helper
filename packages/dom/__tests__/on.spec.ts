@@ -8,7 +8,7 @@ describe('on.ts', () => {
 
 	it('on', () => {
 		expect.assertions(3);
-		const off = $.on(el, 'click', (e) => {
+		const off = $.on(el, 'click', (e: any) => {
 			expect(e.type).toBe('click');
 		});
 

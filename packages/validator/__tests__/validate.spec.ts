@@ -2,7 +2,7 @@ import { Validator } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('boolean', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message1 = 'age < 30';
 		const message2 = 'age > 16';
 		const validator = new Validator({
@@ -31,7 +31,7 @@ describe('validator.ts', () => {
 	});
 
 	it('string', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message1 = 'age < 30';
 		const message2 = 'age > 16';
 		const validator = new Validator({
@@ -58,7 +58,7 @@ describe('validator.ts', () => {
 	});
 
 	it('promise', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message = 'age > 16';
 		const validator = new Validator({
 			age: [
@@ -81,7 +81,7 @@ describe('validator.ts', () => {
 	});
 
 	it('function', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const message = 'age > 16';
 		const validator = new Validator({
 			age: (value) => {

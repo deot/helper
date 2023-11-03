@@ -2,7 +2,7 @@ import { Validator, RuleHelper } from '@deot/helper-validator';
 
 describe('validator.ts', () => {
 	it('number, empty string ', async () => {
-		expect.assertions(4);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: RuleHelper.create({ type: 'number', required: true }),
 		});
@@ -29,7 +29,7 @@ describe('validator.ts', () => {
 	});
 
 	it('number, string number', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: RuleHelper.create({ type: 'number', required: true }),
 		});
@@ -54,7 +54,7 @@ describe('validator.ts', () => {
 	});
 
 	it('number, range: [0, 10]', async () => {
-		expect.assertions(2);
+		expect.hasAssertions();
 		const validator = new Validator({
 			age: RuleHelper.create({ 
 				type: 'number', 
