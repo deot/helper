@@ -1,5 +1,13 @@
 # @deot/helper-cache ChangeLog
 
+## v1.1.2
+
+_2023-11-16_
+
+### Features
+
+- feat(utils): add `toPromise` ([b25c820](https://github.com/deot/helper/commit/b25c820250f686798dde2c0c1f1cd34b0acf61a8))
+
 ## v1.1.1
 
 _2023-08-25_

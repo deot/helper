@@ -1,5 +1,15 @@
 # @deot/helper ChangeLog
 
+## v1.1.2
+
+_2023-11-16_
+
+### Features
+
+- feat(utils): add `toPromise` ([b25c820](https://github.com/deot/helper/commit/b25c820250f686798dde2c0c1f1cd34b0acf61a8))
+- feat(validator): `InternalRule` -> `ValidatorRule` ([70e1e00](https://github.com/deot/helper/commit/70e1e0090099c95a840f595556db15b60893b7c4))
+- feat(validator): allow `validate` return string type as a error ([0520782](https://github.com/deot/helper/commit/052078269e0f7139bcfdf1b1f37b1f77ca10fda9))
+
 ## v1.1.1
 
 _2023-08-25_
