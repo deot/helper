@@ -12,18 +12,6 @@ interface InternalValidateError {
 	paths: Path[];
 }
 
-interface InternalRule {
-	enum?: (string | number | boolean | null | undefined)[];
-	required?: boolean;
-	message?: string | ((e: ValidateError) => string);
-	pattern?: Pattern;
-	transform?: Transform;
-	validate?: Validate;
-	fields?: ValidatorRules;
-}
-
-type InternalMultipleRule = InternalRule | Validate | Pattern | boolean;
-
 export interface ValidateContext {
 	source: Record<any, any>;
 
@@ -52,13 +40,24 @@ export interface ValidateError {
 	paths: Path[];
 }
 
-export type ValidatorRule = InternalMultipleRule[] | InternalMultipleRule
-export type ValidatorRules = Record<string, ValidatorRule>;
+export interface ValidatorRule {
+	[key: string]: any;
+	enum?: (string | number | boolean | null | undefined)[];
+	required?: boolean;
+	message?: string | ((e: ValidateError) => string);
+	pattern?: Pattern;
+	transform?: Transform;
+	validate?: Validate;
+	fields?: ValidatorRules;
+}
+
+export type ValidatorMutipleRule = ValidatorRule | Validate | Pattern | boolean;
+export type ValidatorRules = Record<string, ValidatorMutipleRule | ValidatorMutipleRule[]>;
 
 export class Validator {
 	static falsy = [undefined, null, ''];
 
-	rules: Record<string, InternalRule[]> = {};
+	rules: Record<string, ValidatorRule[]> = {};
 
 	paths: Path[];
 

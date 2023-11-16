@@ -3,6 +3,7 @@ import { Validator } from '../validator';
 import { number as numberPattern } from '../reg-exps';
 
 interface RuleOptions {
+	[key: string]: any;
 	type?: 'number' | 'string' | 'array';
 	range?: [number?, number?];
 	required?: boolean;
@@ -20,7 +21,7 @@ interface RuleOptions {
 	lang?: string; // 后期考虑，默认中文
 }
 
-export const create = (options?: RuleOptions): ValidatorRule => {
+export const create = (options?: RuleOptions): ValidatorRule[] => {
 	options = {
 		name: '值',
 		...options
@@ -40,7 +41,7 @@ export const create = (options?: RuleOptions): ValidatorRule => {
 	const { messages, type, pattern, required } = options;
 	const pass = (v: any) => !required && Validator.falsy.includes(v);
 
-	const rules: ValidatorRule = [];
+	const rules: ValidatorRule[] = [];
 
 	if (required) {
 		rules.push({
