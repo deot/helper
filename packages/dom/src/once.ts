@@ -1,7 +1,7 @@
 import { IS_SERVER } from './_constants';
 import { on } from './on';
 
-type AnyFunction = (...args: unknown[]) => unknown;
+type AnyFunction = (...args: any[]) => any;
 export const once = (
 	el: HTMLElement, 
 	event: string, 

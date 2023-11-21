@@ -3,7 +3,7 @@ import { IS_SERVER } from './_constants';
 export const off = (
 	el: HTMLElement, 
 	event: string, 
-	handler: (...args: unknown[]) => unknown, 
+	handler: (...args: any[]) => any, 
 	options?: boolean | AddEventListenerOptions
 ) => { 
 	if (IS_SERVER) return;

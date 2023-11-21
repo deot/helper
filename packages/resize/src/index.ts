@@ -1,4 +1,4 @@
-type ResizableListener = (...args: unknown[]) => unknown;
+type ResizableListener = (...args: any[]) => any;
 
 type ResizableElement = HTMLElement & {
 	__rz__?: Resize;
