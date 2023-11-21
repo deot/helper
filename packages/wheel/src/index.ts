@@ -273,10 +273,10 @@ export class Wheel {
 	 * 2. X和Y都都不能滚动：判断是否需要native行为
 	 * 	如果是则需要停顿，用户松开后再滑动父层才动
 	 * 	如果不是则不阻止父层滑动，直接滚动
-	 * @param {Event} e ~
-	 * @param {boolean} shouldWheelX ~
-	 * @param {boolean} shouldWheelY ~
-	 * @returns {boolean} 是否可继续
+	 * @param e ~
+	 * @param shouldWheelX ~
+	 * @param shouldWheelY ~
+	 * @returns 是否可继续
 	 */
 	private preventParentScroll(e: Event, shouldWheelX: boolean, shouldWheelY: boolean): boolean {
 		// 第2种场景
@@ -309,9 +309,8 @@ export class Wheel {
 	 * 在emitScroll之前:
 	 * 滑动手势X轴偏移小于30度夹角，禁止移动Y轴 -> pixelY = 0
 	 * 滑动手势Y轴偏移小于30度夹角，禁止移动X轴 -> pixelX = 0
-	 * @param {Event} e ~
-	 * @param {ScrollOptions} options ~
-	 * @returns {void} ~
+	 * @param e ~
+	 * @param options ~
 	 */
 	private emitScroll(e: Event, options: ScrollOptions): void {
 		let { x: pixelX, y: pixelY, angle } = options;

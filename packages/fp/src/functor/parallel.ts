@@ -131,7 +131,7 @@ export class Parallel extends ATask {
 	 * 返回一个Promise
 	 * 	then：执行结束（包含主动取消）
 	 * 	catch：异常时会中止程序（如果设置了skipError: faalse）
-	 * @returns {Promise} ~
+	 * @returns ~
 	 */
 	start(): Promise<any> {
 		if (this.target) return this.target;

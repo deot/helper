@@ -56,8 +56,8 @@ export class IndexedDBStore extends ACache {
 	 * 每次操作完要关闭
 	 * 	1. 浏览器上不关闭的话，删库操作会卡一会
 	 * 	2. fake-indexeddb不关闭会卡死
-	 * @param {Function} fn ~
-	 * @returns {Promise<any>} ~
+	 * @param fn ~
+	 * @returns ~
 	 */
 	private concurrent<T = void>(fn: Function): Promise<T> {
 		let target = new Promise<T>((resolve, reject) => {
@@ -71,8 +71,8 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 统一处理
-	 * @param {IDBRequest} request ~
-	 * @returns {Promise<any>} ~
+	 * @param request ~
+	 * @returns ~
 	 */
 	private async task(request: IDBRequest): Promise<any> {
 		return new Promise((resolve, reject) => {
@@ -83,7 +83,7 @@ export class IndexedDBStore extends ACache {
 
 
 	/**
-	 * @param {Promise<any>} target ~
+	 * @param target ~
 	 */
 	async close(target?: Promise<any>) {
 		if (target) {
@@ -108,7 +108,7 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 打开数据库。变更时候更新表
-	 * @returns {Promise<IDBDatabase>} ~
+	 * @returns ~
 	 */
 	openDatabase(): Promise<IDBDatabase> {
 		this.db = this.db || (async () => {
@@ -164,8 +164,8 @@ export class IndexedDBStore extends ACache {
 	 * tip: db.close() 执行后
 	 * 	db打开后的表os对象仍可写入（浏览器支持，fake-indexeddb不支持）
 	 * 	不过正常理解也应该操作所有后再关闭，这里不修改`this.db -> this.os`的逻辑
-	 * @param {string} mode ~
-	 * @returns {IDBObjectStore} ~
+	 * @param mode ~
+	 * @returns ~
 	 */
 	async openObjectStore(mode?: IDBTransactionMode): Promise<IDBObjectStore> {
 		const { storeName } = this.options;
@@ -194,8 +194,8 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 新增数据，通过事务完成。
-	 * @param  {any} data ~
-	 * @returns {Promise<State>} ~
+	 * @param data ~
+	 * @returns ~
 	 */
 	write(data: any): Promise<State> {
 		return this.concurrent<State>(async () => {
@@ -219,8 +219,8 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 读取数据，通过事务完成。
-	 * @param  {string} id ~
-	 * @returns {Promise} ~
+	 * @param id ~
+	 * @returns ~
 	 */
 	read(id: string): Promise<State | undefined> {
 		return this.concurrent<State | undefined>(async () => {
@@ -234,9 +234,9 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 更新数据，通过事务完成。
-	 * @param  {string} id ~
-	 * @param  {object} data ~
-	 * @returns {Promise<State>} ~
+	 * @param id ~
+	 * @param data ~
+	 * @returns ~
 	 */
 	update(id: string, data: object): Promise<State> {
 		return this.concurrent<State>(async () => {
@@ -255,8 +255,8 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 删除数据也是通过事务完成。
-	 * @param  {string} id ~
-	 * @returns {Promise<void>} ~
+	 * @param id ~
+	 * @returns ~
 	 */
 	async delete(id: string): Promise<void> {
 		return this.concurrent(async () => {
@@ -269,7 +269,7 @@ export class IndexedDBStore extends ACache {
 
 	/**
 	 * 搜索数据，通过事务完成。
-	 * @returns {Promise<State[]>} ~
+	 * @returns ~
 	 */
 	search(): Promise<State[]> {
 		return this.concurrent<State[]>(async () => {

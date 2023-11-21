@@ -9,9 +9,9 @@ interface ObjectKeyValue {
  * 查找对应的值
  * 
  * {a: {b: {c: 1}}}, a.b.c -> { o, k, v }
- * @param {object} target ~
- * @param {string} path ~
- * @returns {ObjectKeyValue} ~
+ * @param target ~
+ * @param path ~
+ * @returns ~
  */
 export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 	let o = target;

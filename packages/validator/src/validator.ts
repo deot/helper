@@ -68,7 +68,7 @@ export class Validator {
 
 	/**
 	 * 构建统一规则类型的Rule[], 也可供外部使用
-	 * @param {ValidatorRules} rules ~
+	 * @param rules ~
 	 */
 	updateRules(rules?: ValidatorRules) {
 		if (!rules) return;

@@ -6,8 +6,8 @@ import { flatten } from './flatten';
  * '{}' -> {}
  * '9007199254740992' -> '9007199254740992'
  * '9007199254740991' -> 9007199254740991 
- * @param {[string]} value 输入
- * @returns {any} ~
+ * @param value 输入
+ * @returns ~
  */
 export const flattenJSONParse = (value: string | null): any => {
 	if (value === null) return null;

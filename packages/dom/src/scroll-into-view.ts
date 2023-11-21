@@ -10,9 +10,9 @@ interface Options {
  * el 必须是滚动的(TODO: 使用getScroller获得滚动或使用scroller参数)
  * TODO: 这个后续还需要优化
  * https://github.com/yiminghe/dom-scroll-into-view
- * @param {HTMLElement} el ~
- * @param {Options} options ~
- * @returns {void} ~
+ * @param el ~
+ * @param options ~
+ * @returns ~
  */
 export const scrollIntoView = async (
 	el: HTMLElement | Window, 

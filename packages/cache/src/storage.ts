@@ -54,10 +54,9 @@ class StorageStore extends ACache {
 
 	/**
 	 * 设置缓存
-	 * @param {string} key 保存的键值
-	 * @param {any} value 保存的内容
-	 * @param {Options} options ~
-	 * @returns {void} ~
+	 * @param key 保存的键值
+	 * @param value 保存的内容
+	 * @param options ~
 	 */
 	set(key: string, value: any, options?: Options): void {
 		if (!ALLOW) return;
@@ -75,9 +74,9 @@ class StorageStore extends ACache {
 
 	/**
 	 * 获取缓存
-	 * @param {string} key 保存的键值
-	 * @param {Options} options ~
-	 * @returns {any} ~
+	 * @param key 保存的键值
+	 * @param options ~
+	 * @returns ~
 	 */
 	get(key: string, options?: Options): any {
 		if (!ALLOW) return null;
@@ -91,9 +90,8 @@ class StorageStore extends ACache {
 
 	/**
 	 * 删除缓存
-	 * @param {string} key 键值
-	 * @param {Options} options ~
-	 * @returns {void} ~
+	 * @param key 键值
+	 * @param options ~
 	 */
 	remove(key: string, options?: Options): void {
 		if (!ALLOW) return;

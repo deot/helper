@@ -14,9 +14,9 @@ export class Resize {
 
 	/**
 	 * Resize.of(el, fn);
-	 * @param {ResizableElement} el ~
-	 * @param {ResizableListener} fn ~
-	 * @returns {Function} off
+	 * @param el ~
+	 * @param fn ~
+	 * @returns off
 	 */
 	static on(el: ResizableElement, fn: ResizableListener): Function {
 		return new Resize(el).on(fn);
@@ -24,9 +24,9 @@ export class Resize {
 
 	/**
 	 * 要实现Resize.off(el)，el必须侵入式修改挂上__rz__
-	 * @param {ResizableElement} el ~
-	 * @param {ResizableListener} fn ~
-	 * @returns {void} ~
+	 * @param el ~
+	 * @param fn ~
+	 * @returns ~
 	 */
 	static off(el: ResizableElement, fn?: ResizableListener): void {
 		return new Resize(el).off(fn);

@@ -2,8 +2,8 @@
  * hack event.composedPath
  * touchevent.composedPath 在iOS10.x和iOS9.x上返回的是空数组
  * 跟默认的相比，少了window对象
- * @param {Event} e ~
- * @returns {EventTarget[]} ~
+ * @param e ~
+ * @returns ~
  */
 export const composedPath = (e: Event): EventTarget[] => {
 	let path = (e.composedPath && e.composedPath()) || [];
