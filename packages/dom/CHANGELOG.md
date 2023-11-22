@@ -1,5 +1,13 @@
 # @deot/helper-dom ChangeLog
 
+## v1.1.3
+
+_2023-11-22_
+
+### Force Update Package
+
+- `1.1.1` -> `1.1.3`
+
 ## v1.1.1
 
 _2023-08-25_

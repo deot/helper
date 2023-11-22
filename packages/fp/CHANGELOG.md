@@ -1,5 +1,13 @@
 # @deot/helper-fp ChangeLog
 
+## v1.1.3
+
+_2023-11-22_
+
+### Updates
+
+- chore(emitter): force-publish `1.1.1` -> `1.1.3`
+
 ## v1.1.1
 
 _2023-08-25_

@@ -1,5 +1,13 @@
 # @deot/helper-utils ChangeLog
 
+## v1.1.3
+
+_2023-11-22_
+
+### Force Update Package
+
+- `1.1.2` -> `1.1.3`
+
 ## v1.1.2
 
 _2023-11-16_

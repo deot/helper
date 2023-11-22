@@ -1,5 +1,13 @@
 # @deot/helper-cache ChangeLog
 
+## v1.1.3
+
+_2023-11-22_
+
+### Updates
+
+- chore(utils): force-publish `1.1.2` -> `1.1.3`
+
 ## v1.1.2
 
 _2023-11-16_
