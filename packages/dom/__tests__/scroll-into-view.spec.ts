@@ -1,9 +1,8 @@
 import * as $ from '@deot/helper-dom';
 
 describe('scroll-into-view.ts', () => {
-
-	let el = document.createElement('div');
-	let child = document.createElement('div');
+	const el = document.createElement('div');
+	const child = document.createElement('div');
 	el.style.overflow = 'scroll';
 	child.innerHTML = '<p>xxxx</p>';
 
@@ -15,25 +14,25 @@ describe('scroll-into-view.ts', () => {
 	it('basic', async () => {
 		$.scrollIntoView(child);
 		await $.scrollIntoView(
-			child, 
-			{ 
-				from: 0, 
+			child,
+			{
+				from: 0,
 				to: 100
 			}
 		);
 
 		await $.scrollIntoView(
-			window, 
-			{ 
-				from: 0, 
+			window,
+			{
+				from: 0,
 				to: 100
 			}
 		);
 
 		await $.scrollIntoView(
-			window, 
-			{ 
-				from: 100, 
+			window,
+			{
+				from: 100,
 				to: 0
 			}
 		);

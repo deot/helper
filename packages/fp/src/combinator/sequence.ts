@@ -6,6 +6,6 @@
 
 export const sequence = (...funcs: Function[]) => {
 	return (x?: any) => {
-		 funcs.forEach((fn) => fn(x));
+		funcs.forEach(fn => fn(x));
 	};
 };

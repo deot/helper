@@ -9,4 +9,3 @@ describe('bool.ts', () => {
 		expect(Is.bool(false)).toBe(true);
 	});
 });
-

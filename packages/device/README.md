@@ -3,10 +3,13 @@
 `Device` 
 
 ```js
-import { Device } from "@deot/helper-device";
+import { Device } from '@deot/helper-device';
+```
 
+
+```js
 // or
-import { Device } from "@deot/helper";
+import { Device } from '@deot/helper';
 ```
 
 --- 

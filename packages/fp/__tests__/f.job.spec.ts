@@ -1,7 +1,7 @@
 import * as FP from '@deot/helper-fp';
 
 const { Task, Job } = FP;
-const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
+const sleep = (s: number) => new Promise((_) => { setTimeout(_, s || 0); });
 
 let count = 0;
 const current = Job.of(
@@ -15,7 +15,7 @@ const current = Job.of(
 
 describe('job.ts', () => {
 	it('start', async () => {
-		let record = count;
+		const record = count;
 
 		current.start();
 		await sleep(30);
@@ -23,7 +23,7 @@ describe('job.ts', () => {
 	});
 
 	it('pasue', async () => {
-		let record = count;
+		const record = count;
 
 		current.pasue();
 		await sleep(30);
@@ -31,7 +31,7 @@ describe('job.ts', () => {
 	});
 
 	it('resume', async () => {
-		let record = count;
+		const record = count;
 
 		current.resume();
 		await sleep(30);
@@ -39,15 +39,15 @@ describe('job.ts', () => {
 	});
 
 	it('cancel', async () => {
-		let record = count;
+		const record = count;
 
 		current.cancel();
 		await sleep(30);
 		expect(count).toBe(record);
 	});
-	
+
 	it('restart', async () => {
-		let record = count;
+		const record = count;
 
 		current.restart();
 		await sleep(30);
@@ -77,7 +77,7 @@ describe('job.ts', () => {
 
 		expect(current$.isStart).toBe(true);
 		await sleep(9);
-		
+
 		expect(count$).toBeLessThanOrEqual(2);
 
 		current$.cancel();
@@ -94,7 +94,7 @@ describe('job.ts', () => {
 			9
 		);
 		expect.assertions(6);
-		
+
 		// 开始
 		current$.start();
 		await sleep(30);
@@ -110,7 +110,7 @@ describe('job.ts', () => {
 		current$.resume();
 		await sleep(30);
 		expect(count$).not.toBe(record);
-		
+
 		// 取消
 		current$.cancel();
 		record = count$;
@@ -138,7 +138,7 @@ describe('job.ts', () => {
 						throw new Error(v);
 					}
 					return count$;
-				}), 
+				}),
 			10
 		);
 
@@ -197,7 +197,7 @@ describe('job.ts', () => {
 		current$.immediate();
 		expect(current$.isStart).toBe(true);
 		await sleep(25);
-		
+
 		expect(count$).not.toBe(0);
 
 		current$.cancel();

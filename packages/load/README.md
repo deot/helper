@@ -3,10 +3,12 @@
 ### `Load` 
 
 ```js
-import * as Load from "@deot/helper-load";
+import * as Load from '@deot/helper-load';
+```
 
+```js
 // or
-import { Load } from "@deot/helper";
+import { Load } from '@deot/helper';
 ```
 
 ---

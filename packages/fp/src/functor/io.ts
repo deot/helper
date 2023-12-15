@@ -10,8 +10,8 @@ export class IO extends AMonad {
 	}
 
 	map(fn: Function) {
-		let composed = compose(
-			fn, 
+		const composed = compose(
+			fn,
 			this.value._isIO ? this.value : () => this.value
 		);
 		// @ts-ignore

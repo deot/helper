@@ -10,4 +10,3 @@ describe('blob.ts', () => {
 		expect(Is.blob(file)).toBe(false);
 	});
 });
-

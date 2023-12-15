@@ -3,15 +3,15 @@ import { on } from './on';
 
 type AnyFunction = (...args: any[]) => any;
 export const once = (
-	el: HTMLElement, 
-	event: string, 
-	handler: AnyFunction, 
+	el: HTMLElement,
+	event: string,
+	handler: AnyFunction,
 	options?: boolean | AddEventListenerOptions
-) => { 
-	if (IS_SERVER) return (() => {});
+) => {
+	if (IS_SERVER) return () => {};
 
-	let off: AnyFunction;
-	let handler$ = function (this: any, ...args: any[]) {
+	const off: AnyFunction;
+	const handler$ = function (this: any, ...args: any[]) {
 		handler && handler.apply(this, args);
 		off();
 	};

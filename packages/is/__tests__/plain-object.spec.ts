@@ -13,9 +13,9 @@ class B {
 }
 
 describe('plain-object.ts', () => {
-	let a = new A();
-	let b = new B();
-	let c = {
+	const a = new A();
+	const b = new B();
+	const c = {
 		get [Symbol.toStringTag]() {
 			return 'any';
 		},
@@ -23,7 +23,6 @@ describe('plain-object.ts', () => {
 			return 'any';
 		}
 	};
-
 
 	it('Basic', () => {
 		expect(Is.plainObject()).toBe(false);
@@ -35,4 +34,3 @@ describe('plain-object.ts', () => {
 		expect(Is.plainObject(c)).toBe(false);
 	});
 });
-

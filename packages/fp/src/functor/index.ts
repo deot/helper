@@ -1,9 +1,9 @@
 // 抽象类
-export * from './abstract'; 
+export * from './abstract';
 
 // Monadic类型
 export * from './monad';
-export * from './maybe'; 
+export * from './maybe';
 export * from './either';
 export * from './io';
 export * from './task';

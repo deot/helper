@@ -1,6 +1,6 @@
-import { Resize } from "@deot/helper-resize";
+import { Resize } from '@deot/helper-resize';
 
-let el = document.createElement('div');
+const el = document.createElement('div');
 
 el.style.width = '100vw';
 el.style.height = '100vh';
@@ -10,7 +10,7 @@ document.body.appendChild(el);
 
 let count = 0;
 
-let off = Resize.of(el).on(() => {
+const off = Resize.of(el).on(() => {
 	el.innerHTML = `Count: ${count++}, 点击取消监听`;
 });
 
@@ -23,4 +23,3 @@ el.addEventListener('click', () => {
 	el.innerHTML = `Count: ${count}, 强制刷新页面重置`;
 	off();
 });
-

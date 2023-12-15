@@ -8,7 +8,7 @@ const R = {
 
 describe('pointed.ts', () => {
 	it('map', () => {
-		let current = Pointed.of('Hello Pointeds!')
+		const current = Pointed.of('Hello Pointeds!')
 			.map(R.toUpper)
 			.map(R.identity);
 

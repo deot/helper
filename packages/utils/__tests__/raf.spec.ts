@@ -10,4 +10,3 @@ describe('raf.ts', () => {
 		await t.sleep(20);
 	});
 });
-

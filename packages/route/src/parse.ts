@@ -24,11 +24,11 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 		Array
 			.from((search.match(/[^?=&]+=[^&]*/g) || []))
 			.forEach((v: string) => {
-				let [key, value] = v.split('=');
-				value = flatten(value);
-				query[key] = typeof options$.parse === 'function' 
-					? options$.parse(value) 
-					: value;
+				const [key, value] = v.split('=');
+				const value$ = flatten(value);
+				query[key] = typeof options$.parse === 'function'
+					? options$.parse(value$)
+					: value$;
 			});
 	}
 

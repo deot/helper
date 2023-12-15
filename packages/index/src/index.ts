@@ -18,7 +18,7 @@ import { Device } from '@deot/helper-device';
 import { Validator, RegExps, RuleHelper } from '@deot/helper-validator';
 import { Cookie, Storage, IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
-export { 
+export {
 	Cookie,
 	Storage,
 	IndexedDB,
@@ -35,7 +35,7 @@ export {
 	Route,
 	$,
 	Is,
-	Validator, 
-	RegExps, 
+	Validator,
+	RegExps,
 	RuleHelper
 };

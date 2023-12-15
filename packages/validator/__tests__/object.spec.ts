@@ -11,7 +11,7 @@ describe('validator.ts', () => {
 						message,
 						required: true,
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -34,7 +34,7 @@ describe('validator.ts', () => {
 						message,
 						required: false,
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -49,7 +49,7 @@ describe('validator.ts', () => {
 	it('object, type pass', async () => {
 		expect.hasAssertions();
 		const validator = new Validator({
-			age: RuleHelper.create({ 
+			age: RuleHelper.create({
 				required: true
 			})
 		});

@@ -28,7 +28,7 @@ describe('validator.ts', () => {
 						message,
 						required: true,
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -48,15 +48,15 @@ describe('validator.ts', () => {
 					age: {
 						message,
 						validate(value, e) {
-							value === '' 
+							value === ''
 								? expect(e.paths).toEqual(['users', 0, 'age'])
 								: expect(e.paths).toEqual(['users', 1, 'age']);
-							return value 
-								? Promise.resolve() 
+							return value
+								? Promise.resolve()
 								: Promise.reject(new Error(`${+e.paths[1] + 1}. age is required`));
 						}
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -82,7 +82,7 @@ describe('validator.ts', () => {
 							}
 						}
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -106,7 +106,7 @@ describe('validator.ts', () => {
 						message,
 						required: true,
 					}
-				}	
+				}
 			},
 		});
 		try {
@@ -121,8 +121,8 @@ describe('validator.ts', () => {
 	it('array, range: [undefined, 10]', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'array', 
+			age: RuleHelper.create({
+				type: 'array',
 				required: true,
 				range: [undefined, 10]
 			}),
@@ -137,8 +137,8 @@ describe('validator.ts', () => {
 	it('array, range: [0, undefined]', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'array', 
+			age: RuleHelper.create({
+				type: 'array',
 				required: true,
 				range: [0, undefined]
 			}),
@@ -153,8 +153,8 @@ describe('validator.ts', () => {
 	it('array, range: [0, 10], required: false', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'array', 
+			age: RuleHelper.create({
+				type: 'array',
 				required: false,
 				range: [0, 10]
 			})
@@ -169,7 +169,7 @@ describe('validator.ts', () => {
 	it('array, type error', async () => {
 		expect.hasAssertions();
 		const validator = new Validator({
-			age: RuleHelper.create({ 
+			age: RuleHelper.create({
 				type: 'array'
 			})
 		});

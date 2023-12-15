@@ -1,10 +1,10 @@
 import * as Utils from '@deot/helper-utils';
 
 describe('get-prop-by-path.ts', () => {
-	let target = { a: { b: { c: 1 } } };
+	const target = { a: { b: { c: 1 } } };
 
 	it('basic', () => {
-		let result = Utils.getPropByPath(target, 'a.b.c');
+		const result = Utils.getPropByPath(target, 'a.b.c');
 
 		expect(result.v).toBe(1);
 		expect(result.k).toBe('c');
@@ -12,7 +12,7 @@ describe('get-prop-by-path.ts', () => {
 	});
 
 	it('error', () => {
-		let target1 = { a: { b: { c: {} } } };
+		const target1 = { a: { b: { c: {} } } };
 		try {
 			Utils.getPropByPath(target1, 'a.b.c.d.f');
 		} catch (e: any) {
@@ -20,4 +20,3 @@ describe('get-prop-by-path.ts', () => {
 		}
 	});
 });
-

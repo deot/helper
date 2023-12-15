@@ -56,4 +56,3 @@ describe('device.ts', () => {
 		expect(d.ios).toBe(true);
 	});
 });
-

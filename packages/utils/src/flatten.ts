@@ -7,7 +7,7 @@ export const flatten = (value: any, parser?: ((x: any) => any)) => {
 			throw new Error(value);
 		}
 		try {
-			let next = (parser || decodeURIComponent)(parseValue);
+			const next = (parser || decodeURIComponent)(parseValue);
 			if (parseValue === next) {
 				need = false;
 			}

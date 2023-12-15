@@ -9,4 +9,3 @@ describe('string.ts', () => {
 		expect(Is.string([])).toBe(false);
 	});
 });
-

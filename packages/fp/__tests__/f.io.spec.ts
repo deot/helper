@@ -11,7 +11,7 @@ const R = {
 
 describe('io.ts', () => {
 	it('map', () => {
-		let current = IO.of('Hello IOs!')
+		const current = IO.of('Hello IOs!')
 			.map(R.toUpper)
 			.map(R.addSuffix)
 			.map(R.addSuffix)
@@ -24,7 +24,7 @@ describe('io.ts', () => {
 	});
 
 	it('flatMap', () => {
-		let current = IO.of(IO.of(IO.of('Hello IOs!')))
+		const current = IO.of(IO.of(IO.of('Hello IOs!')))
 			.flatMap(R.toUpper)
 			.flatMap(R.addSuffix)
 			.flatMap(R.addSuffix)
@@ -37,7 +37,7 @@ describe('io.ts', () => {
 	});
 
 	it('Monadic: map / flatMap / valueOf / toString', () => {
-		let current = IO.of(IO.of(Monad.of(IO.of('Hello IOs!'))))
+		const current = IO.of(IO.of(Monad.of(IO.of('Hello IOs!'))))
 			.flatMap(R.toUpper)
 			.map(R.identity);
 

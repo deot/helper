@@ -9,4 +9,3 @@ describe('number.ts', () => {
 		expect(Is.number(Infinity)).toBe(true);
 	});
 });
-

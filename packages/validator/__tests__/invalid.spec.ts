@@ -10,7 +10,7 @@ describe('validator.ts', () => {
 	it('empty validator', async () => {
 		const validator = new Validator({
 			age: [{
-				validate: undefined	
+				validate: undefined
 			}]
 		});
 

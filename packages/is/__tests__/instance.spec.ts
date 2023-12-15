@@ -9,8 +9,8 @@ class B {
 }
 
 describe('instance.ts', () => {
-	let a = new A();
-	let b = new B();
+	const a = new A();
+	const b = new B();
 
 	it('Basic', () => {
 		expect(Is.instance([], Array)).toBe(true);
@@ -22,4 +22,3 @@ describe('instance.ts', () => {
 		expect(Is.instance(b, 'B')).toBe(true);
 	});
 });
-

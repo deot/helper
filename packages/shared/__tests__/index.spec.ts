@@ -5,4 +5,3 @@ describe('constants.ts', () => {
 		expect(Shared.IS_SERVER).toBe(false);
 	});
 });
-

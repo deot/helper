@@ -1,7 +1,7 @@
 import * as Load from '@deot/helper-load';
 
 describe('image.ts', () => {
-	let url = 'https://*.com/helper-load.png';
+	const url = 'https://*.com/helper-load.png';
 
 	Object.defineProperty(globalThis, 'Image', {
 		value: class Image {
@@ -39,7 +39,7 @@ describe('image.ts', () => {
 		await Load.image(url);
 		await Load.image(url);
 		await Load.image(url);
-		
+
 		expect(Load.image.cache.size).toBe(1);
 	});
 });

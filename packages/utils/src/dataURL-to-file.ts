@@ -8,7 +8,7 @@ const getMime = (filename?: string) => {
 };
 
 export const dataURLToFile = (
-	dataURL: string, 
+	dataURL: string,
 	filename?: string,
 	filetype?: string
 ): File => {
@@ -17,11 +17,11 @@ export const dataURLToFile = (
 		dataURL = `data:${filetype || getMime(filename)};base64,${dataURL}`;
 	}
 
-	let [suffix, dataURL$] = dataURL.split(',');
-	let mime = suffix.match(/:(.*?);/)?.[1];
-	let bstr = window.atob(dataURL$);
+	const [suffix, dataURL$] = dataURL.split(',');
+	const mime = suffix.match(/:(.*?);/)?.[1];
+	const bstr = window.atob(dataURL$);
 	let n = bstr.length;
-	let u8arr = new Uint8Array(n);
+	const u8arr = new Uint8Array(n);
 	while (n--) {
 		u8arr[n] = bstr.charCodeAt(n);
 	}

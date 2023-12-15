@@ -3,10 +3,12 @@
 ### `Route` 
 
 ```js
-import * as Route from "@deot/helper-route";
+import * as Route from '@deot/helper-route';
+```
 
+```js
 // or
-import { Route } from "@deot/helper";
+import { Route } from '@deot/helper';
 ```
 
 ---

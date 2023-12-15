@@ -7,4 +7,3 @@ describe('regexp.ts', () => {
 		expect(Is.regexp('/abc/')).toBe(false);
 	});
 });
-

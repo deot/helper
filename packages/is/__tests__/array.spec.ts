@@ -10,4 +10,3 @@ describe('array.ts', () => {
 		expect(Is.array(document.querySelectorAll('body'))).toBe(false);
 	});
 });
-

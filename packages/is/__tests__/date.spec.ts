@@ -6,4 +6,3 @@ describe('date.ts', () => {
 		expect(Is.date(new Date())).toBe(true);
 	});
 });
-

@@ -1,7 +1,7 @@
 import * as $ from '@deot/helper-dom';
 
 describe('el.ts', () => {
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 	el.innerHTML = '<span></span>';
 	document.body.appendChild(el);
 

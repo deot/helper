@@ -10,4 +10,3 @@ describe('nil.ts', () => {
 		expect(Is.nil(null)).toBe(true);
 	});
 });
-

@@ -1,4 +1,3 @@
-
 interface ObjectKeyValue {
 	o: object;
 	k: PropertyKey;
@@ -7,7 +6,7 @@ interface ObjectKeyValue {
 
 /**
  * 查找对应的值
- * 
+ *
  * {a: {b: {c: 1}}}, a.b.c -> { o, k, v }
  * @param target ~
  * @param path ~
@@ -18,11 +17,11 @@ export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 	path = path.replace(/\[(\w+)\]/g, '.$1');
 	path = path.replace(/^\./, '');
 
-	let keyArr = path.split('.');
+	const keyArr = path.split('.');
 	let i = 0;
 
 	for (let len = keyArr.length; i < len - 1; ++i) {
-		let key = keyArr[i];
+		const key = keyArr[i];
 		try {
 			if (key in o) {
 				o = o[key];
@@ -33,7 +32,7 @@ export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 			throw new Error('无效路径!');
 		}
 	}
-	
+
 	return {
 		o,
 		k: keyArr[i],

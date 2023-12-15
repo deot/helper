@@ -19,7 +19,7 @@ const factory = (key: Key) => (...funcs: Function[]): Function => {
  * 函数组合
  * compose :: (B -> C) -> (A -> B) -> (A -> C)
  * 中间件的应用
- * 
+ *
  * 参考：https://raw.githubusercontent.com/reduxjs/redux/master/src/compose.ts
  * 增加对this的支持
  * @param {Function[]} funcs ~

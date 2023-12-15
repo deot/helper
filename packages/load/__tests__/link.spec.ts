@@ -1,12 +1,12 @@
 import * as Load from '@deot/helper-load';
 
 describe('link.ts', () => {
-	let url = 'https://*.com/helper-load.css';
+	const url = 'https://*.com/helper-load.css';
 
-	let originalCreate = document.createElement.bind(document);
+	const originalCreate = document.createElement.bind(document);
 	Object.defineProperty(document, 'createElement', {
 		value() {
-			let target: any = originalCreate('_link_');
+			const target: any = originalCreate('_link_');
 			setTimeout(() => {
 				target.href && target.href.includes('.css')
 					? target.onload && target.onload()
@@ -35,7 +35,7 @@ describe('link.ts', () => {
 		await Load.link(url);
 		await Load.link(url);
 		await Load.link(url);
-		
+
 		expect(Load.link.cache.size).toBe(1);
 	});
 });

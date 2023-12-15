@@ -8,7 +8,7 @@ export const getStyle = (el: HTMLElement, name?: string) => {
 	}
 
 	try {
-		let computed = (document.defaultView as any).getComputedStyle(el, '');
+		const computed = (document.defaultView as any).getComputedStyle(el, '');
 		return el.style[name] || (computed?.[name] || '');
 	} catch (e) {
 		return el.style[name] || '';

@@ -7,10 +7,12 @@
 > IndexDB 返回的是`Promise`
 
 ```js
-import { Cookie, Storage, IndexDB } from "@deot/helper-cache";
+import { Cookie, Storage, IndexDB } from '@deot/helper-cache';
+```
 
+```js
 // or
-import { Cookie, Storage, IndexDB } from "@deot/helper";
+import { Cookie, Storage, IndexDB } from '@deot/helper';
 ```
 
 ---

@@ -3,7 +3,7 @@ import * as FP from '@deot/helper-fp';
 describe('memoize.ts', () => {
 	it('nothing', () => {
 		let count = 0;
-		let factorial = FP.memoize(() => {
+		const factorial = FP.memoize(() => {
 			count++;
 			return Math.random();
 		});
@@ -18,7 +18,7 @@ describe('memoize.ts', () => {
 
 	it('base', () => {
 		let count = 0;
-		let factorial = FP.memoize((n: number) => {
+		const factorial = FP.memoize((n: number) => {
 			count++;
 			return Math.random() * n;
 		});
@@ -35,11 +35,11 @@ describe('memoize.ts', () => {
 
 	it('resolver', () => {
 		let count = 0;
-		let fn = (v: any) => {
+		const fn = (v: any) => {
 			count++;
 			return Math.random() * v.n;
 		};
-		let factorial = FP.memoize(fn, JSON.stringify);
+		const factorial = FP.memoize(fn, JSON.stringify);
 
 		expect(factorial({ n: 9 })).toBe(factorial({ n: 9 }));
 

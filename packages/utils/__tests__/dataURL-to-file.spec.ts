@@ -1,8 +1,8 @@
 import * as Utils from '@deot/helper-utils';
 
 describe('dataURL-to-file.ts', () => {
-	let base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
-	let noSuffixBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
+	const base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
+	const noSuffixBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
 
 	it('basic', () => {
 		const result = Utils.dataURLToFile(base64);
@@ -27,4 +27,3 @@ describe('dataURL-to-file.ts', () => {
 		expect(result.name).toBe(filename);
 	});
 });
-

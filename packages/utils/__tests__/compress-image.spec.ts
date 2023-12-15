@@ -2,8 +2,7 @@
 import * as Utils from '@deot/helper-utils';
 
 describe('compress-image.ts', () => {
-
-	let base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
+	const base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
 	Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
 		value: () => {
 			return base64;
@@ -19,7 +18,7 @@ describe('compress-image.ts', () => {
 		}
 	});
 
-	let file = Utils.dataURLToFile(base64);
+	const file = Utils.dataURLToFile(base64);
 
 	it('success', async () => {
 		Object.defineProperty(globalThis, 'Image', {
@@ -41,7 +40,7 @@ describe('compress-image.ts', () => {
 
 	it('error', async () => {
 		expect.assertions(1);
-		let message = new Error();
+		const message = new Error();
 		Object.defineProperty(globalThis, 'Image', {
 			value: class Image {
 				onerror!: any;
@@ -81,11 +80,10 @@ describe('compress-image.ts', () => {
 		});
 
 		// 因为是fake的，所以结果一样
-		let result1 = await Utils.compressImage(file, { width: 16, height: 9 });
-		let result2 = await Utils.compressImage(file, { width: 9, height: 16 });
+		const result1 = await Utils.compressImage(file, { width: 16, height: 9 });
+		const result2 = await Utils.compressImage(file, { width: 9, height: 16 });
 
 		expect(result1.dataURL).toBe(base64);
 		expect(result2.file.name).toBe('__filename');
 	});
 });
-

@@ -10,7 +10,7 @@ describe('get.ts', () => {
 		expect(Route.get('id', '?id=10000001')).toBe(10000001);
 		expect(Route.get('id', '?id=01')).toBe('01');
 		expect(Route.get('id', '?id=00000000000000001')).toBe('00000000000000001');
-		
+
 		expect(Route.get('id', '?id=9007199254740991')).toBe(Number.MAX_SAFE_INTEGER);
 		expect(Route.get('id', '?id=9007199254740992')).toBe('9007199254740992');
 
@@ -33,7 +33,6 @@ describe('get.ts', () => {
 
 	it('?&=', () => {
 		expect(Route.get('id', `?id=${encodeURIComponent(JSON.stringify({ '?&id=1': '?&id=1' }))}&_id=1`))
-			.toEqual({ "?&id=1": "?&id=1" });
+			.toEqual({ '?&id=1': '?&id=1' });
 	});
 });
-

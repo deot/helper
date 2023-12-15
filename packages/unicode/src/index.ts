@@ -3,7 +3,7 @@ import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate';
 /**
  * https://developer.mozilla.org/zh-CN/docs/Glossary/Base64
  * a: ascii(ascii字符串), b: binary(二进制), u: unicode(统一码)
- * 
+ *
  * Unicode 解码和编码
  * escape / unescape
  * ↓↓↓↓↓↓   ECMAScript 3 ↓↓↓↓↓↓

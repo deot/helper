@@ -73,22 +73,22 @@ export class Validator {
 	updateRules(rules?: ValidatorRules) {
 		if (!rules) return;
 
-		Object.keys(rules).forEach(field => {
+		Object.keys(rules).forEach((field) => {
 			const rule = rules[field];
-			this.rules[field] = (Array.isArray(rule) ? rule : [rule]).map(rule$ => {
+			this.rules[field] = (Array.isArray(rule) ? rule : [rule]).map((rule$) => {
 				// Validate
 				if (typeof rule$ === 'function') {
 					return { validate: rule$ };
-				} 
+				}
 				// Pattern
 				if (typeof rule$ === 'string' || rule$ instanceof RegExp) {
 					rule$ = { pattern: rule$ };
-				} 
+				}
 
 				// boolean
 				if (typeof rule$ === 'boolean') {
 					rule$ = { required: rule$ };
-				} 
+				}
 
 				// Rule
 				const { validate, pattern, required, enum: enum$ = [] } = rule$;
@@ -99,17 +99,17 @@ export class Validator {
 				// pattern
 				if (!validate && pattern) {
 					const pattern$ = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
-					return { 
+					return {
 						...rule$,
-						validate: v => pattern$.test(v) 
+						validate: v => pattern$.test(v)
 					};
 				}
 
 				// required, 注意v = 0 时，是存在值的，这里只认定falsy中的undefined, null和''
 				if (!validate && required) {
-					return { 
+					return {
 						...rule$,
-						validate: v => (Array.isArray(v) 
+						validate: v => (Array.isArray(v)
 							? (!!v.length && v.every(j => Validator.falsy.every(i => j !== i)))
 							: Validator.falsy.every(i => v !== i))
 					};
@@ -117,7 +117,7 @@ export class Validator {
 
 				// enum
 				if (!validate && enum$.length) {
-					return { 
+					return {
 						...rule$,
 						validate: v => enum$.some(i => v === i)
 					};
@@ -136,18 +136,18 @@ export class Validator {
 		}
 
 		const needCheckFields = options.fields || Object.keys(this.rules);
-		let errors: InternalValidateError[] = [];
+		const errors: InternalValidateError[] = [];
 
 		for (let i = 0; i < needCheckFields.length; i++) {
 			const field = needCheckFields[i];
 			const rules = this.rules[field];
-			let value = source[field];
+			const value = source[field];
 
 			for (let j = 0; j < rules.length; j++) {
 				const rule = rules[j];
 				const { validate = () => {}, transform = (x: any) => x, fields: fields$ } = rule;
-				
-				let paths = [...this.paths, field];
+
+				const paths = [...this.paths, field];
 				if (typeof options._index !== 'undefined') {
 					paths.splice(paths.length - 1, 0, options._index);
 				}
@@ -155,8 +155,8 @@ export class Validator {
 				const value$ = transform!(value, { field, source, paths });
 
 				if (fields$) {
-					let isArray = Array.isArray(value$);
-					let value$$ = isArray ? value$ : [value$];
+					const isArray = Array.isArray(value$);
+					const value$$ = isArray ? value$ : [value$];
 					if (value$$.every((v: any) => v && typeof v === 'object')) {
 						const validator = new Validator(fields$, paths);
 						for (let k = 0; k < value$$.length; k++) {
@@ -170,7 +170,7 @@ export class Validator {
 						continue;
 					}
 				}
-				
+
 				let result = validate!(value$, { field, source, paths });
 				let message$ = '';
 				if (result instanceof Promise) {
@@ -199,7 +199,7 @@ export class Validator {
 		}
 
 		if (errors.length) {
-			let errors$ = errors.map(i => {
+			const errors$ = errors.map((i) => {
 				const { message, ...extra } = i;
 				i.message = typeof message === 'function' ? message(extra) : message;
 				return i;

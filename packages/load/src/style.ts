@@ -1,14 +1,14 @@
 import { IS_SERVER } from './_constants';
 
 interface LoadStyleCodeOptions {
-	id?: string | HTMLElement; 
+	id?: string | HTMLElement;
 }
 
 export const style = (value: string, options?: LoadStyleCodeOptions) => {
 	if (IS_SERVER) return;
-		
+
 	if (options?.id) {
-		let el = typeof options.id === 'string' 
+		const el = typeof options.id === 'string'
 			? document.getElementById(options.id)
 			: options.id;
 
@@ -21,7 +21,7 @@ export const style = (value: string, options?: LoadStyleCodeOptions) => {
 	if (style.cache.has(value)) return;
 	style.cache.add(value);
 
-	let el = document.createElement('style');
+	const el = document.createElement('style');
 
 	/* istanbul ignore else -- @preserve */
 	if (options?.id && typeof options.id === 'string') {
@@ -37,13 +37,13 @@ export const removeStyle = (id: string | HTMLElement) => {
 	if (IS_SERVER) return;
 
 	if (id) {
-		let el = typeof id === 'string' 
+		const el = typeof id === 'string'
 			? document.getElementById(id)
 			: id;
 
 		if (!el) return;
 
-		let code = el.innerHTML;
+		const code = el.innerHTML;
 		document.getElementsByTagName('head')[0].removeChild(el);
 
 		if (style.cache.has(code)) {

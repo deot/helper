@@ -1,7 +1,7 @@
 import * as $ from '@deot/helper-dom';
 
 describe('get-style.ts', () => {
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 	el.style.display = 'none';
 	el.style.float = 'left';
 

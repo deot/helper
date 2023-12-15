@@ -15,18 +15,18 @@ interface Options {
  * @returns ~
  */
 export const scrollIntoView = async (
-	el: HTMLElement | Window, 
+	el: HTMLElement | Window,
 	options?: Options
 ): Promise<any> => {
 	if (IS_SERVER) return;
 
-	let { from = 0, to = 0, duration = 300 } = options || {};
-	
-	let difference = Math.abs(from - to);
-	let step = Math.ceil((difference / duration) * 50);
+	const { from = 0, to = 0, duration = 300 } = options || {};
+
+	const difference = Math.abs(from - to);
+	const step = Math.ceil((difference / duration) * 50);
 
 	let onResolve: Function;
-	let target = new Promise((resolve) => {
+	const target = new Promise((resolve) => {
 		onResolve = resolve;
 	});
 	const scroll = (start: number, end: number) => {
@@ -49,6 +49,6 @@ export const scrollIntoView = async (
 	};
 
 	scroll(from, to);
-	
+
 	return target;
 };

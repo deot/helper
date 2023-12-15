@@ -1,7 +1,7 @@
 import * as $ from '@deot/helper-dom';
 
 describe('on.ts', () => {
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 	it('empty', () => {
 		expect(typeof $.on(el, 'empty', () => {})).toBe('function');
 	});

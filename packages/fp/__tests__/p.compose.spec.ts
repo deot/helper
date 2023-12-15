@@ -1,8 +1,8 @@
 import * as FP from '@deot/helper-fp';
 import * as R from 'ramda';
 
-const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
-const { compose, pipe } = FP; 
+const sleep = (s: number) => new Promise((_) => { setTimeout(_, s || 0); });
+const { compose, pipe } = FP;
 describe('compose/pipe.ts', () => {
 	it('base', () => {
 		const add = (x: number) => {
@@ -15,8 +15,8 @@ describe('compose/pipe.ts', () => {
 			return x - 10;
 		};
 
-		const composed = compose(add, mul, sub); 
-		const piped = pipe(add, mul, sub); 
+		const composed = compose(add, mul, sub);
+		const piped = pipe(add, mul, sub);
 
 		// ((5 - 10) * 3) + 2 = -13
 		expect(composed(5)).toBe(-13);
@@ -32,7 +32,6 @@ describe('compose/pipe.ts', () => {
 			// any
 		}
 	});
-
 
 	it('this', () => {
 		const add = function (this: any, x: number) {
@@ -51,7 +50,7 @@ describe('compose/pipe.ts', () => {
 			x: 2,
 			y: 3,
 			z: 10
-		}; 
+		};
 
 		// ((5 - 10) * 3) + 2 = -13
 		expect(ctx.composed(5)).toBe(-13);
@@ -60,18 +59,18 @@ describe('compose/pipe.ts', () => {
 	});
 
 	it('multiple args', () => {
-		let f = (a: any, b: any, c: any) => [a, b, c];
-		let g = compose(f);
+		const f = (a: any, b: any, c: any) => [a, b, c];
+		const g = compose(f);
 		expect(g(1, 2, 3)).toEqual([1, 2, 3]);
 
-		let f1 = (a: any) => (b: any, c: any) => [a, b, c];
-		let g2 = compose(f1);
+		const f1 = (a: any) => (b: any, c: any) => [a, b, c];
+		const g2 = compose(f1);
 		expect(g2(1)(2, 3)).toEqual([1, 2, 3]);
 	});
 
 	it('middlewares', () => {
 		let step = 0;
-		let a = (next: any) => {
+		const a = (next: any) => {
 			expect(++step).toEqual(1);
 			return (options: any) => {
 				expect(options).toEqual({ b: 1, c: 1 });
@@ -82,7 +81,7 @@ describe('compose/pipe.ts', () => {
 				});
 			};
 		};
-		let b = (next: any) => {
+		const b = (next: any) => {
 			expect(++step).toEqual(2);
 			return (options: any) => {
 				expect(options).toEqual({ c: 1 });
@@ -94,7 +93,7 @@ describe('compose/pipe.ts', () => {
 			};
 		};
 
-		let page = (options: any) => {
+		const page = (options: any) => {
 			expect(++step).toEqual(5);
 			return options;
 		};
@@ -102,13 +101,13 @@ describe('compose/pipe.ts', () => {
 		// next = page;
 		// step1: _next = afn = a(page);
 		// step2: __next = bfn = b(afn);
-		let g = R.compose(b, a)(page); // b(a(page))
+		const g = R.compose(b, a)(page); // b(a(page))
 
 		// options = { c: 1 };
 		// step3: _options = __next(options) = bfn(options);
 		// step4: __options = _next(_options) = afn(_options);
 		// step5: next(__options) = page(__options);
-		let result = g({ c: 1 });
+		const result = g({ c: 1 });
 
 		/**
 		 * 这样`next => options => any`的设计，虽然是先执行a，再执行b。
@@ -119,7 +118,7 @@ describe('compose/pipe.ts', () => {
 	});
 
 	it('mirco redux', async () => {
-		let createStore = (reducer: any, initialState = {}) => {
+		const createStore = (reducer: any, initialState = {}) => {
 			let currentState = initialState;
 			return {
 				dispatch: (action: any) => {
@@ -129,13 +128,13 @@ describe('compose/pipe.ts', () => {
 			};
 		};
 
-		let applyMiddleware = (...middlewares: any[]) => {
+		const applyMiddleware = (...middlewares: any[]) => {
 			return (next: any) => (reducer: any, initialState = {}) => {
-				let store = next(reducer, initialState);
-				let chain = middlewares.map((fn) => fn(store));
+				const store = next(reducer, initialState);
+				const chain = middlewares.map(fn => fn(store));
 
-				let _next = store.dispatch;
-				let _dispatch = compose(...chain)(_next);
+				const _next = store.dispatch;
+				const _dispatch = compose(...chain)(_next);
 
 				return {
 					...store,
@@ -173,8 +172,8 @@ describe('compose/pipe.ts', () => {
 			} else {
 				return function (next: any) {
 					return function (reducer: any, initialState: any) {
-						let store = next(reducer, initialState);
-						let _dispatch = (action: any) => {
+						const store = next(reducer, initialState);
+						const _dispatch = (action: any) => {
 							// 变化前`store.getState()`;
 							store.dispatch(action);
 							// 变化后`store.getState();`
@@ -184,36 +183,35 @@ describe('compose/pipe.ts', () => {
 							...store,
 							dispatch: _dispatch
 						};
-
 					};
 				};
 			}
 		};
 
-		let finalCreateStore = compose(
+		const finalCreateStore = compose(
 			applyMiddleware(thunk, api),
 			debug(true),
 			debug(false),
 		)(createStore);
 
-		let reducer = (state: any, action: any) => {
+		const reducer = (state: any, action: any) => {
 			if (action.type === 'REQUEST') {
 				state = {
 					...state,
-					request: ++state.request 
+					request: ++state.request
 				};
 			}
 
 			if (action.type === 'THUNK') {
 				state = {
 					...state,
-					thunk: ++state.thunk 
+					thunk: ++state.thunk
 				};
 			}
 
 			return state;
 		};
-		let store = finalCreateStore(reducer, { request: 0, thunk: 0 });
+		const store = finalCreateStore(reducer, { request: 0, thunk: 0 });
 
 		// 异步方式1
 		store.dispatch({ type: 'API' });

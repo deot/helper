@@ -11,7 +11,7 @@ const R = {
 
 describe('monad.ts', () => {
 	it('map', () => {
-		let current = Monad.of('Hello Monads!')
+		const current = Monad.of('Hello Monads!')
 			.map(R.toUpper)
 			.map(R.identity);
 		expect(current instanceof Monad).toBe(true);
@@ -37,15 +37,15 @@ describe('monad.ts', () => {
 			Monad.of,
 			Monad.of,
 			Monad.of,
-			(x: any) => x.flatMap(R.add2), 
-			(x: any) => x.flatMap(R.add3), 
+			(x: any) => x.flatMap(R.add2),
+			(x: any) => x.flatMap(R.add3),
 			(x: any) => x.value
 		);
 		expect(safeAdd('1')).toBe('123');
 	});
 
 	it('Monadic: map / flatMap / valueOf / toString', () => {
-		let current = Monad.of(Monad.of(Monad.of(Monad.of('Hello Monads!'))))
+		const current = Monad.of(Monad.of(Monad.of(Monad.of('Hello Monads!'))))
 			.flatMap(R.toUpper)
 			.map(R.identity);
 

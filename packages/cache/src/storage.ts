@@ -23,14 +23,13 @@ interface Options {
 }
 
 class StorageStore extends ACache {
-
 	sessionStorage = new MemoryStorage();
 
 	localStorage = new MemoryStorage();
 
 	getInvoke(options?: Options) {
-		return options?.session 
-			? 'sessionStorage' 
+		return options?.session
+			? 'sessionStorage'
 			: 'localStorage';
 	}
 
@@ -44,7 +43,7 @@ class StorageStore extends ACache {
 		Object.keys(window.localStorage).forEach((item) => {
 			/* istanbul ignore else -- @preserve */
 			if (
-				item.includes(PREFIX_NAME) 
+				item.includes(PREFIX_NAME)
 				&& !item.includes(`${PREFIX_NAME}${version}`)
 			) {
 				window.localStorage.removeItem(item);
@@ -60,7 +59,7 @@ class StorageStore extends ACache {
 	 */
 	set(key: string, value: any, options?: Options): void {
 		if (!ALLOW) return;
-		let invoke = this.getInvoke(options);
+		const invoke = this.getInvoke(options);
 
 		key = formatKey(key, this.options.version);
 		value = this.options.set!(typeof value === 'string' ? value : JSON.stringify(value));
@@ -81,10 +80,10 @@ class StorageStore extends ACache {
 	get(key: string, options?: Options): any {
 		if (!ALLOW) return null;
 
-		let invoke = this.getInvoke(options);
+		const invoke = this.getInvoke(options);
 		key = formatKey(key, this.options.version);
-		
-		let value = this[invoke].getItem(key) || window[invoke].getItem(key);
+
+		const value = this[invoke].getItem(key) || window[invoke].getItem(key);
 		return this.options.get!(value);
 	}
 
@@ -96,10 +95,10 @@ class StorageStore extends ACache {
 	remove(key: string, options?: Options): void {
 		if (!ALLOW) return;
 
-		let invoke = this.getInvoke(options);
+		const invoke = this.getInvoke(options);
 		key = formatKey(key, this.options.version);
 
-		this[invoke].removeItem(key); 
+		this[invoke].removeItem(key);
 		window[invoke].removeItem(key);
 	}
 }

@@ -6,10 +6,12 @@
 
 
 ```js
-import * as $ from "@deot/helper-dom";
+import * as $ from '@deot/helper-dom';
+```
 
+```js
 // or
-import { $, DOM } from "@deot/helper";
+import { $, DOM } from '@deot/helper';
 ```
 
 ---

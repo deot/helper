@@ -10,7 +10,7 @@ describe('flatten-json-parse.ts', () => {
 	});
 
 	it('maxTries: 10', () => {
-		let v1 = {};
+		const v1 = {};
 		let v2 = JSON.stringify(v1);
 		Array.from({ length: 11 }).forEach(() => {
 			v2 = JSON.stringify(v2);
@@ -22,4 +22,3 @@ describe('flatten-json-parse.ts', () => {
 		}
 	});
 });
-

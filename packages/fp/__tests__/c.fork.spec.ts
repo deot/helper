@@ -2,7 +2,7 @@ import * as FP from '@deot/helper-fp';
 
 describe('fork.ts', () => {
 	it('base', () => {
-		let f = FP.fork(
+		const f = FP.fork(
 			(a: any, b: any) => a === b,
 			(x: any) => x,
 			(x: any) => x,

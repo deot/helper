@@ -1,15 +1,15 @@
 import { dataURLToFile } from './dataURL-to-file';
 
 interface Result {
-	dataURL: string; 
+	dataURL: string;
 	file?: File;
 }
 
 export const canvasToImage = (canvas: HTMLCanvasElement, filename?: string): Promise<Result> => {
-	const dataURL = canvas.toDataURL("image/png"); // base64
-	
+	const dataURL = canvas.toDataURL('image/png'); // base64
+
 	return new Promise((resolve) => {
-		let result: Result = {
+		const result: Result = {
 			dataURL
 		};
 

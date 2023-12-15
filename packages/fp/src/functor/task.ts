@@ -42,7 +42,7 @@ export class Task extends AMonad {
 		this.isStart = parent?.isStart || false;
 
 		// 如果已经开始了, ready可以直接执行
-		this.ready = this.isStart 
+		this.ready = this.isStart
 			? Promise.resolve()
 			: new Promise((resolve) => {
 				this._ready = resolve;
@@ -95,7 +95,7 @@ export class Task extends AMonad {
 
 	flatMap(fn: Function) {
 		this.record = ['flatMap', fn];
-	    return super.flatMap(fn);
+		return super.flatMap(fn);
 	}
 
 	reduce(collection: any[] | ((...args: any[]) => (Promise<any[]> | any[])), done: Function) {
@@ -143,7 +143,7 @@ export class Task extends AMonad {
 		if (this.isCancel || this.isComplete) return this;
 		this.isCancel = true;
 		this.cancelHooks.forEach(fn => fn());
-		
+
 		this.parent?.cancel();
 		return this;
 	}
@@ -173,9 +173,9 @@ export class Task extends AMonad {
 			const [key, fn] = child.record;
 			/* istanbul ignore else -- @preserve */
 			if (key) {
-				next = next[key](fn);	
+				next = next[key](fn);
 			}
-			
+
 			child = child.child;
 		}
 

@@ -12,15 +12,15 @@ export abstract class AMonad {
 
 	// this.join().map()会导致不同Monadic混用时this出现问题
 	flatMap(fn: Function): any {
-		let v = this.join();
-		
+		const v = this.join();
+
 		this.value = v.value;
 		return this.map(fn);
 	}
 
 	join(): any {
 		if (!(this.value instanceof AMonad)) {
-			 return this;
+			return this;
 		}
 		return this.value.join();
 	}

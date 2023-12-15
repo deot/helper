@@ -1,4 +1,4 @@
-import "fake-indexeddb/auto";
+import 'fake-indexeddb/auto';
 import { IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
 describe('indexed-db.ts', () => {
@@ -57,7 +57,7 @@ describe('indexed-db.ts', () => {
 			storeName: 'store'
 		});
 
-		let length = 100;
+		const length = 100;
 		Array
 			.from({ length })
 			.forEach((_: any, index: number) => {

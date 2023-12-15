@@ -7,5 +7,5 @@ import { curry } from '../pipeline';
  */
 
 export const fork = curry((join: Function, func1: Function, func2: Function) => {
-	 return (x: any) => join(func1(x), func2(x));
+	return (x: any) => join(func1(x), func2(x));
 });

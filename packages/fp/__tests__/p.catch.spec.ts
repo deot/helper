@@ -2,7 +2,7 @@ import * as FP from '@deot/helper-fp';
 
 describe('catch.ts', () => {
 	it('base', () => {
-		let safe = FP.catch$((e: any) => {
+		const safe = FP.catch$((e: any) => {
 			expect(e).toBe('error');
 		});
 

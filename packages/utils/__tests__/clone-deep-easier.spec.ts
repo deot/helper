@@ -7,4 +7,3 @@ describe('clone-deep-easier.ts', () => {
 		expect(Utils.cloneDeepEasier(target) !== target).toBe(true);
 	});
 });
-

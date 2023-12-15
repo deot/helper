@@ -10,12 +10,12 @@ export const debounce = (original: Function, wait?: number, options?: Options) =
 	let timer: ReturnType<typeof global.setTimeout> | null;
 	let invoke: Function | null;
 
-	let cancel = () => {
+	const cancel = () => {
 		timer && clearTimeout(timer);
 		timer = null;
 	};
 
-	let start = () => {
+	const start = () => {
 		timer = setTimeout(() => {
 			timer = null;
 			trailing && invoke && invoke();

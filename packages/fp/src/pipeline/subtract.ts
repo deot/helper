@@ -4,16 +4,16 @@ type Subtract = (arg1: number, arg2: number) => number;
 export const subtract: Subtract = curry((arg1, arg2) => {
 	let r1: number;
 	let r2: number;
-	let m: number;
-	let n: number;
+	const m: number;
+	const n: number;
 
 	try {
-		r1 = arg1.toString().split(".")[1].length;
+		r1 = arg1.toString().split('.')[1].length;
 	} catch (e) {
 		r1 = 0;
 	}
 	try {
-		r2 = arg2.toString().split(".")[1].length;
+		r2 = arg2.toString().split('.')[1].length;
 	} catch (e) {
 		r2 = 0;
 	}

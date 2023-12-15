@@ -1,7 +1,7 @@
 import * as FP from '@deot/helper-fp';
 
 const { Parallel, Task } = FP;
-const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
+const sleep = (s: number) => new Promise((_) => { setTimeout(_, s || 0); });
 
 describe('parallel.ts', () => {
 	it('task', async () => {
@@ -36,7 +36,7 @@ describe('parallel.ts', () => {
 		expect(count).not.toBe(record);
 
 		// 取消
-		let len = current.tasks.length;
+		const len = current.tasks.length;
 		current.cancel();
 		record = count;
 		await sleep(20);
@@ -52,12 +52,11 @@ describe('parallel.ts', () => {
 		expect(count).not.toBe(record);
 
 		current.cancel();
-
 	});
 
 	it('tasks', async () => {
 		let count = 0;
-		let gen = () => {
+		const gen = () => {
 			return Task.of('Hello Parallels!')
 				.map(async (v: any) => {
 					await sleep(1);
@@ -89,10 +88,9 @@ describe('parallel.ts', () => {
 		expect(current.tasks.length).toBe(0);
 
 		// 取消之后会一直处于pending
-		let message = await Promise.race([new Promise(_ => { setTimeout(() => _('CANCELED'), 50); }), target1]);
+		const message = await Promise.race([new Promise((_) => { setTimeout(() => _('CANCELED'), 50); }), target1]);
 		expect(message).toBe('CANCELED');
 	});
-
 
 	it('func', async () => {
 		let count = 0;
@@ -145,7 +143,7 @@ describe('parallel.ts', () => {
 
 	it('funcs', async () => {
 		let count = 0;
-		let gen = () => {
+		const gen = () => {
 			return async () => {
 				count++;
 				await sleep(1);
@@ -174,7 +172,7 @@ describe('parallel.ts', () => {
 		expect(current.tasks.length).toBe(0);
 
 		// 取消之后会一直处于pending
-		let message = await Promise.race([new Promise(_ => { setTimeout(() => _('CANCELED'), 50); }), target1]);
+		const message = await Promise.race([new Promise((_) => { setTimeout(() => _('CANCELED'), 50); }), target1]);
 		expect(message).toBe('CANCELED');
 	});
 
@@ -200,7 +198,7 @@ describe('parallel.ts', () => {
 		});
 
 		current.start();
-		
+
 		await sleep(30);
 		await current.cancel();
 	});
@@ -229,7 +227,7 @@ describe('parallel.ts', () => {
 		await sleep(2);
 		expect(count).not.toBe(0);
 		current.setConcurrency(20);
-		
+
 		await sleep(2);
 		expect(count).toBeGreaterThan(10);
 		await sleep(20);

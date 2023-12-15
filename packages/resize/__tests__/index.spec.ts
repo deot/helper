@@ -15,7 +15,7 @@ describe('resize.ts', () => {
 		}
 	});
 
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 
 	el.style.width = '100px';
 	el.style.height = '100px';
@@ -25,11 +25,11 @@ describe('resize.ts', () => {
 
 	it('on', async () => {
 		expect.assertions(1);
-		let handler = () => {
+		const handler = () => {
 			// any
 		};
 		Resize.on(el, handler);
-		let off = Resize.of(el).on(() => {
+		const off = Resize.of(el).on(() => {
 			expect(1).toBe(1);
 		});
 

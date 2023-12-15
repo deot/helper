@@ -11,4 +11,3 @@ describe('stream.ts', () => {
 		expect(Is.stream(stream)).toBe(true);
 	});
 });
-

@@ -1,7 +1,7 @@
 import * as $ from '@deot/helper-dom';
 
 describe('has-class.ts', () => {
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 	it('empty', () => {
 		expect($.hasClass(el)).toBe(false);
 	});

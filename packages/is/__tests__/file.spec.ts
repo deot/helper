@@ -10,4 +10,3 @@ describe('file.ts', () => {
 		expect(Is.file(file)).toBe(true);
 	});
 });
-

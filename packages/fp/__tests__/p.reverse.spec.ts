@@ -4,7 +4,7 @@ const { reverse } = FP;
 
 describe('reverse.ts', () => {
 	it('array', () => {
-		let v = [1, 2, 3];
+		const v = [1, 2, 3];
 		expect(reverse(v)).toEqual([3, 2, 1]);
 
 		// 不改变原数据
@@ -16,7 +16,7 @@ describe('reverse.ts', () => {
 	});
 
 	it('object', () => {
-		let target = {} as any[];
+		const target = {} as any[];
 		expect(reverse(target)).toBe(target);
 	});
 });

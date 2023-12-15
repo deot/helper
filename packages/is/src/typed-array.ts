@@ -1,4 +1,4 @@
-import { instance } from "./instance";
+import { instance } from './instance';
 
 const TypedArray = typeof Uint8Array !== 'undefined' && Object.getPrototypeOf(Uint8Array);
 

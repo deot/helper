@@ -2,7 +2,7 @@ import { Emitter } from '@deot/helper-emitter';
 
 export abstract class ATask extends Emitter {
 	_pasuer!: Function;
-	
+
 	pasuer = Promise.resolve();
 
 	canceler = Promise.resolve();

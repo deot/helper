@@ -9,8 +9,8 @@ export class Maybe extends AMonad {
 	}
 
 	map(fn: Function) {
-		return this.isNothing() 
-			? Maybe.of(this.value) 
+		return this.isNothing()
+			? Maybe.of(this.value)
 			: Maybe.of(fn(this.value));
 	}
 
@@ -28,8 +28,8 @@ export class Maybe extends AMonad {
 	}
 
 	valueOf(other?: any) {
-		return typeof other !== 'undefined' && this.isNothing() 
-			? other 
+		return typeof other !== 'undefined' && this.isNothing()
+			? other
 			: this.value;
 	}
 }

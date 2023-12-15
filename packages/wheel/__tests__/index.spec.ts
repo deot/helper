@@ -3,8 +3,8 @@ import normalizeWheel from 'normalize-wheel';
 import { Wheel } from '@deot/helper-wheel';
 
 describe('wheel.ts', () => {
-	let make = (mode: string): HTMLElement => {
-		let el = document.createElement('div');
+	const make = (mode: string): HTMLElement => {
+		const el = document.createElement('div');
 
 		el.style.margin = '25px 0';
 		el.style.width = 'calc(100vw - 100px)';
@@ -15,7 +15,7 @@ describe('wheel.ts', () => {
 		Array.from({
 			length: 30
 		}).forEach((_: any, index: number) => {
-			let child = document.createElement('div');
+			const child = document.createElement('div');
 			child.style.width = '300vw';
 			child.innerHTML = `<span style="color: red">${index}</span>` + (` .${mode}. `).repeat(25);
 
@@ -35,9 +35,8 @@ describe('wheel.ts', () => {
 		return el;
 	};
 
-
-	let dispatchWheel = (el: HTMLElement, deltaX: number, deltaY: number) => {
-		let e = new WheelEvent(normalizeWheel.getEventType());
+	const dispatchWheel = (el: HTMLElement, deltaX: number, deltaY: number) => {
+		const e = new WheelEvent(normalizeWheel.getEventType());
 		Object.defineProperty(e, 'deltaX', { value: deltaX });
 		Object.defineProperty(e, 'deltaY', { value: deltaY });
 		Object.defineProperty(e, 'cancelable', { value: true });
@@ -45,8 +44,8 @@ describe('wheel.ts', () => {
 		el.dispatchEvent(e);
 	};
 
-	let dispatchTouch = (el: HTMLElement, type: string, screenX: number, screenY: number) => {
-		let e = new TouchEvent(type);
+	const dispatchTouch = (el: HTMLElement, type: string, screenX: number, screenY: number) => {
+		const e = new TouchEvent(type);
 		Object.defineProperty(e, 'touches', { value: [] });
 		Object.defineProperty(e.touches, '0', { value: {} });
 		Object.defineProperty(e.touches[0], 'screenX', { value: -screenX });
@@ -60,8 +59,8 @@ describe('wheel.ts', () => {
 		el.dispatchEvent(e);
 	};
 
-	let dispatchMouse = (el: HTMLElement, deltaX: number, deltaY: number, which?: number) => {
-		let e = new MouseEvent('mousemove');
+	const dispatchMouse = (el: HTMLElement, deltaX: number, deltaY: number, which?: number) => {
+		const e = new MouseEvent('mousemove');
 		Object.defineProperty(e, 'which', { value: which || 2 });
 		Object.defineProperty(e, 'movementX', { value: deltaX });
 		Object.defineProperty(e, 'movementY', { value: deltaY });
@@ -70,8 +69,8 @@ describe('wheel.ts', () => {
 	};
 
 	it('none options', async () => {
-		let el = make('wheel');
-		let wheel = Wheel.of(el, {
+		const el = make('wheel');
+		const wheel = Wheel.of(el, {
 			shouldWheelX: () => true,
 			shouldWheelY: () => true,
 			stopPropagation: () => true
@@ -88,8 +87,8 @@ describe('wheel.ts', () => {
 
 	it('y', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(
+		const el = make('wheel');
+		const wheel = Wheel.of(
 			el
 		);
 
@@ -98,7 +97,7 @@ describe('wheel.ts', () => {
 			expect(y).toBe(10);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchWheel(el, 0, 10);
 		await Utils.sleep(20);
@@ -107,15 +106,15 @@ describe('wheel.ts', () => {
 
 	it('x', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		const handler = (x: number, y: number) => {
 			expect(x).toBe(10);
 			expect(y).toBe(0);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchWheel(el, 10, 0);
 		await Utils.sleep(30);
@@ -124,8 +123,8 @@ describe('wheel.ts', () => {
 
 	it('shouldWheel: false', async () => {
 		expect.assertions(0);
-		let el = make('wheel');
-		let wheel = Wheel.of(el, {
+		const el = make('wheel');
+		const wheel = Wheel.of(el, {
 			freedom: true,
 			shouldWheelX: () => false,
 			shouldWheelY: () => false
@@ -136,7 +135,7 @@ describe('wheel.ts', () => {
 			expect(y).toBe(0);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchWheel(el, 10, 0);
 		await Utils.sleep(30);
@@ -145,15 +144,15 @@ describe('wheel.ts', () => {
 
 	it('touch x', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		const handler = (x: number, y: number) => {
 			expect(x).toBe(10);
 			expect(y).toBe(0);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchTouch(el, 'touchmove', 100, 0); // 无效
 
@@ -166,15 +165,15 @@ describe('wheel.ts', () => {
 
 	it('touch -x', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		const handler = (x: number, y: number) => {
 			expect(x).toBe(-10);
 			expect(y).toBe(0);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchTouch(el, 'touchstart', 0, 0);
 		dispatchTouch(el, 'touchmove', -10, 0);
@@ -185,15 +184,15 @@ describe('wheel.ts', () => {
 
 	it('touch y', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		const handler = (x: number, y: number) => {
 			expect(x).toBe(0);
 			expect(y).toBe(10);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchTouch(el, 'touchstart', 0, 0);
 		dispatchTouch(el, 'touchmove', 0, 10);
@@ -204,15 +203,15 @@ describe('wheel.ts', () => {
 
 	it('touch -y', async () => {
 		expect.assertions(2);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		const handler = (x: number, y: number) => {
 			expect(x).toBe(0);
 			expect(y).toBe(-10);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchTouch(el, 'touchstart', 0, 0);
 		dispatchTouch(el, 'touchmove', 0, -10);
@@ -223,15 +222,15 @@ describe('wheel.ts', () => {
 
 	// 滑动延迟，跟随移动
 	it('touch end', async () => {
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		let count = 0;
 		const handler = () => {
 			count++;
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchTouch(el, 'touchstart', 0, 0);
 		await Utils.sleep(100);
@@ -246,8 +245,8 @@ describe('wheel.ts', () => {
 
 	it('no scroll', async () => {
 		expect.assertions(0);
-		let el = make('wheel');
-		let wheel = Wheel.of(el);
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
 
 		Object.defineProperty(el, 'scrollWidth', { value: 1000 });
 		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
@@ -256,7 +255,7 @@ describe('wheel.ts', () => {
 			expect(1).toBe(1);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 		dispatchWheel(el, 10, 0);
 		dispatchWheel(el, 0, 10);
 		await Utils.sleep(30);
@@ -265,8 +264,8 @@ describe('wheel.ts', () => {
 
 	it('native', async () => {
 		expect.assertions(0);
-		let el = make('wheel');
-		let wheel = Wheel.of(el, {
+		const el = make('wheel');
+		const wheel = Wheel.of(el, {
 			shouldWheelX: () => false,
 			shouldWheelY: () => false
 		});
@@ -286,8 +285,8 @@ describe('wheel.ts', () => {
 	it('mousemove', async () => {
 		expect.assertions(2);
 		Object.defineProperty(document, 'ontouchend', { value: undefined });
-		let el = make('wheel');
-		let wheel = Wheel.of(el, {
+		const el = make('wheel');
+		const wheel = Wheel.of(el, {
 			shouldWheelX: () => true,
 			shouldWheelY: () => true
 		});
@@ -297,7 +296,7 @@ describe('wheel.ts', () => {
 			expect(y).toBe(0);
 		};
 
-		let off = wheel.on(handler);
+		const off = wheel.on(handler);
 
 		dispatchMouse(el, 100, 0);
 		dispatchMouse(el, 1000, 0, 1);

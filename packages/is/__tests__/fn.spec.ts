@@ -9,4 +9,3 @@ describe('fn.ts', () => {
 		expect(Is.fn([])).toBe(false);
 	});
 });
-

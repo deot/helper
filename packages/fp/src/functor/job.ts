@@ -35,11 +35,11 @@ export class Job extends ATask {
 			this.task = leaf;
 		}
 
-		let interrupter = (v: any) => Promise.resolve(v)
+		const interrupter = (v: any) => Promise.resolve(v)
 			.then((x: any) => this.suspend(x, new Promise((_) => { setTimeout(_, this.interval); })))
 			.then((x: any) => this.suspend(x, this.canceler))
 			.then((x: any) => this.suspend(x, this.pasuer));
-			
+
 		// Task可以更加细粒度的中断
 		return this.original instanceof Task
 			? Promise.resolve()
@@ -63,12 +63,12 @@ export class Job extends ATask {
 		this.isStart = true;
 
 		if (
-			this.original instanceof Task 
-			&& !this.original.isStart
+			this.original instanceof Task
+				&& !this.original.isStart
 		) {
 			this.original.start();
 		}
-		
+
 		this.process();
 	}
 
@@ -101,9 +101,9 @@ export class Job extends ATask {
 			this.task.pasue();
 			this.task.cancel();
 		}
-		
+
 		this.setCancelStatus(false);
-		
+
 		this.isStart = false;
 		this.process();
 	}

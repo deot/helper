@@ -1,7 +1,7 @@
 import * as FP from '@deot/helper-fp';
 
 const { Task, Monad } = FP;
-const sleep = (s: number) => new Promise(_ => { setTimeout(_, s || 0); });
+const sleep = (s: number) => new Promise((_) => { setTimeout(_, s || 0); });
 const R = {
 	toUpper: async (x: string) => {
 		await sleep(0);
@@ -25,7 +25,7 @@ describe('task.ts', () => {
 	it('serial: then / reduce', async () => {
 		expect.assertions(3);
 
-		let current = Task.of('Hello Tasks!')
+		const current = Task.of('Hello Tasks!')
 			.map(R.toUpper)
 			.map((x: any) => {
 				return ['.', '.'].reduce((pre: any, cur: any) => {
@@ -63,7 +63,7 @@ describe('task.ts', () => {
 
 	it('start / immediate', async () => {
 		expect.assertions(1);
-		let current = Task.of('Hello Tasks!')
+		const current = Task.of('Hello Tasks!')
 			.start()
 			.immediate()
 			.map(R.identity)
@@ -76,7 +76,7 @@ describe('task.ts', () => {
 
 	it('pasue / resume', async () => {
 		expect.assertions(2);
-		let current = Task.of('Hello Tasks!')
+		const current = Task.of('Hello Tasks!')
 			.map(R.toUpper)
 			.map(R.identity)
 			.map(async (x: any) => {
@@ -107,8 +107,7 @@ describe('task.ts', () => {
 	it('catch / then', async () => {
 		expect.assertions(2);
 
-		
-		let message = 'ERROR';
+		const message = 'ERROR';
 		Task.of('Hello Tasks!')
 			.map(async () => {
 				throw new Error(message);
@@ -128,7 +127,7 @@ describe('task.ts', () => {
 
 	it('restart', async () => {
 		expect.assertions(3);
-		
+
 		const current = Task.of('Hello Tasks!')
 			.map(R.toUpper)
 			.map(R.identity)
@@ -150,7 +149,7 @@ describe('task.ts', () => {
 
 	it('Monadic: map / flatMap / valueOf / toString', async () => {
 		expect.assertions(3);
-		let current = Task.of(Task.of(Task.of(Monad.of(Task.of('Hello Tasks!')))))
+		const current = Task.of(Task.of(Task.of(Monad.of(Task.of('Hello Tasks!')))))
 			.flatMap(R.toUpper)
 			.map(R.identity)
 			.start();

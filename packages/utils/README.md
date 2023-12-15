@@ -3,10 +3,11 @@
 ### `Utils`
 ```js
 import * as Utils from '@deot/helper-utils';
+```
 
+```js
 // or
 import { Utils } from '@deot/helper';
-
 ```
 
 | 方法                                                                 | 说明                             |

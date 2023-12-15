@@ -6,4 +6,3 @@ describe('asterisk.ts', () => {
 		expect(Utils.asterisk('')).toBe(`****`);
 	});
 });
-

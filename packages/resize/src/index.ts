@@ -39,7 +39,7 @@ export class Resize {
 	constructor(el: ResizableElement) {
 		this.el = el;
 
-		let rz = el.__rz__;
+		const rz = el.__rz__;
 		if (rz && rz instanceof Resize) {
 			this.listeners = rz.listeners;
 			this.ro = rz.ro;

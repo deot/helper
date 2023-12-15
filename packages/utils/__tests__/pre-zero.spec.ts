@@ -7,4 +7,3 @@ describe('pre-zero.ts', () => {
 		expect(Utils.preZero(10)).toBe('10');
 	});
 });
-

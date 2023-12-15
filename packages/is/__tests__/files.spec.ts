@@ -18,4 +18,3 @@ describe('files.ts', () => {
 		expect(Is.files(files)).toBe(true);
 	});
 });
-

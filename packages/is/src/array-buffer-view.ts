@@ -1,4 +1,4 @@
-import { arrayBuffer } from "./array-buffer";
+import { arrayBuffer } from './array-buffer';
 
 export const arrayBufferView = (v?: any) => {
 	let result: boolean;

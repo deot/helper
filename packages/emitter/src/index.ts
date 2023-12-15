@@ -21,18 +21,16 @@ export class Emitter {
 
 	on(event: string | object | Function, callback?: Function) {
 		/* istanbul ignore else -- @preserve */
-		if (typeof event === "object") {
-			for (let key in event) {
+		if (typeof event === 'object') {
+			for (const key in event) {
 				/* istanbul ignore else -- @preserve */
-				if (event[key] && (typeof event[key] === "function")) {
+				if (event[key] && (typeof event[key] === 'function')) {
 					this.on(key, event[key]);
 				}
 			}
-		} else if (typeof event === "string" && typeof callback === "function") {
-
+		} else if (typeof event === 'string' && typeof callback === 'function') {
 			this.events[event] || (this.events[event] = []);
 			this.events[event].push(callback);
-
 		} else if (typeof event === 'function') {
 			this.listeners.push(event);
 		}
@@ -44,7 +42,7 @@ export class Emitter {
 		/* istanbul ignore else -- @preserve */
 		if (typeof event === 'string' && !callback) {
 			delete this.events[event];
-		} else if (typeof event === 'string' && this.events[event] && callback) { 
+		} else if (typeof event === 'string' && this.events[event] && callback) {
 			this.events[event] = this.events[event].filter((item: any) => item !== callback);
 			this.events[event].length === 0 && delete this.events[event];
 		} else if (typeof event === 'undefined') {
@@ -55,8 +53,8 @@ export class Emitter {
 
 	once(event: string, callback: Function) {
 		const self = this.context;
-		/* istanbul ignore else -- @preserve */ 
-		if (typeof event === 'string' && typeof callback === "function") {
+		/* istanbul ignore else -- @preserve */
+		if (typeof event === 'string' && typeof callback === 'function') {
 			const fn = (...args: any[]) => {
 				this.off(event, fn);
 				callback.apply(self, args);
@@ -80,7 +78,7 @@ export class Emitter {
 		for (let i = 0; i < this.listeners.length; i++) {
 			if (this.listeners[i].apply(self, [event].concat(args)) === false) break;
 		}
-		
+
 		return this;
 	}
 }

@@ -33,6 +33,6 @@ export abstract class ACache {
 	abstract get(...args: any[]): any;
 
 	abstract set(...args: any[]): void;
-	
+
 	abstract remove(...args: any[]): void;
 }

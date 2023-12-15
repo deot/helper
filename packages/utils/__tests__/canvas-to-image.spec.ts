@@ -1,7 +1,7 @@
 import * as Utils from '@deot/helper-utils';
 
 describe('canvas-to-image.ts', () => {
-	let canvas = document.createElement('canvas');
+	const canvas = document.createElement('canvas');
 
 	Object.defineProperty(HTMLCanvasElement.prototype, 'toDataURL', {
 		value: () => {
@@ -23,4 +23,3 @@ describe('canvas-to-image.ts', () => {
 		expect(typeof result.dataURL).toBe('string');
 	});
 });
-

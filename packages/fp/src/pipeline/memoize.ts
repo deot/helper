@@ -1,10 +1,10 @@
-export const memoize = (func: Function, reslover?:Function) => {
+export const memoize = (func: Function, reslover?: Function) => {
 	if (func.length === 0 || func.length > 1) {
-		 return func;
+		return func;
 	}
 
 	const memoized = function (this: any, ...args: any[]) {
-		let key = reslover ? reslover.apply(this, args) : args[0];
+		const key = reslover ? reslover.apply(this, args) : args[0];
 
 		if (!memoized.cache.has(key)) {
 			memoized.cache.set(key, func.apply(this, args));

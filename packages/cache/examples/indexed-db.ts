@@ -1,8 +1,7 @@
-import { IndexedDB, IndexedDBStore } from "@deot/helper-cache";
+import { IndexedDB, IndexedDBStore } from '@deot/helper-cache';
 
 await IndexedDB.set('user', { name: 'name' });
 await IndexedDB.get('user');
-
 
 await IndexedDB.set('user', 'name');
 const v = await IndexedDB.get('user');
@@ -31,7 +30,7 @@ const store = new IndexedDBStore({
 
 store.deleteDatabase();
 
-let length = 1000;
+const length = 1000;
 Array
 	.from({ length })
 	.forEach((_: any, index: number) => {
@@ -39,7 +38,7 @@ Array
 	});
 
 console.log('batch, write end', `pending: ${store.pending.length}`);
-let target = store.close();
+const target = store.close();
 
 Array
 	.from({ length })

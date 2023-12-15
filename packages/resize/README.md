@@ -7,7 +7,8 @@
 ### `Resize`
 ```js
 import { Resize } from '@deot/helper-resize';
-
+```
+```js
 // or
 import { Resize } from '@deot/helper';
 ```

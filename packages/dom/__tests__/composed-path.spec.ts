@@ -1,7 +1,7 @@
 import * as $ from '@deot/helper-dom';
 
 describe('composed-path.ts', () => {
-	let el = document.createElement('div');
+	const el = document.createElement('div');
 	el.innerHTML = `<button>~</button>`;
 
 	document.body.appendChild(el);

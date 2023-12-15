@@ -10,4 +10,3 @@ describe('number-to-unit.ts', () => {
 		expect(Utils.numberToUnit(Number.MAX_SAFE_INTEGER)).toBe('9007.2万亿');
 	});
 });
-

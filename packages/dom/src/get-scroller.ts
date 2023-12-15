@@ -12,7 +12,7 @@ export const getScroller = (el?: HTMLElement, direction?: 'y' | 'x') => {
 		if (isScroll(parent as HTMLElement, direction)) {
 			return parent;
 		}
-		
+
 		parent = parent?.parentNode as HTMLElement;
 	}
 	return parent;

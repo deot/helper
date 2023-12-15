@@ -3,7 +3,7 @@ import { IS_SERVER } from './_constants';
 export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Document, child?: HTMLElement) => {
 	if (IS_SERVER || !child) return false;
 
-	let childRect = child.getBoundingClientRect();
+	const childRect = child.getBoundingClientRect();
 	let elRect: { top: number; right: number; bottom: number; left: number };
 
 	if (!el || [window, document, document.documentElement].includes(el)) {
@@ -17,8 +17,8 @@ export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Docum
 		elRect = (el as HTMLElement).getBoundingClientRect();
 	}
 
-	return childRect.top < elRect.bottom 
-		&& childRect.bottom > elRect.top 
-		&& childRect.right > elRect.left 
+	return childRect.top < elRect.bottom
+		&& childRect.bottom > elRect.top
+		&& childRect.right > elRect.left
 		&& childRect.left < elRect.right;
 };

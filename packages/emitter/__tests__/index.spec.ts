@@ -3,7 +3,7 @@ import { Emitter } from '@deot/helper-emitter';
 describe('emitter.ts', () => {
 	it('this', () => {
 		const evt = '[event-name]';
-		let source = new Emitter({ a: 2 });
+		const source = new Emitter({ a: 2 });
 
 		source.on(evt, function (this: any) {
 			expect(this.a).toBe(2);
@@ -13,13 +13,13 @@ describe('emitter.ts', () => {
 	});
 
 	it('of', () => {
-		let source = Emitter.of();
+		const source = Emitter.of();
 		expect(source instanceof Emitter).toBe(true);
 	});
 
 	it('on', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
 
 		source.on(evt, () => count++);
@@ -33,9 +33,9 @@ describe('emitter.ts', () => {
 
 	it('off alone', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.on(evt, handle);
 		expect(source.events[evt].length).toBe(1);
@@ -45,9 +45,9 @@ describe('emitter.ts', () => {
 
 	it('off by event', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.on(evt, handle);
 		expect(source.events[evt].length).toBe(1);
@@ -57,9 +57,9 @@ describe('emitter.ts', () => {
 
 	it('off by event & callback', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.on(evt, handle);
 		expect(source.events[evt].length).toBe(1);
@@ -69,9 +69,9 @@ describe('emitter.ts', () => {
 
 	it('once', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.once(evt, handle);
 		source.emit(evt);
@@ -84,9 +84,9 @@ describe('emitter.ts', () => {
 
 	it('emit false', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.on(evt, handle);
 		source.on(evt, () => false);
@@ -98,22 +98,22 @@ describe('emitter.ts', () => {
 	});
 
 	it('emit listener false', () => {
-		let source = new Emitter();
+		const source = new Emitter();
 		let count = 0;
-		let handle = () => count++;
+		const handle = () => count++;
 
 		source.on(handle);
 		source.on(() => false);
 		source.on(handle);
 		source.on(handle);
-		
+
 		source.emit();
 		expect(count).toBe(1);
 	});
 
 	it('emit args', () => {
 		const evt = '[event-name]';
-		let source = new Emitter();
+		const source = new Emitter();
 
 		source.on((event: any, a: any, b: any, c: any) => {
 			expect(event).toBe(evt);
@@ -132,7 +132,7 @@ describe('emitter.ts', () => {
 	});
 
 	it('emit args direct', () => {
-		let source = new Emitter();
+		const source = new Emitter();
 
 		source.on((event: any) => {
 			expect(event).toBe(undefined);

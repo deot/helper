@@ -9,4 +9,3 @@ describe('undef.ts', () => {
 		expect(Is.undef(null)).toBe(false);
 	});
 });
-

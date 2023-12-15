@@ -9,9 +9,9 @@ export const throttle = (original: Function, wait?: number, options?: Options) =
 	const { leading = true, trailing = true } = options || {};
 	return debounce(
 		original,
-		wait, 
-		{ 
-			leading, 
+		wait,
+		{
+			leading,
 			trailing,
 			throttle: true
 		}

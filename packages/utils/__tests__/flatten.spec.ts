@@ -2,7 +2,7 @@ import * as Utils from '@deot/helper-utils';
 
 describe('flatten.ts', () => {
 	it('basic', () => {
-		let v1 = '我';
+		const v1 = '我';
 		let v2 = v1;
 		Array.from({ length: 100 }).forEach(() => {
 			v2 = encodeURIComponent(v2);
@@ -12,7 +12,7 @@ describe('flatten.ts', () => {
 	});
 
 	it('maxTries: 1000', () => {
-		let v1 = '我';
+		const v1 = '我';
 		let v2 = v1;
 		Array.from({ length: 1001 }).forEach(() => {
 			v2 = encodeURIComponent(v2);
@@ -30,8 +30,8 @@ describe('flatten.ts', () => {
 
 	it('error input', () => {
 		expect(Utils.flatten('%')).toBe('%');
-		
-		let v1 = '我%';
+
+		const v1 = '我%';
 		let v2 = v1;
 		Array.from({ length: 100 }).forEach(() => {
 			v2 = encodeURIComponent(v2);
@@ -40,4 +40,3 @@ describe('flatten.ts', () => {
 		expect(Utils.flatten(v2)).toBe(v1);
 	});
 });
-

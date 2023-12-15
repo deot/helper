@@ -6,4 +6,3 @@ describe('generate-string.ts', () => {
 		expect(Utils.generateString(32).length).toBe(32);
 	});
 });
-

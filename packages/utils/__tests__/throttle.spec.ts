@@ -6,7 +6,7 @@ describe('throttle.ts', () => {
 	it('wait = 0', async () => {
 		expect.assertions(3);
 		let next = 1;
-		let throttle = Utils.throttle((v: number) => {
+		const throttle = Utils.throttle((v: number) => {
 			expect(v).toBe(next);
 			next++;
 		});
@@ -20,7 +20,7 @@ describe('throttle.ts', () => {
 
 	it('basic', async () => {
 		expect.assertions(1);
-		let throttle = Utils.throttle((v: number) => {
+		const throttle = Utils.throttle((v: number) => {
 			expect(v).toBe(1);
 		}, 10);
 
@@ -32,7 +32,7 @@ describe('throttle.ts', () => {
 	it('10ms', async () => {
 		expect.assertions(2);
 		let next = 1;
-		let throttle = Utils.throttle((v: number) => {
+		const throttle = Utils.throttle((v: number) => {
 			expect(v).toBe(next);
 			next++;
 		}, 10);
@@ -50,7 +50,7 @@ describe('throttle.ts', () => {
 
 	it('cancel', async () => {
 		expect.assertions(1);
-		let throttle = Utils.throttle((v: number) => {
+		const throttle = Utils.throttle((v: number) => {
 			expect(v).toBe(1);
 		}, 10);
 
@@ -71,7 +71,7 @@ describe('throttle.ts', () => {
 	it('flush', async () => {
 		expect.assertions(2);
 		let next = 1;
-		let throttle = Utils.throttle((v: number) => {
+		const throttle = Utils.throttle((v: number) => {
 			expect(v).toBe(next);
 			next++;
 		}, 10000000);
@@ -93,4 +93,3 @@ describe('throttle.ts', () => {
 		await t.sleep(30);
 	});
 });
-

@@ -9,7 +9,7 @@ const R = {
 
 describe('maybe.ts', () => {
 	it('just', () => {
-		let current = Maybe.of('Hello Maybes!')
+		const current = Maybe.of('Hello Maybes!')
 			.map(R.toUpper)
 			.map(R.addSuffix)
 			.map(R.addSuffix)
@@ -25,7 +25,7 @@ describe('maybe.ts', () => {
 	});
 
 	it('nothing', () => {
-		let current = Maybe.of(null)
+		const current = Maybe.of(null)
 			.flatMap(R.toUpper)
 			.flatMap(R.identity);
 
@@ -39,7 +39,7 @@ describe('maybe.ts', () => {
 	});
 
 	it('Monadic: map / flatMap / valueOf / toString', () => {
-		let current = Maybe.of(Maybe.of(Monad.of(Maybe.of(null))))
+		const current = Maybe.of(Maybe.of(Monad.of(Maybe.of(null))))
 			.flatMap(R.toUpper)
 			.map(R.identity);
 

@@ -42,4 +42,3 @@ describe('merge.ts', () => {
 		})).toBe('');
 	});
 });
-

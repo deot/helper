@@ -48,7 +48,7 @@ export class IndexedDBStore extends ACache {
 		super.configure(options);
 
 		if (typeof this.options.version === 'string') {
-			this.options.version = parseInt(this.options.version, 10);	
+			this.options.version = parseInt(this.options.version, 10);
 		}
 	}
 
@@ -60,7 +60,7 @@ export class IndexedDBStore extends ACache {
 	 * @returns ~
 	 */
 	private concurrent<T = void>(fn: Function): Promise<T> {
-		let target = new Promise<T>((resolve, reject) => {
+		const target = new Promise<T>((resolve, reject) => {
 			fn().then(resolve).catch(reject);
 		});
 
@@ -81,7 +81,6 @@ export class IndexedDBStore extends ACache {
 		});
 	}
 
-
 	/**
 	 * @param target ~
 	 */
@@ -89,7 +88,7 @@ export class IndexedDBStore extends ACache {
 		if (target) {
 			this.pending = this.pending.filter(i => i !== target);
 		} else {
-			let done = async (pending: Promise<any>[]) => {
+			const done = async (pending: Promise<any>[]) => {
 				if (pending.length) {
 					await Promise.allSettled(pending);
 					await done(this.pending);
@@ -97,9 +96,9 @@ export class IndexedDBStore extends ACache {
 			};
 			await done(this.pending);
 		}
-		
+
 		if (!this.pending.length && this.db) {
-			let db = this.db;
+			const db = this.db;
 			this.db = null;
 
 			(await db).close();
@@ -114,7 +113,7 @@ export class IndexedDBStore extends ACache {
 		this.db = this.db || (async () => {
 			const { name, version, keyPath, storeName } = this.options;
 			const poll = () => new Promise((resolve, reject) => {
-				let request = window.indexedDB.open(name, version as number);
+				const request = window.indexedDB.open(name, version as number);
 				request.onsuccess = () => {
 					resolve(request.result);
 				};
@@ -124,7 +123,7 @@ export class IndexedDBStore extends ACache {
 
 				// 如果指定版本大于数据库的实际版本号，先删除原来的表，再创建先表
 				request.onupgradeneeded = () => {
-					let db = request.result;
+					const db = request.result;
 
 					if (db.objectStoreNames.contains(storeName)) {
 						db.deleteObjectStore(storeName);
@@ -172,7 +171,7 @@ export class IndexedDBStore extends ACache {
 		const db = await this.openDatabase();
 
 		// 新建时必须指定表格名称和操作模式（"只读"或"读写"）
-		let os = db
+		const os = db
 			.transaction([storeName], mode || 'readwrite')
 			.objectStore(storeName);
 
@@ -276,10 +275,10 @@ export class IndexedDBStore extends ACache {
 			const os = await this.openObjectStore();
 			const request = os.openCursor();
 
-			let rowData: State[] = [];
+			const rowData: State[] = [];
 			await new Promise((resolve, reject) => {
 				request.onsuccess = () => {
-					let cursor = request.result;
+					const cursor = request.result;
 					if (cursor) {
 						rowData.push(cursor.value);
 						cursor.continue();
@@ -296,7 +295,7 @@ export class IndexedDBStore extends ACache {
 	// 同Stoage / Cookie使用api
 	async get(key: string) {
 		if (!ALLOW) return null;
-		let v = await this.read(key);
+		const v = await this.read(key);
 
 		return this.options.get!(!v ? null : v.data);
 	}

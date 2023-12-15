@@ -4,7 +4,7 @@ describe('style.ts', () => {
 	const id = 'test';
 	const style = `a { font-size: 14px }`;
 
-	let el = document.createElement('style');
+	const el = document.createElement('style');
 	el.setAttribute('id', id);
 
 	beforeEach(() => {

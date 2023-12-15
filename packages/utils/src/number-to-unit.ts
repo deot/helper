@@ -25,7 +25,7 @@ const getDigit = (integer: number) => {
 };
 
 const addWan = (integer: number, num: number, mutiple: number, decimalDigit: number) => {
-	let digit = getDigit(integer);
+	const digit = getDigit(integer);
 	if (digit > 3) {
 		let remainder = digit % 8;
 		if (remainder >= 5) { // ‘十万’、‘百万’、‘千万’显示为‘万’
@@ -42,12 +42,12 @@ export const numberToUnit = (number: number, decimalDigit?: number) => {
 		number = Number.MAX_SAFE_INTEGER;
 	}
 	decimalDigit = decimalDigit == null ? 2 : decimalDigit;
-	let integer = Math.floor(number);
-	let digit = getDigit(integer);
+	const integer = Math.floor(number);
+	const digit = getDigit(integer);
 	// ['个', '十', '百', '千', '万', '十万', '百万', '千万'];
-	let unit: string[] = [];
+	const unit: string[] = [];
 	if (digit > 3) {
-		let multiple = Math.floor(digit / 8);
+		const multiple = Math.floor(digit / 8);
 		if (multiple >= 1) {
 			let tmp = Math.round(integer / Math.pow(10, 8 * multiple)); // eslint-disable-line
 			unit.push(addWan(tmp, number, 8 * multiple, decimalDigit));

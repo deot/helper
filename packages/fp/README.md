@@ -3,10 +3,10 @@
 ### `FP`
 ```js
 import * as FP from '@deot/helper-fp';
-
+```
+```js
 // or
 import { FP } from '@deot/helper';
-
 ```
 
 - pipeline 函数管道，配合函数链的函数式工具

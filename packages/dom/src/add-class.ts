@@ -5,10 +5,10 @@ export const addClass = (el: HTMLElement, cls?: string) => {
 	if (IS_SERVER || !cls) return;
 
 	let curClass = el.className;
-	let classes = cls.split(' ');
+	const classes = cls.split(' ');
 
 	for (let i = 0, j = classes.length; i < j; i++) {
-		let clsName = classes[i];
+		const clsName = classes[i];
 		if (clsName) {
 			if (el.classList) {
 				el.classList.add(clsName);

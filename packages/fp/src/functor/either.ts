@@ -46,11 +46,11 @@ export class Either extends AMonad {
 	}
 
 	map(fn: Function) {
-		return this.isLeft 
-			? Either.left(this.value) 
+		return this.isLeft
+			? Either.left(this.value)
 			: Either.right(fn(this.value));
 	}
-	
+
 	toString() {
 		return `Either.${this.isLeft ? 'Left' : 'Right'}(${this.value})`;
 	}

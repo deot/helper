@@ -27,9 +27,9 @@ class CookieStore extends ACache {
 	get(key: string): any {
 		if (!ALLOW) return null;
 
-		let r = new RegExp("(?:^|;+|\\s+)" + key + "=([^;]*)");
-		let m = window.document.cookie.match(r);
-		let value = !m ? null : decodeURIComponent(m[1]);
+		const r = new RegExp('(?:^|;+|\\s+)' + key + '=([^;]*)');
+		const m = window.document.cookie.match(r);
+		const value = !m ? null : decodeURIComponent(m[1]);
 
 		return this.options.get!(value);
 	}
@@ -43,8 +43,8 @@ class CookieStore extends ACache {
 	set(key: string, value: any, options?: Options): void {
 		if (!ALLOW) return;
 
-		let { days, path, domain } = options || {}; 
-		let expires = new Date();
+		const { days, path, domain } = options || {};
+		const expires = new Date();
 		expires.setTime(expires.getTime() + (days ? 3600000 * 24 * days : 0.5 * 24 * 60 * 60 * 1000)); // 默认12小时
 
 		value = this.options.set!(typeof value === 'string' ? value : JSON.stringify(value));
@@ -60,8 +60,8 @@ class CookieStore extends ACache {
 	remove(key: string, options?: Options): void {
 		if (!ALLOW) return;
 
-		let { path, domain } = options || {}; 
-		let expires = new Date(0);
+		const { path, domain } = options || {};
+		const expires = new Date(0);
 		document.cookie = `${key}=;expires=${expires.toUTCString()};path=${(path || '/')};${domain ? `domain=${domain};` : ''}`;
 	}
 }

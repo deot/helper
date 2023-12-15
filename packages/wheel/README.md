@@ -5,7 +5,9 @@
 ### `Wheel`
 ```js
 import { Wheel } from '@deot/helper-wheel';
+```
 
+```js
 // or
 import { Wheel } from '@deot/helper';
 ```

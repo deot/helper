@@ -3,10 +3,11 @@
 ### `Validator`
 ```js
 import { Validator } from '@deot/helper-validator';
+```
 
+```js
 // or
 import { Validator } from '@deot/helper';
-
 ```
 
 - 示例
@@ -18,14 +19,14 @@ const validator = new Validator({
 			// async
 			validate: (value) => {
 				return value < 30 ? Promise.reject('age < 30') : Promise.resolve();
-			} 
+			}
 		},
 		{
 			message: message2,
 			// sync
 			validate: (value) => {
 				return value > 16;
-			} 
+			}
 		}
 	]
 });
@@ -33,7 +34,7 @@ const validator = new Validator({
 try {
 	await validator.validate({ age: 25 });
 	console.log('pass');
-} catch (errors: ValidateError[]) {
+} catch (errors) {
 	console.log(errors);
 }
 ```

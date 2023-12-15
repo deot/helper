@@ -1,8 +1,8 @@
 import * as $ from '@deot/helper-dom';
 
 describe('contains.ts', () => {
-	let el = document.createElement('div');
-	let child = document.createElement('button');
+	const el = document.createElement('div');
+	const child = document.createElement('button');
 
 	it('empty', () => {
 		expect($.contains(el)).toBe(false);

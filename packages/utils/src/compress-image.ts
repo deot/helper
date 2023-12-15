@@ -4,12 +4,12 @@ export interface CompressImageOptions {
 	/**
 	 * 图片缩放最大宽度，不传默认源图片宽度
 	 */
-	width?: number; 
+	width?: number;
 
 	/**
 	 * 图片缩放最大高度，不传默认源图片高度
 	 */
-	height?: number; 
+	height?: number;
 
 	/**
 	 * 文件类型

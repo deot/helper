@@ -13,8 +13,8 @@ export const toPromise = <T extends {}, K = any>(target: T, promise: Promise<K>)
 	}
 
 	instance.then = (resolve, reject) => promise.then(resolve, reject);
-	instance.catch = (callback) => promise.catch(callback);
-	instance.finally = (callback) => promise.finally(callback);
+	instance.catch = callback => promise.catch(callback);
+	instance.finally = callback => promise.finally(callback);
 
 	return instance;
 };

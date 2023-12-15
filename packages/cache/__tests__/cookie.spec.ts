@@ -7,7 +7,7 @@ describe('cookie.ts', () => {
 		expect(typeof Cookie.remove).toBe('function');
 
 		Cookie.set('user', { name: 'name' });
-		
+
 		expect(Cookie.get('user').name).toBe('name');
 
 		Cookie.set('user', '{"name": "name1"}');

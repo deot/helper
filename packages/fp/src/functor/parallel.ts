@@ -51,20 +51,19 @@ export class Parallel extends ATask {
 		return this.concurrency;
 	}
 
-
 	process() {
 		while (
 			this.tasks.length < this.concurrency
-			&& (
-				typeof this.task === 'function'
-				|| this.task instanceof Task
-				|| (this.task instanceof Array && this.task.length)
-			)
+				&& (
+					typeof this.task === 'function'
+						|| this.task instanceof Task
+						|| (this.task instanceof Array && this.task.length)
+				)
 		) {
 			let leaf!: Promise<any> | Task;
 
 			if (this.task instanceof Array) {
-				let item = this.task.pop();
+				const item = this.task.pop();
 				/* istanbul ignore else -- @preserve */
 				if (typeof item === 'function') {
 					leaf = item();
@@ -76,7 +75,7 @@ export class Parallel extends ATask {
 			} else {
 				leaf = this.task();
 			}
-			
+
 			this.tasks.push(leaf);
 
 			Promise.resolve()
@@ -92,9 +91,9 @@ export class Parallel extends ATask {
 		}
 
 		if (
-			this.task instanceof Array 
-			&& !this.task.length
-			&& this.tasks.length === 0
+			this.task instanceof Array
+				&& !this.task.length
+				&& this.tasks.length === 0
 		) {
 			this._target.resolve();
 			this.target = null;
@@ -155,7 +154,7 @@ export class Parallel extends ATask {
 	 */
 	async cancel() {
 		if (!this.target) return;
-		let tasks = this.tasks;
+		const tasks = this.tasks;
 
 		this.setCancelStatus(true);
 
@@ -165,7 +164,7 @@ export class Parallel extends ATask {
 		if (!tasks.some(i => i instanceof Task)) {
 			await Promise.allSettled(tasks);
 		} else {
-			tasks.forEach((i) => (i as Task).cancel());
+			tasks.forEach(i => (i as Task).cancel());
 		}
 	}
 
@@ -174,13 +173,13 @@ export class Parallel extends ATask {
 	 * 暂停那一刻开始不在有fulfilled/rejected事件
 	 */
 	async pasue() {
-		let tasks = this.tasks;
+		const tasks = this.tasks;
 		this.setPasueStatus(true);
 
 		if (!tasks.some(i => i instanceof Task)) {
 			await Promise.allSettled(tasks);
 		} else {
-			tasks.forEach((i) => (i as Task).pasue());
+			tasks.forEach(i => (i as Task).pasue());
 		}
 	}
 
@@ -190,9 +189,9 @@ export class Parallel extends ATask {
 	resume() {
 		this.setPasueStatus(false);
 
-		let tasks = this.tasks;
+		const tasks = this.tasks;
 		if (tasks.some(i => i instanceof Task)) {
-			tasks.forEach((i) => (i as Task).resume());
+			tasks.forEach(i => (i as Task).resume());
 		}
 	}
 

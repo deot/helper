@@ -3,16 +3,16 @@ import { IS_SERVER } from './_constants';
 // TODO: 增加maxTries
 export const image = (src: string) => {
 	if (IS_SERVER) return;
-	
+
 	if (image.cache.has(src)) {
 		return image.cache.get(src);
 	}
 
-	let target = new Promise((resolve, reject) => {
-		let el = new Image();
+	const target = new Promise((resolve, reject) => {
+		const el = new Image();
 		el.src = src;
 		el.onload = () => {
-			let value = {
+			const value = {
 				source: src,
 				width: el.naturalWidth,
 				height: el.naturalHeight,

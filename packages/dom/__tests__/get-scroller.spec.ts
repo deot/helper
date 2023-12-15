@@ -1,11 +1,11 @@
 import * as $ from '@deot/helper-dom';
 
 describe('get-scroller.ts', () => {
-	let p1 = document.createElement('p');
-	let p2 = document.createElement('p');
+	const p1 = document.createElement('p');
+	const p2 = document.createElement('p');
 
-	let el = document.createElement('div');
-	let child = document.createElement('div');
+	const el = document.createElement('div');
+	const child = document.createElement('div');
 	el.style.overflow = 'scroll';
 	child.innerHTML = '<p>xxxx</p>';
 

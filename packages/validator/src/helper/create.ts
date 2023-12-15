@@ -8,7 +8,7 @@ interface RuleOptions {
 	range?: [number?, number?];
 	required?: boolean;
 	name?: string;
-	pattern?: RegExp; 
+	pattern?: RegExp;
 	maxlength?: number;
 	messages?: {
 		required?: string;
@@ -30,7 +30,7 @@ export const create = (options?: RuleOptions): ValidatorRule[] => {
 	const { name, range = [], maxlength } = options;
 
 	options.messages = {
-		required: `${name} 必填`, 
+		required: `${name} 必填`,
 		pattern: `请输入正确的 ${name}`,
 		type: `${name} 类型错误`,
 		range: `${name} 取值范围: ${range[0] || '*'}~${range[1] || '*'}`,

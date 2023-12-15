@@ -16,4 +16,3 @@ describe('auto-catch.ts', () => {
 		});
 	});
 });
-

@@ -5,7 +5,7 @@ import * as Utils from '@deot/helper-utils';
 describe('debounce.ts', () => {
 	it('default(trailing)', async () => {
 		expect.assertions(1);
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(3);
 		}, 10);
 
@@ -24,7 +24,7 @@ describe('debounce.ts', () => {
 	it('leading + trailing', async () => {
 		expect.assertions(2);
 		let next = 1;
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(next);
 			next = 3;
 		}, 10, { leading: true });
@@ -43,7 +43,7 @@ describe('debounce.ts', () => {
 
 	it('leading', async () => {
 		expect.assertions(1);
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(1);
 		}, 10, { leading: true, trailing: false });
 
@@ -61,7 +61,7 @@ describe('debounce.ts', () => {
 
 	it('none', async () => {
 		expect.assertions(0);
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(1);
 		}, 10, { leading: false, trailing: false });
 
@@ -79,7 +79,7 @@ describe('debounce.ts', () => {
 
 	it('cancel', async () => {
 		expect.assertions(0);
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(1);
 		}, 10, { leading: false, trailing: false });
 
@@ -101,7 +101,7 @@ describe('debounce.ts', () => {
 	it('flush', async () => {
 		expect.assertions(1);
 		let next = 3;
-		let debounce = Utils.debounce((v: number) => {
+		const debounce = Utils.debounce((v: number) => {
 			expect(v).toBe(next);
 			next++;
 		}, 10);
@@ -124,4 +124,3 @@ describe('debounce.ts', () => {
 		await t.sleep(30);
 	});
 });
-

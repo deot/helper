@@ -2,7 +2,7 @@ import { IS_SERVER } from './_constants';
 
 const $target = IS_SERVER ? {} : document.createElement('div').style;
 const prefix = (() => {
-	let keys = {
+	const keys = {
 		webkit: 'webkitTransform',
 		Moz: 'MozTransform',
 		O: 'OTransform',
@@ -10,7 +10,7 @@ const prefix = (() => {
 		standard: 'transform'
 	};
 
-	let values = {
+	const values = {
 		webkit: '-webkit-',
 		Moz: '-moz-',
 		O: '-o-',
@@ -18,7 +18,7 @@ const prefix = (() => {
 		standard: ''
 	};
 
-	for (let key in keys) {
+	for (const key in keys) {
 		if ($target[keys[key]] !== undefined) {
 			return {
 				camel: key,

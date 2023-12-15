@@ -14,4 +14,3 @@ describe('object.ts', () => {
 		expect(Is.object(() => {})).toBe(false);
 	});
 });
-

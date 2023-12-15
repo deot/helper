@@ -6,8 +6,8 @@ describe('partial.ts', () => {
 	it('placeholder', () => {
 		const greet = (greeting: string, name: string) => greeting + ' ' + name;
 
-		let sayHelloTo = partial(greet, 'hello');
-		let greetFred = partial(greet, placeholder, 'fred');
+		const sayHelloTo = partial(greet, 'hello');
+		const greetFred = partial(greet, placeholder, 'fred');
 
 		expect(sayHelloTo('fred')).toBe('hello fred');
 		expect(greetFred('hi')).toBe('hi fred');

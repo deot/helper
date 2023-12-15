@@ -40,4 +40,3 @@ describe('unicode.ts', () => {
 		expect(INPUT1.length < INPUT2.length).toBe(true);
 	});
 });
-

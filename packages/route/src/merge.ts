@@ -15,23 +15,23 @@ export const merge = (route: Route) => {
 		query
 	} = route;
 	let result = origin;
-	result += path instanceof Array 
-		? path.length 
-			? `/${path.join('/')}` 
+	result += path instanceof Array
+		? path.length
+			? `/${path.join('/')}`
 			: ''
 		: path;
 
 	let queryArr: string[] = [];
-	for (let key in query) {
+	for (const key in query) {
 		// 过滤掉值为null,undefined,''情况
 		if (
-			query[key] 
-			|| query[key] === false 
+			query[key]
+			|| query[key] === false
 			|| query[key] === 0
 		) {
-			let v = flatten(query[key]);
+			const v = flatten(query[key]);
 			queryArr = [
-				...queryArr, 
+				...queryArr,
 				`${key}=${encodeURIComponent(v)}`
 			];
 		}

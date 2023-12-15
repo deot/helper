@@ -17,8 +17,8 @@ const parseJSON = (v: string) => {
 
 describe('either.ts', () => {
 	it('basic', () => {
-		let right = Either.right(12).flatMap(R.add(2));
-		let left = Either.left(12).flatMap(R.add(2));
+		const right = Either.right(12).flatMap(R.add(2));
+		const left = Either.left(12).flatMap(R.add(2));
 
 		expect(right.valueOf()).toBe(14);
 		expect(left.valueOf()).toBe(12);
@@ -31,35 +31,35 @@ describe('either.ts', () => {
 	});
 
 	it('static error/left', () => {
-		let run = (v: any) => {
+		const run = (v: any) => {
 			expect(v.isLeft).toBe(true);
 			expect(v.isRight).toBe(false);
 			expect(v.toString()).toMatch('Either.Left');
 			expect(v.flatMap(R.identity).valueOf().message).toMatch(`in JSON at position 1`);
 		};
 
-		let json = '{name:deot}';
+		const json = '{name:deot}';
 
 		run(parseJSON(json));
 		run(Either.of(() => R.parse(json)));
 	});
 
 	it('static ok/right', () => {
-		let run = (v: any) => {
+		const run = (v: any) => {
 			expect(v.isLeft).toBe(false);
 			expect(v.isRight).toBe(true);
 			expect(v.toString()).toMatch('Either.Right');
 			expect(v.flatMap(R.identity).valueOf()).toEqual({ name: 'deot' });
 		};
 
-		let json = '{"name":"deot"}';
+		const json = '{"name":"deot"}';
 
 		run(parseJSON(json));
 		run(Either.of(() => R.parse(json)));
 	});
 
 	it('Monadic: map / flatMap / valueOf / toString', () => {
-		let current = Either.right(Either.right(Monad.of(Either.of(() => 1))))
+		const current = Either.right(Either.right(Monad.of(Either.of(() => 1))))
 			.flatMap(R.add(1))
 			.map(R.add(1))
 			.map(R.identity);

@@ -3,10 +3,11 @@
 ### `Emitter`
 ```js
 import { Emitter } from '@deot/helper-emitter';
+```
 
+```js
 // or
 import { Emitter } from '@deot/helper';
-
 ```
 
 ### 示例
@@ -25,7 +26,7 @@ source.on(({ name }) => {
 });
 
 // 发布事件，第一个值事件，第二个值参数
-source.emit('[event-name]', { name: 'wya-ps' }); 
+source.emit('[event-name]', { name: 'wya-ps' });
 
 // 取消事件订阅
 source.off('[event-name]');
@@ -109,7 +110,7 @@ source.off();
 **示例**
 ```js
 // 发布事件，第一个值事件，第二个值参数
-source.emit('[event-name]', { name: 'wya-ps' }); 
+source.emit('[event-name]', { name: 'wya-ps' });
 ```
 
 ---

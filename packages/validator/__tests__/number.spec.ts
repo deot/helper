@@ -56,8 +56,8 @@ describe('validator.ts', () => {
 	it('number, range: [0, 10]', async () => {
 		expect.hasAssertions();
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'number', 
+			age: RuleHelper.create({
+				type: 'number',
 				required: true,
 				range: [0, 10]
 			}),
@@ -73,8 +73,8 @@ describe('validator.ts', () => {
 	it('number, range: [undefined, 10]', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'number', 
+			age: RuleHelper.create({
+				type: 'number',
 				required: true,
 				range: [undefined, 10]
 			}),
@@ -89,8 +89,8 @@ describe('validator.ts', () => {
 	it('number, range: [0, undefined]', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'number', 
+			age: RuleHelper.create({
+				type: 'number',
 				required: true,
 				range: [0, undefined]
 			}),
@@ -105,8 +105,8 @@ describe('validator.ts', () => {
 	it('number, range: [0, 10], required: false', async () => {
 		expect.assertions(0);
 		const validator = new Validator({
-			age: RuleHelper.create({ 
-				type: 'number', 
+			age: RuleHelper.create({
+				type: 'number',
 				required: false,
 				range: [0, 10]
 			})

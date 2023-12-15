@@ -2,7 +2,7 @@ import * as FP from '@deot/helper-fp';
 
 describe('then.ts', () => {
 	it('base', () => {
-		let safe = FP.then$((e: any) => {
+		const safe = FP.then$((e: any) => {
 			expect(e).toBe('then');
 		});
 

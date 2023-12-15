@@ -6,4 +6,3 @@ describe('get-uid.ts', () => {
 		expect(Utils.getUid('1')).not.toBe(Utils.getUid('1'));
 	});
 });
-

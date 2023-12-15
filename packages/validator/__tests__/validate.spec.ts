@@ -11,13 +11,13 @@ describe('validator.ts', () => {
 					message: message1,
 					validate: (value) => {
 						return value < 30;
-					} 
+					}
 				},
 				{
 					message: message2,
 					validate: (value) => {
 						return value > 16;
-					} 
+					}
 				}
 			]
 		});
@@ -39,12 +39,12 @@ describe('validator.ts', () => {
 				{
 					validate: (value) => {
 						return value < 30 || message1;
-					} 
+					}
 				},
 				{
 					validate: (value) => {
 						return value > 16 || message2;
-					} 
+					}
 				}
 			]
 		});
@@ -68,7 +68,7 @@ describe('validator.ts', () => {
 						return new Promise<void>((resolve, reject) => {
 							value > 16 ? resolve() : reject(message);
 						});
-					} 
+					}
 				}
 			]
 		});

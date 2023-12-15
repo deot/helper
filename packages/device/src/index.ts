@@ -10,22 +10,21 @@ const parse = (ua?: string) => {
 	const ios = !!(iphone || ipad || ipod);
 
 	// Android
-	const os = android 
-		? 'android' 
+	const os = android
+		? 'android'
 		: ios
 			? 'ios'
 			: '';
 
-	const osVersion = android 
+	const osVersion = android
 		? android[2]
 		: iphone && !ipod
 			? iphone[2].replace(/_/g, '.')
-			: ipad 
+			: ipad
 				? ipad[2].replace(/_/g, '.')
 				: ipod
 					? ipod[3] && ipod[3].replace(/_/g, '.')
 					: '';
-
 
 	// Webview
 	const webView = ios && ua.match(/.*AppleWebKit(?!.*Safari)/i);

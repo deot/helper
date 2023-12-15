@@ -11,7 +11,7 @@ describe('storage.ts', () => {
 		expect(typeof Storage.remove).toBe('function');
 
 		Storage.set('user', { name: 'name' });
-		
+
 		expect(Storage.get('user').name).toBe('name');
 
 		Storage.set('user', '{"name": "name1"}');
@@ -31,7 +31,6 @@ describe('storage.ts', () => {
 		Storage.set('user', 'name');
 		Storage.configure({ version: 1.1 });
 		expect(Storage.get('user')).toBe(null);
-
 	});
 
 	it('session', () => {
@@ -41,7 +40,7 @@ describe('storage.ts', () => {
 
 	it('local memory leak', async () => {
 		let buffer = '';
-		let itemSize = 1024 * 10; // 10kb, 1个字节 = 1b
+		const itemSize = 1024 * 10; // 10kb, 1个字节 = 1b
 
 		for (let k = 0; k < itemSize; k++) {
 			buffer += '0';
@@ -63,7 +62,7 @@ describe('storage.ts', () => {
 			run();
 		});
 
-		let key = '___test' + max;
+		const key = '___test' + max;
 
 		Storage.set(key, buffer);
 		expect(Storage.get(key)).toBe(buffer);

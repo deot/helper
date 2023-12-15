@@ -25,7 +25,7 @@ export interface WheelOptions {
 
 	/**
 	 * 是否允许Y轴方向滚动
-	 */ 
+	 */
 	shouldWheelY?: WheelFunction<boolean>;
 
 	/**
@@ -41,11 +41,11 @@ export interface WheelOptions {
 	 *
 	 * 当`shouldWheelX() => true`或`shouldWheelY() => true`时，
 	 * el的父层的滚动都会被禁用（e.preventDefault()）
-	 * 
+	 *
 	 * 所以只有当`shouldWheelX() => false`或`shouldWheelY() => false`
 	 * 才会考虑native值的影响
 	 */
-	native?: boolean; 
+	native?: boolean;
 
 	/**
 	 * 自由滑动
@@ -64,7 +64,7 @@ const wait = 30;
 const timers = new Set();
 
 if (typeof document !== 'undefined') {
-	let handleWheel = () => {
+	const handleWheel = () => {
 		timers.forEach((context: any) => {
 			context.timer && clearTimeout(context.timer);
 			context.timer = setTimeout(() => {
@@ -82,13 +82,13 @@ if (typeof document !== 'undefined') {
 	if (document.body) {
 		handleAddEvent();
 	} else {
-		window.addEventListener("DOMContentLoaded", handleAddEvent);
+		window.addEventListener('DOMContentLoaded', handleAddEvent);
 	}
 }
 
 const getAngle = (start: number[], end: number[]) => {
-	let dx = end[0] - start[0];
-	let dy = end[1] - start[1];
+	const dx = end[0] - start[0];
+	const dy = end[1] - start[1];
 
 	return Math.abs((360 * Math.atan(dy / dx)) / (2 * Math.PI));
 };
@@ -108,7 +108,7 @@ export class Wheel {
 		}
 
 		return (
-			(delta < 0 && el.scrollLeft > 0) 
+			(delta < 0 && el.scrollLeft > 0)
 			|| (delta >= 0 && el.scrollLeft < el.scrollWidth - el.offsetWidth)
 		);
 	};
@@ -124,7 +124,7 @@ export class Wheel {
 		}
 
 		return (
-			(delta < 0 && el.scrollTop > 0) 
+			(delta < 0 && el.scrollTop > 0)
 			|| (delta >= 0 && el.scrollTop < el.scrollHeight - el.offsetHeight)
 		);
 	};
@@ -157,7 +157,7 @@ export class Wheel {
 
 	options: WheelOptions;
 
-	defaultOnWheel: WheelFunction | null = null; 
+	defaultOnWheel: WheelFunction | null = null;
 
 	constructor(el: HTMLElement, options?: WheelOptions) {
 		this.el = el;
@@ -165,8 +165,8 @@ export class Wheel {
 			native: true,
 			freedom: false,
 			stopPropagation: () => false,
-			shouldWheelX: (deltaX) => Wheel.shouldWheelX(el, deltaX),
-			shouldWheelY: (deltaY) => Wheel.shouldWheelY(el, deltaY),
+			shouldWheelX: deltaX => Wheel.shouldWheelX(el, deltaX),
+			shouldWheelY: deltaY => Wheel.shouldWheelY(el, deltaY),
 			...options
 		};
 	}
@@ -198,7 +198,7 @@ export class Wheel {
 		this.moveY = y;
 
 		this.emitScroll(e, {
-			x: dx, 
+			x: dx,
 			y: dy,
 			angle: getAngle([this.startX, this.startY], [this.moveX, this.moveY])
 		});
@@ -223,7 +223,7 @@ export class Wheel {
 			for (let i = 0; i <= 300; i++) {
 				setTimeout(() => {
 					this.emitScroll(e, {
-						x: speedX, 
+						x: speedX,
 						y: speedY,
 						angle
 					});
@@ -236,7 +236,7 @@ export class Wheel {
 	handleMouseMove = (e: MouseEvent) => {
 		if (e.which === 2) {
 			this.emitScroll(e, {
-				x: e.movementX, 
+				x: e.movementX,
 				y: e.movementY,
 				angle: getAngle([0, 0], [e.movementX, e.movementY])
 			});
@@ -245,10 +245,10 @@ export class Wheel {
 
 	// 滚轮事件
 	handleWheel = (e: WheelEvent) => {
-		let { pixelX, pixelY } = normalizeWheel(e);
-		
+		const { pixelX, pixelY } = normalizeWheel(e);
+
 		this.emitScroll(e, {
-			x: pixelX, 
+			x: pixelX,
 			y: pixelY,
 			angle: getAngle([this.deltaX, this.deltaY], [this.deltaX + pixelX, this.deltaX + pixelY])
 		});
@@ -295,7 +295,7 @@ export class Wheel {
 
 		/* istanbul ignore else -- @preserve */
 		if (this.options.native) {
-			/* istanbul ignore next -- @preserve */ 
+			/* istanbul ignore next -- @preserve */
 			if (this.timer) {
 				clearTimeout(this.timer);
 			}
@@ -313,17 +313,17 @@ export class Wheel {
 	 * @param options ~
 	 */
 	private emitScroll(e: Event, options: ScrollOptions): void {
-		let { x: pixelX, y: pixelY, angle } = options;
+		const { x: pixelX, y: pixelY, angle } = options;
 
 		if (!this.options.freedom) {
 			angle < 30 && (pixelY = 0);
 			angle > 60 && (pixelX = 0);
 		}
 
-		let deltaX = this.deltaX + pixelX;
-		let deltaY = this.deltaY + pixelY;
-		let shouldWheelX = this.options.shouldWheelX!(deltaX, deltaY);
-		let shouldWheelY = this.options.shouldWheelY!(deltaY, deltaX);
+		const deltaX = this.deltaX + pixelX;
+		const deltaY = this.deltaY + pixelY;
+		const shouldWheelX = this.options.shouldWheelX!(deltaX, deltaY);
+		const shouldWheelY = this.options.shouldWheelY!(deltaY, deltaX);
 
 		if (this.preventParentScroll(e, shouldWheelX, shouldWheelY)) return;
 
@@ -339,13 +339,11 @@ export class Wheel {
 				this.animationFrameID = window.requestAnimationFrame(this.didWheel);
 			}
 		}
-
-		
 	}
 
 	private operateDOMEvents(type: string) {
 		if (typeof window === 'undefined') return;
-		let fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
+		const fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
 
 		fn(normalizeWheel.getEventType(), this.handleWheel, false);
 
@@ -390,7 +388,7 @@ export class Wheel {
 					Math.max(0, this.el.scrollTop + deltaY),
 					this.el.scrollHeight - this.el.offsetHeight
 				);
-			} 
+			}
 			if (deltaX && this.el.scrollWidth > this.el.offsetWidth) {
 				this.el.scrollLeft = Math.min(
 					Math.max(0, this.el.scrollLeft + deltaX),

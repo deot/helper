@@ -2,7 +2,7 @@ import * as $ from '@deot/helper-dom';
 
 // @vitest-environment node
 describe('environment node', () => {
-	let el = {} as HTMLElement;
+	const el = {} as HTMLElement;
 	it('add-class', () => {
 		expect($.addClass(el, '')).toBe(undefined);
 	});
@@ -67,7 +67,7 @@ describe('environment node', () => {
 	});
 
 	it('scroll-into-view', async () => {
-		let result = await $.scrollIntoView(el, {});
+		const result = await $.scrollIntoView(el, {});
 		expect(result).toBe(undefined);
 	});
 });

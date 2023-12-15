@@ -1,8 +1,8 @@
 import * as $ from '@deot/helper-dom';
 
 describe('is-scroll.ts', () => {
-	let el = document.createElement('div');
-	let child = document.createElement('div');
+	const el = document.createElement('div');
+	const child = document.createElement('div');
 	el.style.overflow = 'scroll';
 	child.innerHTML = '<p>xxxx</p>';
 

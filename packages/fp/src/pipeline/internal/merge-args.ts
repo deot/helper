@@ -1,9 +1,9 @@
 export const mergeArgs = (
-	baseArgs: any[], 
+	baseArgs: any[],
 	nextArgs: any[],
 	placeholder: any
 ): any[] => {
-	baseArgs = baseArgs.map(arg => {
+	baseArgs = baseArgs.map((arg) => {
 		return arg === placeholder && nextArgs.length
 			? nextArgs.shift()
 			: arg;
