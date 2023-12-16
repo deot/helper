@@ -10,13 +10,12 @@ export const once = (
 ) => {
 	if (IS_SERVER) return () => {};
 
-	const off: AnyFunction;
 	const handler$ = function (this: any, ...args: any[]) {
 		handler && handler.apply(this, args);
 		off();
 	};
 
-	off = on(el, event, handler$, options);
+	const off = on(el, event, handler$, options);
 
 	return off;
 };

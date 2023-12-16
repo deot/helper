@@ -313,8 +313,10 @@ export class Wheel {
 	 * @param options ~
 	 */
 	private emitScroll(e: Event, options: ScrollOptions): void {
-		const { x: pixelX, y: pixelY, angle } = options;
+		const { x, y, angle } = options;
 
+		let pixelX = x;
+		let pixelY = y;
 		if (!this.options.freedom) {
 			angle < 30 && (pixelY = 0);
 			angle > 60 && (pixelX = 0);

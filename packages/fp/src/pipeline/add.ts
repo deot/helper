@@ -4,8 +4,6 @@ type Add = (arg1: number, arg2: number) => number;
 export const add: Add = curry((arg1, arg2) => {
 	let r1: number;
 	let r2: number;
-	const m: number;
-	const c: number;
 	try {
 		r1 = arg1.toString().split('.')[1].length;
 	} catch (e) {
@@ -16,8 +14,8 @@ export const add: Add = curry((arg1, arg2) => {
 	} catch (e) {
 		r2 = 0;
 	}
-	c = Math.abs(r1 - r2);
-	m = 10 ** Math.max(r1, r2);
+	const c = Math.abs(r1 - r2);
+	const m = 10 ** Math.max(r1, r2);
 	if (c > 0) {
 		const cm = 10 ** c;
 		if (r1 > r2) {
