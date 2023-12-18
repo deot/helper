@@ -28,6 +28,7 @@
     "@deot/helper-load": "^1.1.3",
     "@deot/helper-resize": "^1.1.3",
     "@deot/helper-route": "^1.1.3",
+    "@deot/helper-scheduler": "^1.1.3",
     "@deot/helper-shared": "^1.1.3",
     "@deot/helper-unicode": "^1.1.3",
     "@deot/helper-utils": "^1.1.3",

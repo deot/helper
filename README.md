@@ -51,6 +51,9 @@
 [npm-is-image]: https://img.shields.io/npm/v/@deot/helper-is
 [npm-is-url]: https://www.npmjs.com/package/@deot/helper-is
 
+[npm-scheduler-image]: https://img.shields.io/npm/v/@deot/helper-scheduler
+[npm-scheduler-url]: https://www.npmjs.com/package/@deot/helper-scheduler
+
 [npm-image]: https://img.shields.io/npm/v/@deot/helper
 [npm-url]: https://www.npmjs.com/package/@deot/helper
 
@@ -70,6 +73,7 @@
 | [wheel](packages/wheel)         | [![npm][npm-wheel-image]][npm-wheel-url]         | 滚轮                                       |
 | [validator](packages/validator) | [![npm][npm-validator-image]][npm-validator-url] | 验证器，常用正则                                 |
 | [is](packages/is)               | [![npm][npm-is-image]][npm-is-url]               | 类型判断                                     |
+| [scheduler](packages/scheduler) | [![npm][npm-scheduler-image]][npm-scheduler-url] | 调度器                                      |
 | [index](packages/index)         | [![npm][npm-image]][npm-url]                     | 当前所有包的合集                                 |
 
 ## Contributing
