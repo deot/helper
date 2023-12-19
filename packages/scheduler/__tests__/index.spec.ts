@@ -23,9 +23,14 @@ describe('scheduler.ts', () => {
 			expect(next).toBeCalledTimes(2);
 			expect(fail).toBeCalledTimes(1);
 		}
+
+		setTimeout(next, 10);
+		await scheduler;
+		expect(next).toBeCalledTimes(3);
+		expect(fail).toBeCalledTimes(1);
 	});
 
-	it('resolve', async () => {
+	it('finish', async () => {
 		expect.assertions(1);
 		const scheduler = new Scheduler();
 		const resolve = vi.fn(scheduler.finish);
@@ -42,7 +47,7 @@ describe('scheduler.ts', () => {
 		expect(resolve).toBeCalledTimes(1);
 	});
 
-	it('reject', async () => {
+	it('finishWithError', async () => {
 		expect.assertions(4);
 		const scheduler = new Scheduler();
 		const reject = vi.fn(scheduler.finishWithError);
@@ -73,7 +78,7 @@ describe('scheduler.ts', () => {
 	});
 
 	it('catch', async () => {
-		expect.assertions(1);
+		expect.assertions(2);
 		const scheduler = new Scheduler();
 		const reject = vi.fn(scheduler.finishWithError);
 		setTimeout(reject, 10);
@@ -85,12 +90,12 @@ describe('scheduler.ts', () => {
 		try {
 			await scheduler;
 		} catch {
-			// any
+			expect(reject).toBeCalledTimes(1);
 		}
 	});
 
 	it('finally', async () => {
-		expect.assertions(1);
+		expect.assertions(2);
 		const scheduler = Scheduler.of({});
 		const resolve = vi.fn(scheduler.finish);
 		setTimeout(resolve, 10);
@@ -99,6 +104,119 @@ describe('scheduler.ts', () => {
 			expect(resolve).toBeCalledTimes(1);
 		});
 
+		scheduler.finally(() => {
+			expect(resolve).toBeCalledTimes(1);
+		});
+
 		await scheduler;
 	});
+
+	it('next, microtask', async () => {
+		expect.assertions(2);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.next);
+		Promise.resolve().then(next);
+
+		// 这里的_task还是上一个
+		scheduler.then(() => {
+			expect(next).toBeCalledTimes(1);
+		});
+
+		scheduler.then(() => {
+			expect(next).toBeCalledTimes(1);
+		});
+
+		await Promise.resolve();
+	});
+
+	it('next, microtask-1', async () => {
+		expect.assertions(0);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.next);
+
+		await next();
+		scheduler.then(() => {
+			expect(1).toBe(1);
+		});
+	}, 1000);
+
+	it('next, microtask-2', async () => {
+		expect.assertions(1);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.next);
+
+		next(); // 生成的task是一个微任务
+		scheduler.then(() => { // 这里还是上一个task
+			expect(1).toBe(1);
+		});
+	}, 1000);
+
+	it('next, microtask-3', async () => {
+		expect.assertions(1);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.next);
+
+		next();
+		await scheduler;
+		expect(1).toBe(1);
+	}, 1000);
+
+	it('next, microtask-4', async () => {
+		expect.assertions(1);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.nextWithError);
+
+		next().catch(() => {});
+		try {
+			await scheduler;
+		} catch {
+			expect(1).toBe(1);
+		};
+	}, 1000);
+
+	it('next, microtask, async/await', async () => {
+		expect.assertions(3);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.next);
+		Promise.resolve().then(next);
+
+		// 这里的_task还是上一个
+		await scheduler;
+		expect(next).toBeCalledTimes(1);
+
+		setTimeout(next, 10);
+		await scheduler;
+		expect(next).toBeCalledTimes(2);
+
+		Promise.resolve().then(next);
+		await scheduler;
+		expect(next).toBeCalledTimes(3);
+	}, 1000);
+
+	it('nextWithError, microtask, async/await', async () => {
+		expect.assertions(3);
+		const scheduler = new Scheduler();
+		const next = vi.fn(scheduler.nextWithError);
+		try {
+			Promise.resolve().then(next).catch(() => {});
+			// 这里的_task还是上一个
+			await scheduler;
+		} catch {
+			expect(next).toBeCalledTimes(1);
+		}
+
+		try {
+			setTimeout(next, 10);
+			await scheduler;
+		} catch {
+			expect(next).toBeCalledTimes(2);
+		}
+
+		try {
+			Promise.resolve().then(next).catch(() => {});
+			await scheduler;
+		} catch {
+			expect(next).toBeCalledTimes(3);
+		}
+	}, 1000);
 });

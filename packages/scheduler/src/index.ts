@@ -23,47 +23,62 @@ export class Scheduler<T = any> {
 		if (options) {
 			this.options = options;
 		}
-		this.next();
+		this._generateTask();
 	}
 
-	next = (v?: T) => {
-		if (!this._finish) {
-			this._success?.(v);
-			this._task = new Promise<T>((resolve, reject) => {
-				this._success = (value?: any) => {
-					this._fail = undefined;
-					resolve(value);
-				};
-				this._fail = (value?: any) => {
-					this._success = undefined;
-					reject(value);
-				};
-			});
-		}
-		return this;
+	_generateTask = () => {
+		this._task = new Promise<T>((resolve, reject) => {
+			this._success = (value?: any) => {
+				this._fail = undefined;
+				resolve(value);
+			};
+			this._fail = (value?: any) => {
+				this._success = undefined;
+				reject(value);
+			};
+		});
 	};
 
-	nextWithError = (v?: any) => {
+	next = async (v?: T) => {
+		if (!this._finish) {
+			this._success?.(v);
+			await this._task;
+			await Promise.resolve();
+			this._generateTask();
+		} else {
+			await this._task;
+		}
+	};
+
+	nextWithError = async (v?: any) => {
 		if (!this._finish) {
 			this._fail?.(v);
-			this.next();
+			try {
+				await this._task;
+			} catch {
+				await Promise.resolve();
+				this._generateTask();
+			}
+		} else {
+			await this._task;
 		}
-		return this;
 	};
 
 	finish = (v?: T) => {
 		this._success?.(v);
 		this._finish = true;
+
 		return this;
 	};
 
 	finishWithError = (v?: T) => {
 		this._fail?.(v);
 		this._finish = true;
+
 		return this;
 	};
 
-	then(resolve: Func<T>, reject: Func<T>) {
+	then(resolve: Func<T>, reject?: Func<T>) {
 		return this._task.then(resolve, reject);
 	}
 
