@@ -4,6 +4,12 @@ export interface SchedulerOptions {
 	timeout?: number; // TODO
 }
 
+/**
+ * 实现的目的：
+ * 这是一段代码使用`await scheduler`调度器
+ * 永远等待它，直到它上面有任何代码执行了`scheduler.next()`
+ * 不论它是同步，微任务，异步执行，之后才会执行它后面的代码
+ */
 export class Scheduler<T = any> {
 	static of(options?: SchedulerOptions) {
 		return new Scheduler(options);
@@ -42,8 +48,8 @@ export class Scheduler<T = any> {
 	next = async (v?: T) => {
 		if (!this._finish) {
 			this._success?.(v);
-			await this._task;
-			await Promise.resolve();
+			await this._task; // index.spec.ts(next, microtask, async/await)
+			await Promise.resolve(); // index.spec.ts(next, invoke, preTask)
 			this._generateTask();
 		} else {
 			await this._task;
