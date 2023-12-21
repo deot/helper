@@ -71,7 +71,7 @@ importers:
         specifier: ^1.1.3
         version: link:../route
       '@deot/helper-scheduler':
-        specifier: ^1.1.4
+        specifier: ^1.1.5
         version: link:../scheduler
       '@deot/helper-shared':
         specifier: ^1.1.3

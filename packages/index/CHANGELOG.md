@@ -1,5 +1,17 @@
 # @deot/helper ChangeLog
 
+## v1.1.5
+
+_2023-12-21_
+
+### Bugfixes
+
+- fix(scheduler): allow micro task before `await scheduler` ([0133e47](https://github.com/deot/helper/commit/0133e4717576c708d773a3f170477222abbdf881))
+
+### Features
+
+- feat(scheduler): `scheduler` -> `interrupter` ([8cee40e](https://github.com/deot/helper/commit/8cee40e634c92334ac209558fe9e0b146c39ef9b))
+
 ## v1.1.4
 
 _2023-12-18_
