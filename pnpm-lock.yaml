@@ -105,7 +105,11 @@ importers:
         specifier: ^1.1.3
         version: link:../utils
 
-  packages/scheduler: {}
+  packages/scheduler:
+    dependencies:
+      '@deot/helper-fp':
+        specifier: ^1.1.3
+        version: link:../fp
 
   packages/shared: {}
 

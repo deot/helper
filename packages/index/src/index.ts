@@ -11,7 +11,7 @@ import * as Route from '@deot/helper-route';
 import * as $ from '@deot/helper-dom';
 import * as Is from '@deot/helper-is';
 
-import { Scheduler } from '@deot/helper-scheduler';
+import { Interrupter, Task, Job, Parallel } from '@deot/helper-scheduler';
 import { Emitter } from '@deot/helper-emitter';
 import { Resize } from '@deot/helper-resize';
 import { Wheel } from '@deot/helper-wheel';
@@ -39,5 +39,8 @@ export {
 	Validator,
 	RegExps,
 	RuleHelper,
-	Scheduler
+	Interrupter,
+	Task,
+	Job,
+	Parallel
 };
