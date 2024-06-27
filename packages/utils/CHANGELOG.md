@@ -1,5 +1,13 @@
 # @deot/helper-utils ChangeLog
 
+## v1.1.4
+
+_2024-06-27_
+
+### Bugfixes
+
+- fix: catch need the exception value(mp-alipay) ([6611477](https://github.com/deot/helper/commit/661147703e8f19acb22928b5272b9cabe2af3eed))
+
 ## v1.1.3
 
 _2023-11-22_
