@@ -13,7 +13,7 @@ const ALLOW = (() => {
 	try {
 		document.cookie = 'test';
 		return true;
-	} catch {
+	} catch (_) {
 		return false;
 	}
 })();

@@ -139,7 +139,7 @@ export class IndexedDBStore extends ACache {
 			for (let tries = 0; tries < maxTries; tries++) {
 				try {
 					db = await poll();
-				} catch { /* empty */ }
+				} catch (_) { /* empty */ }
 				/* istanbul ignore next -- @preserve */
 				if (db || tries === maxTries - 1) {
 					break;

@@ -12,7 +12,7 @@ export const flatten = (value: any, parser?: ((x: any) => any)) => {
 				need = false;
 			}
 			parseValue = next;
-		} catch {
+		} catch (_) {
 			need = false;
 		}
 		safeCount++;

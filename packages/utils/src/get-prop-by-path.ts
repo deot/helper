@@ -28,7 +28,7 @@ export const getPropByPath = (target: object, path: string): ObjectKeyValue => {
 			} else {
 				throw new Error();
 			}
-		} catch {
+		} catch (_) {
 			throw new Error('无效路径!');
 		}
 	}

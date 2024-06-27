@@ -61,7 +61,7 @@ export class Interrupter<T = any> {
 			this._fail?.(v);
 			try {
 				await this._task;
-			} catch {
+			} catch (_) {
 				await Promise.resolve();
 				this._generateTask();
 			}

@@ -13,7 +13,7 @@ const ALLOW = (() => {
 		window.localStorage.setItem(test, test);
 		window.localStorage.removeItem(test);
 		return true;
-	} catch {
+	} catch (_) {
 		return false;
 	}
 })();
