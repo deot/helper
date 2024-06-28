@@ -5,7 +5,7 @@ const ALLOW = (() => {
 	try {
 		window.indexedDB.open;
 		return true;
-	} catch {
+	} catch (_) {
 		return false;
 	}
 })();
