@@ -44,7 +44,7 @@ importers:
   packages/index:
     dependencies:
       '@deot/helper-cache':
-        specifier: ^1.1.4
+        specifier: ^1.1.5
         version: link:../cache
       '@deot/helper-device':
         specifier: ^1.1.3
