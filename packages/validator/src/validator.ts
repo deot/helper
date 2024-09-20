@@ -19,6 +19,8 @@ export interface ValidateContext {
 
 	// 用于 object / array 在当前source的寻址
 	paths: Path[];
+
+	original: any;
 }
 export type Transform = (value: any, context: ValidateContext) => any;
 export type Validate = (value: any, context: ValidateContext) => Promise<any> | boolean | string | void;
@@ -31,6 +33,8 @@ export interface ValidateOptions {
 
 	// 内部使用，用于数组是记录path
 	_index?: number;
+
+	original?: any;
 }
 
 export interface ValidateError {
@@ -61,9 +65,12 @@ export class Validator {
 
 	paths: Path[];
 
-	constructor(rules?: ValidatorRules, paths?: Path[]) {
+	original: any;
+
+	constructor(rules?: ValidatorRules, paths?: Path[], original?: any) {
 		this.updateRules(rules);
 		this.paths = paths || [];
+		this.original = original;
 	}
 
 	/**
@@ -142,6 +149,7 @@ export class Validator {
 			const field = needCheckFields[i];
 			const rules = this.rules[field];
 			const value = source[field];
+			const original = this.original;
 
 			for (let j = 0; j < rules.length; j++) {
 				const rule = rules[j];
@@ -152,7 +160,7 @@ export class Validator {
 					paths.splice(paths.length - 1, 0, options._index);
 				}
 
-				const value$ = transform!(value, { field, source, paths });
+				const value$ = transform!(value, { field, source, paths, original });
 
 				if (fields$) {
 					const isArray = Array.isArray(value$);
@@ -161,7 +169,7 @@ export class Validator {
 						const validator = new Validator(fields$, paths);
 						for (let k = 0; k < value$$.length; k++) {
 							try {
-								await validator.validate(value$$[k], { _index: isArray ? k : undefined, first: options.first });
+								await validator.validate(value$$[k], { _index: isArray ? k : undefined, first: options.first, original });
 							} catch (errors$: any) {
 								errors.push(...errors$);
 								if (errors$.length && options.first) break;
@@ -171,7 +179,7 @@ export class Validator {
 					}
 				}
 
-				let result = validate!(value$, { field, source, paths });
+				let result = validate!(value$, { field, source, paths, original });
 				let message$ = '';
 				if (result instanceof Promise) {
 					try {
