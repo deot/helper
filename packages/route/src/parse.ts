@@ -32,11 +32,11 @@ export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
 			});
 	}
 
-	const sIndex = prefix.indexOf('/');
-
+	const pIndex = prefix.indexOf('://');
+	const sIndex = prefix.indexOf('/', pIndex === -1 ? 0 : pIndex + 3);
 	return {
 		origin: (sIndex !== -1 ? prefix.slice(0, sIndex) : prefix) || '',
-		path: prefix.slice(sIndex),
+		path: sIndex !== -1 ? prefix.slice(sIndex) : '',
 		query
 	};
 };

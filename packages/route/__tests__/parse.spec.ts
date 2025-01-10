@@ -42,6 +42,23 @@ describe('parse.ts', () => {
 		expect(Route.parse('?id=a&_id=1').query._id).toBe(1);
 	});
 
+	it('url', () => {
+		const current = Route.parse('https://www.xxx.com?id=1');
+		expect(current.query.id).toBe(1);
+		expect(current.path).toBe('');
+		expect(current.origin).toBe('https://www.xxx.com');
+	});
+
+	it('url /', () => {
+		const current = Route.parse('https://www.xxx.com/?id=1');
+		expect(current.path).toBe('/');
+	});
+
+	it('url //', () => {
+		const current = Route.parse('https://www.xxx.com//?id=1');
+		expect(current.path).toBe('//');
+	});
+
 	it('coverage', () => {
 		expect(Route.parse('? ')).toEqual({
 			origin: '',
