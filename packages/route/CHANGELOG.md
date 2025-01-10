@@ -1,5 +1,13 @@
 # @deot/helper-route ChangeLog
 
+## v1.1.5
+
+_2025-01-10_
+
+### Bugfixes
+
+- fix:  parse `url` failed ([93b589f](https://github.com/deot/helper/commit/93b589f49d787b888c9b735da4f84e549f596092))
+
 ## v1.1.4
 
 _2024-06-27_

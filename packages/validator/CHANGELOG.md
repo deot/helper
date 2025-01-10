@@ -1,5 +1,13 @@
 # @deot/helper-validator ChangeLog
 
+## v1.1.4
+
+_2025-01-10_
+
+### Features
+
+- feat: original for validate ([f25a58d](https://github.com/deot/helper/commit/f25a58d71af3179616106682bee03d909e243822))
+
 ## v1.1.3
 
 _2023-11-22_
