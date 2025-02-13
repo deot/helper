@@ -164,7 +164,7 @@ export class Wheel {
 		this.options = {
 			native: true,
 			freedom: false,
-			stopPropagation: () => false,
+			stopPropagation: () => true,
 			shouldWheelX: deltaX => Wheel.shouldWheelX(el, deltaX),
 			shouldWheelY: deltaY => Wheel.shouldWheelY(el, deltaY),
 			...options
