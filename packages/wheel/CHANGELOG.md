@@ -1,5 +1,17 @@
 # @deot/helper-wheel ChangeLog
 
+## v1.1.4
+
+_2025-02-13_
+
+### Bugfixes
+
+- fix: boundary value contrast error ([00df8b5](https://github.com/deot/helper/commit/00df8b5da36ada0832fc4f18a65f38fcaf391b54))
+
+### Features
+
+- feat: native behavior when nested ([225a0f4](https://github.com/deot/helper/commit/225a0f41356b42700eae10fa4c0492e14080417f))
+
 ## v1.1.3
 
 _2023-11-22_
