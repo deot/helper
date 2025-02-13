@@ -109,7 +109,7 @@ export class Wheel {
 
 		return (
 			(delta < 0 && el.scrollLeft > 0)
-			|| (delta >= 0 && el.scrollLeft < el.scrollWidth - el.offsetWidth)
+			|| (delta >= 0 && Math.ceil(el.scrollTop) < el.scrollWidth - el.offsetWidth)
 		);
 	};
 
@@ -125,7 +125,7 @@ export class Wheel {
 
 		return (
 			(delta < 0 && el.scrollTop > 0)
-			|| (delta >= 0 && el.scrollTop < el.scrollHeight - el.offsetHeight)
+			|| (delta >= 0 && Math.ceil(el.scrollTop) < el.scrollHeight - el.offsetHeight)
 		);
 	};
 
