@@ -5,6 +5,9 @@
 
 
 ### `Resize`
+
+> 目前`on`首次绑定会立即调用一次
+
 ```js
 import { Resize } from '@deot/helper-resize';
 ```
@@ -14,7 +17,7 @@ import { Resize } from '@deot/helper';
 ```
 
 ```js
-let off = Resize.of(el).on(() => {});
+const off = Resize.of(el).on(() => {});
 off();
 ```
 
