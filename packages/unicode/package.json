@@ -19,6 +19,6 @@
     "access": "public"
   },
   "dependencies": {
-    "fflate": "^0.8.0"
+    "fflate": "^0.8.2"
   }
 }

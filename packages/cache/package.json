@@ -22,6 +22,6 @@
     "@deot/helper-utils": "^1.1.4"
   },
   "devDependencies": {
-    "fake-indexeddb": "^4.0.1"
+    "fake-indexeddb": "^6.0.0"
   }
 }
