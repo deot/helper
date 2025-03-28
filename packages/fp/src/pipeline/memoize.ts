@@ -1,5 +1,5 @@
 export const memoize = (func: Function, reslover?: Function) => {
-	if (func.length === 0 || func.length > 1) {
+	if (func.length === 0) {
 		return func;
 	}
 

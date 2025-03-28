@@ -50,4 +50,41 @@ describe('memoize.ts', () => {
 		factorial({ n: 9 });
 		expect(count).toBe(1);
 	});
+
+	it('args[0]', () => {
+		let count = 0;
+		const factorial = FP.memoize((a: number, b: number) => {
+			count++;
+			return Math.random() * a * b;
+		});
+
+		expect(factorial(4, 7)).toBe(factorial(4, 7));
+
+		factorial(4, 1);
+		factorial(4, 2);
+		factorial(4, 3);
+		factorial(4, 4);
+		factorial(4, 5);
+		expect(count).toBe(1);
+	});
+
+	it('args/resolver', () => {
+		let count = 0;
+		const factorial = FP.memoize((a: number, b: number) => {
+			count++;
+			return Math.random() * a * b;
+		}, (a: number, b: number) => `${a}#${b}`);
+
+		expect(factorial(4, 6)).toBe(factorial(4, 6));
+		expect(factorial(4, 7)).toBe(factorial(4, 7));
+		expect(factorial(4, 6)).not.toBe(factorial(4, 7));
+
+		factorial(4, 6);
+		factorial(4, 6);
+		factorial(4, 6);
+		factorial(4, 7);
+		factorial(4, 7);
+		factorial(4, 7);
+		expect(count).toBe(2);
+	});
 });
