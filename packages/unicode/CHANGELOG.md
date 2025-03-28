@@ -1,5 +1,13 @@
 # @deot/helper-unicode ChangeLog
 
+## v1.1.4
+
+_2025-03-28_
+
+### Updates
+
+- chore: deps updated ([3c1567c](https://github.com/deot/helper/commit/3c1567ca60eaa19e78e52e52945d75eeb6b7c2a0))
+
 ## v1.1.3
 
 _2023-11-22_

@@ -1,5 +1,17 @@
 # @deot/helper-scheduler ChangeLog
 
+## v1.1.7
+
+_2025-03-28_
+
+### Bugfixes
+
+- fix(fp): memoize multi-argument ([f472f09](https://github.com/deot/helper/commit/f472f0920c8855823d1e6504388f34914118f298))
+
+### Updates
+
+- chore(cache,fp,unicode): deps updated ([3c1567c](https://github.com/deot/helper/commit/3c1567ca60eaa19e78e52e52945d75eeb6b7c2a0))
+
 ## v1.1.6
 
 _2024-06-27_
