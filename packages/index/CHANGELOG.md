@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.11
+
+_2025-04-08_
+
+### Bugfixes
+
+- fix(fp): divide lose precision ([d611100](https://github.com/deot/helper/commit/d611100d492930bbe4cba2483afe1f85dbb5d271))
+
 ## v1.1.10
 
 _2025-03-28_
