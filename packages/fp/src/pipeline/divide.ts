@@ -11,7 +11,9 @@ export const divide: Divide = curry((arg1: number, arg2: number) => {
 		t2 = arg2.toString().split('.')[1].length;
 	} catch (e) { /* empty */ }
 
-	const r1 = Number(arg1.toString().replace('.', ''));
-	const r2 = Number(arg2.toString().replace('.', ''));
-	return (r1 / r2) * (10 ** (t2 - t1));
+	const scalar = 10 ** Math.max(t1, t2);
+	const r1 = arg1 * scalar;
+	const r2 = arg2 * scalar;
+
+	return r1 / r2;
 });
