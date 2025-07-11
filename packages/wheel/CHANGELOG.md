@@ -1,5 +1,13 @@
 # @deot/helper-wheel ChangeLog
 
+## v1.1.6
+
+_2025-07-11_
+
+### Force Update Package
+
+- `1.1.5` -> `1.1.6`
+
 ## v1.1.5
 
 _2025-07-11_
