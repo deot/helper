@@ -4,4 +4,3 @@ declare module 'ramda';
 declare module 'fs-extra'
 declare module 'inquirer'
 declare module 'inquirer-autocomplete-prompt'
-declare module 'normalize-wheel'

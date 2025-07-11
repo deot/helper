@@ -1,5 +1,5 @@
 import { Utils } from '@deot/dev-test';
-import normalizeWheel from 'normalize-wheel';
+import normalizeWheel from 'normalize-wheel-es';
 import { Wheel } from '@deot/helper-wheel';
 
 describe('wheel.ts', () => {
@@ -36,7 +36,7 @@ describe('wheel.ts', () => {
 	};
 
 	const dispatchWheel = (el: HTMLElement, deltaX: number, deltaY: number) => {
-		const e = new WheelEvent(normalizeWheel.getEventType());
+		const e = new WheelEvent((normalizeWheel as any).getEventType());
 		Object.defineProperty(e, 'deltaX', { value: deltaX });
 		Object.defineProperty(e, 'deltaY', { value: deltaY });
 		Object.defineProperty(e, 'cancelable', { value: true });
