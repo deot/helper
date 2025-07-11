@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.12
+
+_2025-07-11_
+
+### Updates
+
+- chore(wheel): normalize-wheel -> normalize-wheel-es ([ddb6dbb](https://github.com/deot/helper/commit/ddb6dbb1c3b416ce49117e229d1637f4cb5a6cb0))
+
 ## v1.1.11
 
 _2025-04-08_
