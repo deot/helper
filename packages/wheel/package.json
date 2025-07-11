@@ -19,6 +19,6 @@
     "access": "public"
   },
   "dependencies": {
-    "normalize-wheel-es": "^1.2.0"
+    "normalize-wheel": "^1.0.1"
   }
 }

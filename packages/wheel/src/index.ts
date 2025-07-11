@@ -13,7 +13,7 @@
  * 3. `overflow: hidden;` 这样可自定义滚动条样式
  * 4. 对移动端也做了兼容处理，在`overflow: hidden;`的情况下也可滑动
  */
-import normalizeWheel from 'normalize-wheel-es';
+import normalizeWheel from 'normalize-wheel';
 
 type WheelFunction<T = unknown> = (a: number, b: number) => T;
 
@@ -347,7 +347,7 @@ export class Wheel {
 		if (typeof window === 'undefined') return;
 		const fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
 
-		fn((normalizeWheel as any).getEventType(), this.handleWheel, false);
+		fn(normalizeWheel.getEventType(), this.handleWheel, false);
 
 		// 让触控屏也能实现滑动(模拟) 不用'ontouchend' in document，主要考虑测试
 		if (document.ontouchend || document.ontouchend === null) {
