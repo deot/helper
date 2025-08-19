@@ -1,4 +1,5 @@
-export const flatten = (value: any, parser?: ((x: any) => any)) => {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export const flatten = (value: any, parser?: ((x: any) => any), exit?: ((x: any) => boolean)) => {
 	let need = true;
 	let safeCount = 1;
 	let parseValue = value;
@@ -8,7 +9,7 @@ export const flatten = (value: any, parser?: ((x: any) => any)) => {
 		}
 		try {
 			const next = (parser || decodeURIComponent)(parseValue);
-			if (parseValue === next) {
+			if (parseValue === next || (typeof exit === 'function' && exit(next))) {
 				need = false;
 			}
 			parseValue = next;

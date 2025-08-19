@@ -39,4 +39,14 @@ describe('flatten.ts', () => {
 
 		expect(Utils.flatten(v2)).toBe(v1);
 	});
+
+	it('exit', () => {
+		const v1 = `https://xxxx?x=${encodeURIComponent(JSON.stringify({ a: '#', b: '我', c: '?' }))}`;
+		let v2 = v1;
+		Array.from({ length: 100 }).forEach(() => {
+			v2 = encodeURIComponent(v2);
+		});
+
+		expect(Utils.flatten(v2, void 0, v => /^https?:\/\//.test(v))).toBe(v1);
+	});
 });
