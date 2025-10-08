@@ -1,6 +1,6 @@
 import * as $ from '@deot/helper-dom';
 
-describe('is-scroll.ts', () => {
+describe('is-scroller.ts', () => {
 	const el = document.createElement('div');
 	const child = document.createElement('div');
 	el.style.overflow = 'scroll';
@@ -10,9 +10,9 @@ describe('is-scroll.ts', () => {
 	document.body.appendChild(el);
 
 	it('basic', () => {
-		expect($.isScroll(el)).toBe(true);
-		expect($.isScroll(el, 'x')).toBe(true);
-		expect($.isScroll(el, 'y')).toBe(true);
-		expect($.isScroll(child)).toBe(false);
+		expect($.isScroller(el)).toBe(true);
+		expect($.isScroller(el, { direction: 'x' })).toBe(true);
+		expect($.isScroller(el, { direction: 'y' })).toBe(true);
+		expect($.isScroller(child)).toBe(false);
 	});
 });

@@ -1,7 +1,8 @@
 import { IS_SERVER } from './_constants';
-import { isScroll } from './is-scroll';
+import { isScroller } from './is-scroller';
+import type { ScrollerOptions } from './is-scroller';
 
-export const getScroller = (el?: HTMLElement, direction?: 'y' | 'x') => {
+export const getScroller = (el?: HTMLElement, options?: ScrollerOptions) => {
 	if (IS_SERVER || !el) return null;
 
 	let parent = el;
@@ -9,7 +10,7 @@ export const getScroller = (el?: HTMLElement, direction?: 'y' | 'x') => {
 		if ([window, document, document.documentElement].includes(parent)) {
 			return window;
 		}
-		if (isScroll(parent as HTMLElement, direction)) {
+		if (isScroller(parent as HTMLElement, options)) {
 			return parent;
 		}
 

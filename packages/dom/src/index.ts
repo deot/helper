@@ -5,7 +5,7 @@ export * from './el';
 export * from './get-scroller';
 export * from './get-style';
 export * from './has-class';
-export * from './is-scroll';
+export * from './is-scroller';
 export * from './off';
 export * from './on';
 export * from './once';

@@ -59,11 +59,11 @@ describe('environment node', () => {
 	});
 
 	it('get-scroller', () => {
-		expect($.getScroller(el, 'x')).toBe(null);
+		expect($.getScroller(el, { direction: 'x' })).toBe(null);
 	});
 
-	it('is-scroll', () => {
-		expect($.isScroll(el, 'x')).toBe(false);
+	it('is-scroller', () => {
+		expect($.isScroller(el, { direction: 'x' })).toBe(false);
 	});
 
 	it('scroll-into-view', async () => {
