@@ -1,5 +1,13 @@
 # @deot/helper-utils ChangeLog
 
+## v1.1.5
+
+_2025-10-08_
+
+### Features
+
+- feat: flatten, custom exit function ([807c11d](https://github.com/deot/helper/commit/807c11ddd0c4b39cc505033f3d5ddabb9c3c41ac))
+
 ## v1.1.4
 
 _2024-06-27_

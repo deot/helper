@@ -1,5 +1,14 @@
 # @deot/helper ChangeLog
 
+## v1.1.14
+
+_2025-10-08_
+
+### Features
+
+- feat(utils): flatten, custom exit function ([807c11d](https://github.com/deot/helper/commit/807c11ddd0c4b39cc505033f3d5ddabb9c3c41ac))
+- feat(dom): `isScroll` -> `isScroller` & className supported ([6a7477a](https://github.com/deot/helper/commit/6a7477a79357661a60cf365d207fe21b2dbbf041))
+
 ## v1.1.13
 
 _2025-07-11_

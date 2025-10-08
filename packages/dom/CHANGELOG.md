@@ -1,5 +1,13 @@
 # @deot/helper-dom ChangeLog
 
+## v1.1.4
+
+_2025-10-08_
+
+### Features
+
+- feat: `isScroll` -> `isScroller` & className supported ([6a7477a](https://github.com/deot/helper/commit/6a7477a79357661a60cf365d207fe21b2dbbf041))
+
 ## v1.1.3
 
 _2023-11-22_
