@@ -9,4 +9,14 @@ describe('raf.ts', () => {
 		});
 		await t.sleep(20);
 	});
+	it('clear', async () => {
+		expect.assertions(1);
+		let count = 0;
+		const v = Utils.raf(() => {
+			count++;
+		});
+		Utils.caf(v);
+		await t.sleep(20);
+		expect(count).toBe(0);
+	});
 });
