@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.15
+
+_2026-03-02_
+
+### Features
+
+- feat(utils): add `caf` ([87ad51e](https://github.com/deot/helper/commit/87ad51e097fb1d733f28aa40cdbeb93c7c87c423))
+
 ## v1.1.14
 
 _2025-10-08_
