@@ -12,6 +12,7 @@ export * from './has-own';
 export * from './number-to-unit';
 export * from './pre-zero';
 export * from './raf';
+export * from './ric';
 export * from './random';
 export * from './sleep';
 export * from './throttle';
