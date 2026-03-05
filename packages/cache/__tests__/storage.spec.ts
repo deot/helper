@@ -33,6 +33,16 @@ describe('storage.ts', () => {
 		expect(Storage.get('user')).toBe(null);
 	});
 
+	it('versions', () => {
+		Storage.configure({ version: 1.0 });
+		expect(Storage.get('user')).toBe(null);
+
+		Storage.set('user', 'name');
+		Storage.configure({ version: 1.1, versions: [1.0, 1.1] });
+		expect(Storage.get('user')).toBe(null);
+		expect(Storage.get('user', { version: 1.0 })).toBe('name');
+	});
+
 	it('session', () => {
 		Storage.set('user', 'name', { session: true });
 		expect(Storage.get('user', { session: true })).toBe('name');
@@ -54,7 +64,7 @@ describe('storage.ts', () => {
 
 					++i;
 					run();
-				} catch (e) {
+				} catch {
 					resolve(i);
 				}
 			};

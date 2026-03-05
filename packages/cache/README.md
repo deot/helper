@@ -1,18 +1,18 @@
 # @deot/helper-cache
 
-缓存管理（`Storage` / `Cookie` / `IndexDB`）
+缓存管理（`Storage` / `Cookie` / `IndexedDB`）
 
-### `Storage/Cookie/IndexDB`
+### `Storage/Cookie/IndexedDB`
 
-> IndexDB 返回的是`Promise`
+> IndexedDB 返回的是`Promise`
 
 ```js
-import { Cookie, Storage, IndexDB } from '@deot/helper-cache';
+import { Cookie, Storage, IndexedDB } from '@deot/helper-cache';
 ```
 
 ```js
 // or
-import { Cookie, Storage, IndexDB } from '@deot/helper';
+import { Cookie, Storage, IndexedDB } from '@deot/helper';
 ```
 
 ---
@@ -76,5 +76,5 @@ Storage.remove('key');
 
 **示例**
 ```js
-Storage.configure({ version: '1.0.0' });
+Storage.configure({ version: '1.0.0', keepVersions: [] });
 ```

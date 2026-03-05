@@ -3,7 +3,8 @@ import { MemoryStorage } from './memory-storage';
 
 const PREFIX_NAME = '@deot/helper/';
 // Storage和Cookie不同，可以自定义key
-const formatKey = (key: string, version: string | number | undefined) => {
+const formatKey = (key: string, versions: Array<string | number | undefined>) => {
+	const version = versions.filter(i => typeof i !== 'undefined')[0];
 	return `${version ? `${PREFIX_NAME}${version}:` : ''}${key}`;
 };
 
@@ -13,6 +14,7 @@ const ALLOW = (() => {
 		window.localStorage.setItem(test, test);
 		window.localStorage.removeItem(test);
 		return true;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (_) {
 		return false;
 	}
@@ -20,6 +22,7 @@ const ALLOW = (() => {
 
 interface Options {
 	session?: boolean;
+	version?: string | number;
 }
 
 class StorageStore extends ACache {
@@ -38,13 +41,14 @@ class StorageStore extends ACache {
 
 		if (!ALLOW) return;
 
-		const { version } = this.options;
+		const { version, versions: keepVersions } = this.options;
+		const versions = [version, ...keepVersions!];
 		// 清除之前的缓存
 		Object.keys(window.localStorage).forEach((item) => {
 			/* istanbul ignore else -- @preserve */
 			if (
 				item.includes(PREFIX_NAME)
-				&& !item.includes(`${PREFIX_NAME}${version}`)
+				&& !versions.some(i => item.includes(`${PREFIX_NAME}${i}`))
 			) {
 				window.localStorage.removeItem(item);
 			}
@@ -61,11 +65,12 @@ class StorageStore extends ACache {
 		if (!ALLOW) return;
 		const invoke = this.getInvoke(options);
 
-		key = formatKey(key, this.options.version);
+		key = formatKey(key, [options?.version, this.options.version]);
 		value = this.options.set!(typeof value === 'string' ? value : JSON.stringify(value));
 
 		try {
 			window[invoke].setItem(key, value);
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (error) {
 			this[invoke].setItem(key, value);
 		}
@@ -81,7 +86,7 @@ class StorageStore extends ACache {
 		if (!ALLOW) return null;
 
 		const invoke = this.getInvoke(options);
-		key = formatKey(key, this.options.version);
+		key = formatKey(key, [options?.version, this.options.version]);
 
 		const value = this[invoke].getItem(key) || window[invoke].getItem(key);
 		return this.options.get!(value);
@@ -96,7 +101,7 @@ class StorageStore extends ACache {
 		if (!ALLOW) return;
 
 		const invoke = this.getInvoke(options);
-		key = formatKey(key, this.options.version);
+		key = formatKey(key, [options?.version, this.options.version]);
 
 		this[invoke].removeItem(key);
 		window[invoke].removeItem(key);

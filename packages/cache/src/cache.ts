@@ -4,6 +4,9 @@ interface Options {
 	[key: string]: any;
 	version?: string | number;
 
+	// 用于避免初始化清理
+	versions?: Array<string | number>;
+
 	// 取值时，对值的转换
 	get?: (v: any) => any;
 
@@ -17,6 +20,7 @@ export abstract class ACache {
 	constructor() {
 		this.options = {
 			version: '',
+			versions: [],
 			get: (v: any) => flattenJSONParse(v),
 			set: (v: string) => v
 		};
