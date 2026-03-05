@@ -1,5 +1,13 @@
 # @deot/helper-route ChangeLog
 
+## v1.1.8
+
+_2026-03-05_
+
+### Features
+
+- feat(utils): add `ric` & `cic` ([157d794](https://github.com/deot/helper/commit/157d794a9b52c262dcbd911917203af2cefa600c))
+
 ## v1.1.7
 
 _2026-03-02_

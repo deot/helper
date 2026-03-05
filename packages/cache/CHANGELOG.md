@@ -1,5 +1,14 @@
 # @deot/helper-cache ChangeLog
 
+## v1.1.9
+
+_2026-03-05_
+
+### Features
+
+- feat: Storage, allow mutiple versions cache ([b4dd6e6](https://github.com/deot/helper/commit/b4dd6e65e28e58453fc6746984efad8f6570ec11))
+- feat(utils): add `ric` & `cic` ([157d794](https://github.com/deot/helper/commit/157d794a9b52c262dcbd911917203af2cefa600c))
+
 ## v1.1.8
 
 _2026-03-02_
