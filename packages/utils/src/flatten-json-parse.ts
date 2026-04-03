@@ -22,5 +22,5 @@ export const flattenJSONParse = (value: string | null): any => {
 		return value;
 	}
 
-	return flatten(value, JSON.parse);
+	return flatten(value, JSON.parse, v => typeof v === 'object');
 };
