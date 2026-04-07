@@ -11,6 +11,7 @@ export const getStyle = (el: HTMLElement, name?: string) => {
 		const computed = (document.defaultView as any).getComputedStyle(el, '');
 		return el.style[name] || (computed?.[name] || '');
 	} catch (e) {
+		/* istanbul ignore next -- @preserve */
 		return el.style[name] || '';
 	}
 };

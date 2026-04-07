@@ -11,8 +11,9 @@ export const isScroller = (el?: HTMLElement, options?: ScrollerOptions) => {
 
 	const { className, direction } = options || {};
 
-	let overflow = getStyle(el, `overflow-${direction ? 'y' : 'x'}`);
-	overflow = overflow || getStyle(el, 'overflow');
+	let overflow = direction ? getStyle(el, `overflow-${direction}`) : '';
+	/* istanbul ignore if -- @preserve */
+	if (!overflow || overflow === 'visible') overflow = getStyle(el, 'overflow');
 
 	return !!(overflow.match(/(scroll|auto)/) || className?.test(el.className));
 };
