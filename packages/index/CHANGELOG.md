@@ -1,5 +1,14 @@
 # @deot/helper ChangeLog
 
+## v1.1.17
+
+_2026-04-07_
+
+### Bugfixes
+
+- fix(utils): flatten-json-parse, add exit hook ([298f9e2](https://github.com/deot/helper/commit/298f9e25b8e1b8973e3fea16db3dc378a1a7de95))
+- fix(dom): overflow-* has default value ([6f9ba31](https://github.com/deot/helper/commit/6f9ba31372d663c57c1eca87f2aff9e8f7d56183))
+
 ## v1.1.16
 
 _2026-03-05_

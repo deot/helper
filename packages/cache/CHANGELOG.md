@@ -1,5 +1,13 @@
 # @deot/helper-cache ChangeLog
 
+## v1.1.10
+
+_2026-04-07_
+
+### Bugfixes
+
+- fix(utils): flatten-json-parse, add exit hook ([298f9e2](https://github.com/deot/helper/commit/298f9e25b8e1b8973e3fea16db3dc378a1a7de95))
+
 ## v1.1.9
 
 _2026-03-05_

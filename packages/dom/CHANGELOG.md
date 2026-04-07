@@ -1,5 +1,13 @@
 # @deot/helper-dom ChangeLog
 
+## v1.1.5
+
+_2026-04-07_
+
+### Bugfixes
+
+- fix: overflow-* has default value ([6f9ba31](https://github.com/deot/helper/commit/6f9ba31372d663c57c1eca87f2aff9e8f7d56183))
+
 ## v1.1.4
 
 _2025-10-08_

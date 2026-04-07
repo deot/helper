@@ -18,7 +18,7 @@ importers:
   packages/cache:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.1.7
+        specifier: ^1.1.8
         version: link:../utils
     devDependencies:
       fake-indexeddb:
@@ -47,14 +47,14 @@ importers:
   packages/index:
     dependencies:
       '@deot/helper-cache':
-        specifier: ^1.1.9
+        specifier: ^1.1.10
         version: link:../cache
       '@deot/helper-device':
         specifier: ^1.1.3
         version: 1.1.3
       '@deot/helper-dom':
-        specifier: ^1.1.4
-        version: 1.1.4
+        specifier: ^1.1.5
+        version: link:../dom
       '@deot/helper-emitter':
         specifier: ^1.1.3
         version: 1.1.3
@@ -71,7 +71,7 @@ importers:
         specifier: ^1.1.3
         version: 1.1.3
       '@deot/helper-route':
-        specifier: ^1.1.8
+        specifier: ^1.1.9
         version: link:../route
       '@deot/helper-scheduler':
         specifier: ^1.1.8
@@ -83,7 +83,7 @@ importers:
         specifier: ^1.1.4
         version: 1.1.4
       '@deot/helper-utils':
-        specifier: ^1.1.7
+        specifier: ^1.1.8
         version: link:../utils
       '@deot/helper-validator':
         specifier: ^1.1.4
@@ -105,7 +105,7 @@ importers:
   packages/route:
     dependencies:
       '@deot/helper-utils':
-        specifier: ^1.1.7
+        specifier: ^1.1.8
         version: link:../utils
 
   packages/scheduler:
@@ -431,9 +431,6 @@ packages:
 
   '@deot/helper-device@1.1.3':
     resolution: {integrity: sha512-2HJMprcalhJj+wvXD60HnpxG4QwGS0YYp/41tv0m6/Xd/dat8v7mBqfJtkj8WBv3g+3kSu+f8U8bUfQZ89oB4g==}
-
-  '@deot/helper-dom@1.1.4':
-    resolution: {integrity: sha512-v1B4/lXnhl5iOqPR8bKPV9l7VqOOSVgF/cndji3TLcXMLa5BsZQnLi2vCoxoomBFCWcbJp7FAPDTUi42SzjHMQ==}
 
   '@deot/helper-emitter@1.1.3':
     resolution: {integrity: sha512-zF0B/aw0vDS8JlWjhZhjngDATKfLBIxmbx9IlZJ+oOUCuJRn75SMaRqOONDIvqrkExBGiMfF6GGvFHlzT6GWRw==}
@@ -4933,8 +4930,6 @@ snapshots:
       - yaml
 
   '@deot/helper-device@1.1.3': {}
-
-  '@deot/helper-dom@1.1.4': {}
 
   '@deot/helper-emitter@1.1.3': {}
 
