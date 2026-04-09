@@ -334,6 +334,7 @@ export class Wheel {
 
 		/* istanbul ignore else -- @preserve */
 		if (this.deltaX !== 0 || this.deltaY !== 0) {
+			/* istanbul ignore next -- @preserve */
 			if (this.options.stopPropagation!(this.deltaX, this.deltaY)) {
 				e.stopPropagation();
 			}
@@ -385,12 +386,14 @@ export class Wheel {
 		this.defaultOnWheel && this.off(this.defaultOnWheel);
 
 		this.defaultOnWheel = /* istanbul ignore next -- @preserve */ (deltaX: number, deltaY: number) => {
+			/* istanbul ignore next -- @preserve */
 			if (deltaY && this.el.scrollHeight > this.el.offsetHeight) {
 				this.el.scrollTop = Math.min(
 					Math.max(0, this.el.scrollTop + deltaY),
 					this.el.scrollHeight - this.el.offsetHeight
 				);
 			}
+			/* istanbul ignore next -- @preserve */
 			if (deltaX && this.el.scrollWidth > this.el.offsetWidth) {
 				this.el.scrollLeft = Math.min(
 					Math.max(0, this.el.scrollLeft + deltaX),

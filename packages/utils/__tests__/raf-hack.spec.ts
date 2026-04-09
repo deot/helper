@@ -7,7 +7,7 @@ describe('raf.ts', async () => {
 	const Utils = await import('@deot/helper-utils');
 	it('setTimeout', async () => {
 		expect.assertions(1);
-		Utils.raf(() => {
+		Utils.rAF(() => {
 			expect(1).toBe(1);
 		});
 		await t.sleep(20);
@@ -15,11 +15,11 @@ describe('raf.ts', async () => {
 	it('clearTimeout', async () => {
 		expect.assertions(1);
 		let count = 0;
-		const v = Utils.raf(() => {
+		const v = Utils.rAF(() => {
 			count++;
 		});
 		await t.sleep(1);
-		Utils.caf(v);
+		Utils.cAF(v);
 		await t.sleep(20);
 		expect(count).toBe(0);
 	});

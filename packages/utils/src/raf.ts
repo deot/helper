@@ -1,5 +1,10 @@
-export type Raf = (callback: FrameRequestCallback) => number;
-export type Caf = (rafId: number) => void;
+export type RAF = (callback: FrameRequestCallback) => number;
+export type CAF = (rafId: number) => void;
 
-export const raf: Raf = (typeof window !== 'undefined' && window.requestAnimationFrame) || ((fn: Function) => setTimeout(fn, 16));
-export const caf: Caf = (typeof window !== 'undefined' && window.cancelAnimationFrame) || ((rafIf: number) => clearTimeout(rafIf));
+export const rAF: RAF = (typeof window !== 'undefined' && window.requestAnimationFrame) || ((fn: Function) => setTimeout(fn, 16));
+export const cAF: CAF = (typeof window !== 'undefined' && window.cancelAnimationFrame) || ((id: number) => clearTimeout(id));
+
+// @deprecated
+export const raf = rAF;
+// @deprecated
+export const caf = cAF;

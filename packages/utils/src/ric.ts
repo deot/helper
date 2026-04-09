@@ -1,7 +1,7 @@
-export type Ric = (handler: IdleRequestCallback) => any;
-export type Cic = (idleId: number) => void;
+export type RIC = (handler: IdleRequestCallback, options?: IdleRequestOptions) => any;
+export type CIC = (id: number) => void;
 
-export const ric: Ric = (typeof window !== 'undefined' && window.requestIdleCallback)
+export const rIC: RIC = (typeof window !== 'undefined' && window.requestIdleCallback)
 	|| ((handler: IdleRequestCallback) => {
 		const start = Date.now();
 		const cb = () => {
@@ -12,4 +12,9 @@ export const ric: Ric = (typeof window !== 'undefined' && window.requestIdleCall
 		};
 		return setTimeout(cb, 1);
 	});
-export const cic: Cic = (typeof window !== 'undefined' && window.cancelIdleCallback) || ((idleId: any) => clearTimeout(idleId));
+export const cIC: CIC = (typeof window !== 'undefined' && window.cancelIdleCallback) || ((id: any) => clearTimeout(id));
+
+// @deprecated
+export const ric = rIC;
+// @deprecated
+export const cic = cIC;

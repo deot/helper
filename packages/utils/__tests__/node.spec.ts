@@ -5,7 +5,7 @@ import * as Utils from '@deot/helper-utils';
 describe('environment node', () => {
 	it('raf', async () => {
 		expect.assertions(1);
-		Utils.raf(() => {
+		Utils.rAF(() => {
 			expect(1).toBe(1);
 		});
 		await t.sleep(20);

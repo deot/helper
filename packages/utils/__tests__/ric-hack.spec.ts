@@ -7,7 +7,7 @@ describe('ric.ts', async () => {
 	const Utils = await import('@deot/helper-utils');
 	it('setTimeout', async () => {
 		expect.hasAssertions();
-		Utils.ric((e) => {
+		Utils.rIC((e) => {
 			expect(e.didTimeout).toBe(false);
 			expect(e.timeRemaining()).toBeGreaterThan(0);
 			expect(1).toBe(1);
@@ -17,11 +17,11 @@ describe('ric.ts', async () => {
 	it('clearTimeout', async () => {
 		expect.hasAssertions();
 		let count = 0;
-		const v = Utils.ric(() => {
+		const v = Utils.rIC(() => {
 			count++;
 		});
 		await Promise.resolve();
-		Utils.cic(v);
+		Utils.cIC(v);
 		await t.sleep(20);
 		expect(count).toBe(0);
 	});
