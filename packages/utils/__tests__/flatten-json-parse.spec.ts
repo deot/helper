@@ -7,7 +7,11 @@ describe('flatten-json-parse.ts', () => {
 		expect(Utils.flattenJSONParse('{}')).toEqual({});
 		expect(Utils.flattenJSONParse('9007199254740992')).toEqual('9007199254740992');
 		expect(Utils.flattenJSONParse('9007199254740991')).toEqual(9007199254740991);
+		expect(Utils.flattenJSONParse('1E1')).toEqual('1E1');
 		expect(Utils.flattenJSONParse(`["1234"]`)).toEqual(['1234']);
+		expect(Utils.flattenJSONParse(`["1234"]`)).toEqual(['1234']);
+		expect(Utils.flattenJSONParse(`-1`)).toEqual(-1);
+		expect(Utils.flattenJSONParse(`-1E1`)).toEqual('-1E1');
 	});
 
 	it('maxTries: 10', () => {
