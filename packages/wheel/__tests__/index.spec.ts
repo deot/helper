@@ -282,6 +282,88 @@ describe('wheel.ts', () => {
 		off();
 	});
 
+	it('shouldWheelX at right edge uses scrollLeft not scrollTop', () => {
+		const el = document.createElement('div');
+		const maxScrollLeft = 9000;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0 });
+		Object.defineProperty(el, 'scrollLeft', { value: maxScrollLeft });
+
+		// At right edge: further right scroll must be disallowed.
+		expect(Wheel.shouldWheelX(el, 100)).toBe(false);
+		// Must still allow scrolling back left.
+		expect(Wheel.shouldWheelX(el, -100)).toBe(true);
+	});
+
+	it('scroll left after reaching right edge', async () => {
+		const el = document.createElement('div');
+		let scrollLeft = 9000;
+		const maxScrollLeft = 9000;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0, writable: true });
+		Object.defineProperty(el, 'scrollLeft', {
+			get: () => scrollLeft,
+			set: (v: number) => {
+				scrollLeft = v;
+			}
+		});
+
+		document.body.appendChild(el);
+
+		const off = Wheel.of(el).enable();
+
+		// Hit right boundary: shouldWheelX returns false for further right scroll.
+		dispatchWheel(el, 100, 0);
+		await Utils.sleep(30);
+		expect(scrollLeft).toBe(maxScrollLeft);
+
+		// User must be able to scroll back left from the right edge.
+		dispatchWheel(el, -100, 0);
+		await Utils.sleep(30);
+		expect(scrollLeft).toBeLessThan(maxScrollLeft);
+
+		off();
+	});
+
+	it('scroll left at right edge when opposing wheel events share one rAF', async () => {
+		const el = document.createElement('div');
+		let scrollLeft = 9000;
+		const maxScrollLeft = 9000;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0, writable: true });
+		Object.defineProperty(el, 'scrollLeft', {
+			get: () => scrollLeft,
+			set: (v: number) => {
+				scrollLeft = v;
+			}
+		});
+
+		document.body.appendChild(el);
+
+		const off = Wheel.of(el).enable();
+
+		// At right edge: rightward delta is rejected, leftward delta in the same frame must still apply.
+		dispatchWheel(el, 100, 0);
+		dispatchWheel(el, -100, 0);
+		await Utils.sleep(30);
+
+		expect(scrollLeft).toBeLessThan(maxScrollLeft);
+
+		off();
+	});
+
 	it('mousemove', async () => {
 		expect.assertions(2);
 		Object.defineProperty(document, 'ontouchend', { value: undefined });
