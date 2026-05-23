@@ -36,12 +36,12 @@ describe('wheel.ts', () => {
 	};
 
 	const dispatchWheel = (el: HTMLElement, deltaX: number, deltaY: number) => {
-		const e = new WheelEvent(normalizeWheel.getEventType());
+		const e = new WheelEvent(normalizeWheel.getEventType(), { cancelable: true });
 		Object.defineProperty(e, 'deltaX', { value: deltaX });
 		Object.defineProperty(e, 'deltaY', { value: deltaY });
-		Object.defineProperty(e, 'cancelable', { value: true });
 
 		el.dispatchEvent(e);
+		return e;
 	};
 
 	const dispatchTouch = (el: HTMLElement, type: string, screenX: number, screenY: number) => {
@@ -263,8 +263,11 @@ describe('wheel.ts', () => {
 	});
 
 	it('native', async () => {
-		expect.assertions(0);
+		expect.assertions(2);
 		const el = make('wheel');
+		Object.defineProperty(el, 'scrollWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+
 		const wheel = Wheel.of(el, {
 			shouldWheelX: () => false,
 			shouldWheelY: () => false
@@ -274,11 +277,13 @@ describe('wheel.ts', () => {
 		const off = wheel.enable();
 
 		wheel.needThresholdWait = true;
-		dispatchWheel(el, 100, 0);
-		dispatchWheel(el, 0, 100);
+		const e = dispatchWheel(el, 100, 0);
+		expect(e.defaultPrevented).toBe(true);
+
 		dispatchWheel(document.body, 0, 100);
 
-		await Utils.sleep(30);
+		await Utils.sleep(35);
+		expect(wheel.needThresholdWait).toBe(false);
 		off();
 	});
 
@@ -297,6 +302,130 @@ describe('wheel.ts', () => {
 		expect(Wheel.shouldWheelX(el, 100)).toBe(false);
 		// Must still allow scrolling back left.
 		expect(Wheel.shouldWheelX(el, -100)).toBe(true);
+	});
+
+	it('shouldWheelX uses pending delta for boundary prediction', () => {
+		const el = document.createElement('div');
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'scrollLeft', { value: 0 });
+
+		// DOM scrollLeft is still 0, but pending rightward delta already queued in this frame.
+		expect(Wheel.shouldWheelX(el, -100, 100)).toBe(true);
+		expect(Wheel.shouldWheelX(el, 100, 0)).toBe(true);
+	});
+
+	it('scroll left after right from left edge in same rAF', async () => {
+		const el = document.createElement('div');
+		let scrollLeft = 0;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0, writable: true });
+		Object.defineProperty(el, 'scrollLeft', {
+			get: () => scrollLeft,
+			set: (v: number) => {
+				scrollLeft = v;
+			}
+		});
+
+		document.body.appendChild(el);
+
+		const off = Wheel.of(el).enable();
+
+		dispatchWheel(el, 100, 0);
+		dispatchWheel(el, -50, 0);
+		await Utils.sleep(30);
+
+		expect(scrollLeft).toBe(50);
+
+		off();
+	});
+
+	it('scroll left after right from left edge across frames', async () => {
+		const el = document.createElement('div');
+		let scrollLeft = 0;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0, writable: true });
+		Object.defineProperty(el, 'scrollLeft', {
+			get: () => scrollLeft,
+			set: (v: number) => {
+				scrollLeft = v;
+			}
+		});
+
+		document.body.appendChild(el);
+
+		const off = Wheel.of(el).enable();
+
+		dispatchWheel(el, 100, 0);
+		await Utils.sleep(30);
+		expect(scrollLeft).toBeGreaterThan(0);
+
+		const afterRight = scrollLeft;
+		dispatchWheel(el, -100, 0);
+		await Utils.sleep(30);
+		expect(scrollLeft).toBeLessThan(afterRight);
+
+		off();
+	});
+
+	it('preventDefault at left edge when scrolling further left', async () => {
+		const el = document.createElement('div');
+		let scrollLeft = 0;
+
+		Object.defineProperty(el, 'offsetWidth', { value: 1000 });
+		Object.defineProperty(el, 'scrollWidth', { value: 10000 });
+		Object.defineProperty(el, 'offsetHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollHeight', { value: 1000 });
+		Object.defineProperty(el, 'scrollTop', { value: 0, writable: true });
+		Object.defineProperty(el, 'scrollLeft', {
+			get: () => scrollLeft,
+			set: (v: number) => {
+				scrollLeft = v;
+			}
+		});
+
+		document.body.appendChild(el);
+
+		const off = Wheel.of(el).enable();
+
+		const e = dispatchWheel(el, -100, 0);
+		await Utils.sleep(30);
+
+		expect(e.defaultPrevented).toBe(true);
+		expect(scrollLeft).toBe(0);
+
+		off();
+	});
+
+	it('enable applies overscroll-behavior contain by default', () => {
+		const el = document.createElement('div');
+		const off = Wheel.of(el).enable();
+
+		expect(el.style.overscrollBehaviorX).toBe('contain');
+		expect(el.style.overscrollBehaviorY).toBe('contain');
+
+		off();
+		expect(el.style.overscrollBehaviorX).toBe('');
+		expect(el.style.overscrollBehaviorY).toBe('');
+	});
+
+	it('overscrollBehavior false skips style changes', () => {
+		const el = document.createElement('div');
+		el.style.overscrollBehaviorX = 'auto';
+		const off = Wheel.of(el, { overscrollBehavior: false }).enable();
+
+		expect(el.style.overscrollBehaviorX).toBe('auto');
+
+		off();
 	});
 
 	it('scroll left after reaching right edge', async () => {

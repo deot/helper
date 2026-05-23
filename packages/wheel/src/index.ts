@@ -51,6 +51,13 @@ export interface WheelOptions {
 	 * 自由滑动
 	 */
 	freedom?: boolean;
+
+	/**
+	 * 是否在 enable() 时设置 overscroll-behavior: contain
+	 * 用于阻止 macOS 触控板横向滑动触发浏览器前进/后退
+	 * 默认: true
+	 */
+	overscrollBehavior?: boolean;
 }
 
 interface ScrollOptions {
@@ -98,7 +105,7 @@ export class Wheel {
 		return new Wheel(el, options);
 	}
 
-	static shouldWheelX = (el: HTMLElement, delta: number) => {
+	static shouldWheelX = (el: HTMLElement, delta: number, pending = 0) => {
 		if (el.offsetWidth === el.scrollWidth) {
 			return false;
 		}
@@ -107,13 +114,16 @@ export class Wheel {
 			return false;
 		}
 
+		const scrollLeft = el.scrollLeft + pending;
+		const maxScrollLeft = el.scrollWidth - el.offsetWidth;
+
 		return (
-			(delta < 0 && el.scrollLeft > 0)
-			|| (delta >= 0 && Math.ceil(el.scrollLeft) < el.scrollWidth - el.offsetWidth)
+			(delta < 0 && scrollLeft > 0)
+			|| (delta >= 0 && Math.ceil(scrollLeft) < maxScrollLeft)
 		);
 	};
 
-	static shouldWheelY = (el: HTMLElement, delta: number) => {
+	static shouldWheelY = (el: HTMLElement, delta: number, pending = 0) => {
 		if (el.offsetHeight === el.scrollHeight) {
 			return false;
 		}
@@ -123,9 +133,12 @@ export class Wheel {
 			return false;
 		}
 
+		const scrollTop = el.scrollTop + pending;
+		const maxScrollTop = el.scrollHeight - el.offsetHeight;
+
 		return (
-			(delta < 0 && el.scrollTop > 0)
-			|| (delta >= 0 && Math.ceil(el.scrollTop) < el.scrollHeight - el.offsetHeight)
+			(delta < 0 && scrollTop > 0)
+			|| (delta >= 0 && Math.ceil(scrollTop) < maxScrollTop)
 		);
 	};
 
@@ -159,14 +172,21 @@ export class Wheel {
 
 	defaultOnWheel: WheelFunction | null = null;
 
+	savedOverscrollBehaviorX: string | undefined;
+
+	savedOverscrollBehaviorY: string | undefined;
+
+	private static wheelListenerOptions = { passive: false, capture: true };
+
 	constructor(el: HTMLElement, options?: WheelOptions) {
 		this.el = el;
 		this.options = {
 			native: true,
 			freedom: false,
+			overscrollBehavior: true,
 			stopPropagation: () => true,
-			shouldWheelX: deltaX => Wheel.shouldWheelX(el, deltaX),
-			shouldWheelY: deltaY => Wheel.shouldWheelY(el, deltaY),
+			shouldWheelX: deltaX => Wheel.shouldWheelX(el, deltaX, this.deltaX),
+			shouldWheelY: deltaY => Wheel.shouldWheelY(el, deltaY, this.deltaY),
 			...options
 		};
 	}
@@ -267,6 +287,20 @@ export class Wheel {
 	};
 
 	/**
+	 * 容器存在对应方向溢出且手势含该方向分量时，始终阻止浏览器默认行为
+	 * （如 macOS 触控板横向滑动触发历史后退）
+	 * @param pixelX ~
+	 * @param pixelY ~
+	 * @returns 是否应阻止浏览器默认行为
+	 */
+	private shouldBlockBrowserDefault(pixelX: number, pixelY: number): boolean {
+		const hasOverflowX = this.el.scrollWidth > this.el.offsetWidth;
+		const hasOverflowY = this.el.scrollHeight > this.el.offsetHeight;
+
+		return (hasOverflowX && pixelX !== 0) || (hasOverflowY && pixelY !== 0);
+	}
+
+	/**
 	 * 阻止X，Y轴上的滚动时，父层滚动（mac下的父层滚动越界会带有回弹）
 	 * 以下两种情况需要阻止
 	 * 1. 容器内在滚动：shouldWheelX = true 或 shouldWheelY = true
@@ -276,12 +310,24 @@ export class Wheel {
 	 * @param e ~
 	 * @param shouldWheelX ~
 	 * @param shouldWheelY ~
+	 * @param pixelX ~
+	 * @param pixelY ~
 	 * @returns 是否可继续
 	 */
-	private preventParentScroll(e: Event, shouldWheelX: boolean, shouldWheelY: boolean): boolean {
+	private preventParentScroll(
+		e: Event,
+		shouldWheelX: boolean,
+		shouldWheelY: boolean,
+		pixelX: number,
+		pixelY: number
+	): boolean {
+		const blockBrowserDefault = this.shouldBlockBrowserDefault(pixelX, pixelY);
+
 		// 第2种场景
 		if (!shouldWheelX && !shouldWheelY) {
-			if (this.options.native && this.needThresholdWait) {
+			if (blockBrowserDefault) {
+				e.cancelable && e.preventDefault();
+			} else if (this.options.native && this.needThresholdWait) {
 				e.cancelable && e.preventDefault();
 				this.timer && clearTimeout(this.timer);
 				this.timer = setTimeout(this.clear, wait);
@@ -322,12 +368,10 @@ export class Wheel {
 			angle > 60 && (pixelX = 0);
 		}
 
-		const deltaX = this.deltaX + pixelX;
-		const deltaY = this.deltaY + pixelY;
-		const shouldWheelX = this.options.shouldWheelX!(deltaX, deltaY);
-		const shouldWheelY = this.options.shouldWheelY!(deltaY, deltaX);
+		const shouldWheelX = this.options.shouldWheelX!(pixelX, pixelY);
+		const shouldWheelY = this.options.shouldWheelY!(pixelY, pixelX);
 
-		if (this.preventParentScroll(e, shouldWheelX, shouldWheelY)) return;
+		if (this.preventParentScroll(e, shouldWheelX, shouldWheelY, pixelX, pixelY)) return;
 
 		this.deltaX += shouldWheelX ? pixelX : 0;
 		this.deltaY += shouldWheelY ? pixelY : 0;
@@ -348,7 +392,7 @@ export class Wheel {
 		if (typeof window === 'undefined') return;
 		const fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
 
-		fn(normalizeWheel.getEventType(), this.handleWheel, false);
+		fn(normalizeWheel.getEventType(), this.handleWheel, Wheel.wheelListenerOptions);
 
 		// 让触控屏也能实现滑动(模拟) 不用'ontouchend' in document，主要考虑测试
 		if (document.ontouchend || document.ontouchend === null) {
@@ -378,12 +422,33 @@ export class Wheel {
 		}
 
 		if (!this.listeners.length) {
+			this.restoreOverscrollBehavior();
 			this.operateDOMEvents('remove');
 		}
 	}
 
+	private applyOverscrollBehavior() {
+		if (this.options.overscrollBehavior === false) return;
+
+		this.savedOverscrollBehaviorX = this.el.style.overscrollBehaviorX;
+		this.savedOverscrollBehaviorY = this.el.style.overscrollBehaviorY;
+		this.el.style.overscrollBehaviorX = 'contain';
+		this.el.style.overscrollBehaviorY = 'contain';
+	}
+
+	private restoreOverscrollBehavior() {
+		if (this.savedOverscrollBehaviorX === undefined) return;
+
+		this.el.style.overscrollBehaviorX = this.savedOverscrollBehaviorX;
+		this.el.style.overscrollBehaviorY = this.savedOverscrollBehaviorY!;
+		this.savedOverscrollBehaviorX = undefined;
+		this.savedOverscrollBehaviorY = undefined;
+	}
+
 	enable() {
 		this.defaultOnWheel && this.off(this.defaultOnWheel);
+
+		this.applyOverscrollBehavior();
 
 		this.defaultOnWheel = /* istanbul ignore next -- @preserve */ (deltaX: number, deltaY: number) => {
 			/* istanbul ignore next -- @preserve */

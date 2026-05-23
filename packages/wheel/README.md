@@ -16,3 +16,16 @@ import { Wheel } from '@deot/helper';
 let off = Wheel.of(el, wheelOptions).enable();
 off();
 ```
+
+### macOS 触控板
+
+使用 `overflow: hidden` + 手动滚动时，macOS「双指滑动网页前进/后退」可能误触发。`Wheel.enable()` 默认会：
+
+- 在容器有溢出且手势含对应方向分量时始终 `preventDefault`，与是否到达边界无关
+- 设置 `overscroll-behavior: contain`（可通过 `{ overscrollBehavior: false }` 关闭）
+
+典型用法：
+
+```js
+Wheel.of(el, { overscrollBehavior: true }).enable();
+```
