@@ -82,9 +82,8 @@ export class Parallel extends ATask {
 				.then(() => (leaf instanceof Task ? leaf.value : leaf))
 				.then((x: any) => this.suspend(x, this.canceler))
 				.then((x: any) => this.suspend(x, this.pasuer))
-				.then((x: any) => {
+				.finally(() => {
 					this.tasks = this.tasks.filter(i => i !== leaf);
-					return x;
 				})
 				.then(this.onFulfilled)
 				.catch(this.onRejected);

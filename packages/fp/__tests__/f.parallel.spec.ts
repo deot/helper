@@ -203,6 +203,29 @@ describe('parallel.ts', () => {
 		await current.cancel();
 	});
 
+	it('continues after all concurrent tasks reject', async () => {
+		let started = 0;
+		let rejected = 0;
+		const current = Parallel.of(
+			Array.from({ length: 6 }).map(() => async () => {
+				started++;
+				await sleep(1);
+				throw new Error('Hello Parallels!');
+			}),
+			2
+		);
+
+		current.on('rejected', () => {
+			rejected++;
+		});
+
+		await current.start();
+
+		expect(started).toBe(6);
+		expect(rejected).toBe(6);
+		expect(current.tasks.length).toBe(0);
+	});
+
 	it('for coverage', async () => {
 		expect.assertions(3);
 		let count = 0;
