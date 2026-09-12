@@ -26,4 +26,25 @@ describe('validator.ts', () => {
 			expect(e[0].message).toBe(message1);
 		}
 	});
+
+	it('options.original', async () => {
+		const original = { min: 16 };
+		const received: any[] = [];
+		const validator = new Validator({
+			user: {
+				fields: {
+					age: {
+						validate: (value, context) => {
+							received.push(context.original);
+							return value > context.original.min;
+						}
+					}
+				}
+			}
+		});
+
+		await validator.validate({ user: { age: 18 } }, { original });
+
+		expect(received).toEqual([original]);
+	});
 });

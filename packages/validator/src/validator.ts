@@ -1,7 +1,3 @@
-/* eslint-disable no-continue */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable prefer-promise-reject-errors */
-
 type Pattern = RegExp | string;
 type Path = number | string;
 
@@ -149,7 +145,9 @@ export class Validator {
 			const field = needCheckFields[i];
 			const rules = this.rules[field];
 			const value = source[field];
-			const original = this.original;
+			const original = typeof options.original === 'undefined'
+				? this.original
+				: options.original;
 
 			for (let j = 0; j < rules.length; j++) {
 				const rule = rules[j];
@@ -166,7 +164,7 @@ export class Validator {
 					const isArray = Array.isArray(value$);
 					const value$$ = isArray ? value$ : [value$];
 					if (value$$.every((v: any) => v && typeof v === 'object')) {
-						const validator = new Validator(fields$, paths);
+						const validator = new Validator(fields$, paths, original);
 						for (let k = 0; k < value$$.length; k++) {
 							try {
 								await validator.validate(value$$[k], { _index: isArray ? k : undefined, first: options.first, original });

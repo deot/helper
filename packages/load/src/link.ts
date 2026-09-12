@@ -10,7 +10,7 @@ export const link = (src: string) => {
 	const target = new Promise((resolve, reject) => {
 		const el = document.createElement('link');
 		el.type = 'text/css';
-		el.rel = 'linksheet';
+		el.rel = 'stylesheet';
 		el.href = src;
 		el.onload = () => resolve(1);
 		el.onerror = (e) => {

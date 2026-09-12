@@ -14,6 +14,7 @@
     "lint": "eslint . --color",
     "lint:fix": "npm run lint -- --fix",
     "link": "ddc link",
+    "docs:dev": "doc dev --workspace .",
     "dev": "ddc dev",
     "build": "ddc build --script-formats=es,cjs,umd,iife",
     "update": "ddc update",
@@ -42,6 +43,7 @@
   },
   "homepage": "https://github.com/deot/helper#readme",
   "devDependencies": {
-    "@deot/dev": "^2.9.14"
+    "@deot/dev": "^2.9.15",
+    "@deot/docs": "^1.1.2"
   }
 }
