@@ -1,5 +1,14 @@
 # @deot/helper-wheel ChangeLog
 
+## v1.1.7
+
+_2026-09-24_
+
+### Bugfixes
+
+- fix: listen to the standard wheel event instead of DOMMouseScroll in Firefox ([92ea628](https://github.com/deot/helper/commit/92ea628f353354cb1537f1a4b4d648da74424c82))
+- fix: correct shouldWheelX boundary check and wheel angle ([c7629c2](https://github.com/deot/helper/commit/c7629c22ef3cf506bc91db6a158df471cb89efe6))
+
 ## v1.1.6
 
 _2025-07-11_

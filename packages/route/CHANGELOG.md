@@ -1,5 +1,17 @@
 # @deot/helper-route ChangeLog
 
+## v1.1.10
+
+_2026-09-24_
+
+### Bugfixes
+
+- fix(utils): flattenJSONParse, preserve digit exponent strings ([f701204](https://github.com/deot/helper/commit/f7012047b0eaa58b3b32f9d79ddcccc70601260c))
+
+### Features
+
+- feat(utils): `raf` -> `rAF`, `ric` -> `rIC` ([ca66c01](https://github.com/deot/helper/commit/ca66c015cf6c6598c05d71833d85790892fd84a6))
+
 ## v1.1.9
 
 _2026-04-07_

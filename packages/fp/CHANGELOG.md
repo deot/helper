@@ -1,5 +1,13 @@
 # @deot/helper-fp ChangeLog
 
+## v1.1.6
+
+_2026-09-24_
+
+### Bugfixes
+
+- fix: ensure parallel tasks are removed after rejection ([cf6b715](https://github.com/deot/helper/commit/cf6b7152ff78da94dddd63d29d7cb0f50e93fbb3))
+
 ## v1.1.5
 
 _2025-04-08_

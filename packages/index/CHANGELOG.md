@@ -1,5 +1,20 @@
 # @deot/helper ChangeLog
 
+## v1.1.18
+
+_2026-09-24_
+
+### Bugfixes
+
+- fix(utils): flattenJSONParse, preserve digit exponent strings ([f701204](https://github.com/deot/helper/commit/f7012047b0eaa58b3b32f9d79ddcccc70601260c))
+- fix(fp): ensure parallel tasks are removed after rejection ([cf6b715](https://github.com/deot/helper/commit/cf6b7152ff78da94dddd63d29d7cb0f50e93fbb3))
+- fix(wheel): listen to the standard wheel event instead of DOMMouseScroll in Firefox ([92ea628](https://github.com/deot/helper/commit/92ea628f353354cb1537f1a4b4d648da74424c82))
+- fix(wheel): correct shouldWheelX boundary check and wheel angle ([c7629c2](https://github.com/deot/helper/commit/c7629c22ef3cf506bc91db6a158df471cb89efe6))
+
+### Features
+
+- feat(utils): `raf` -> `rAF`, `ric` -> `rIC` ([ca66c01](https://github.com/deot/helper/commit/ca66c015cf6c6598c05d71833d85790892fd84a6))
+
 ## v1.1.17
 
 _2026-04-07_
