@@ -36,7 +36,7 @@ describe('wheel.ts', () => {
 	};
 
 	const dispatchWheel = (el: HTMLElement, deltaX: number, deltaY: number) => {
-		const e = new WheelEvent(normalizeWheel.getEventType());
+		const e = new WheelEvent('wheel');
 		Object.defineProperty(e, 'deltaX', { value: deltaX });
 		Object.defineProperty(e, 'deltaY', { value: deltaY });
 		Object.defineProperty(e, 'cancelable', { value: true });
@@ -119,6 +119,22 @@ describe('wheel.ts', () => {
 		dispatchWheel(el, 10, 0);
 		await Utils.sleep(30);
 		off();
+	});
+
+	// Firefox下getEventType()返回DOMMouseScroll，仍需监听标准wheel事件
+	it('listen to wheel even if normalizeWheel prefers DOMMouseScroll', async () => {
+		const spy = vi.spyOn(normalizeWheel, 'getEventType').mockReturnValue('DOMMouseScroll');
+		const el = make('wheel');
+		const handler = vi.fn();
+
+		const off = Wheel.of(el).on(handler);
+
+		dispatchWheel(el, 0, 10);
+		await Utils.sleep(30);
+		off();
+		spy.mockRestore();
+
+		expect(handler).toHaveBeenCalledWith(0, 10);
 	});
 
 	it('shouldWheel: false', async () => {

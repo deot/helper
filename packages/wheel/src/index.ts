@@ -348,7 +348,15 @@ export class Wheel {
 		if (typeof window === 'undefined') return;
 		const fn = (type === 'add' ? this.el.addEventListener : this.el.removeEventListener).bind(this.el);
 
-		fn(normalizeWheel.getEventType(), this.handleWheel, false);
+		/**
+		 * 统一监听标准wheel事件（与上方全局监听一致），deltaMode（行/页）的换算仍由handleWheel中的normalizeWheel(e)处理
+		 * 1. 不用normalizeWheel.getEventType()：它按UA在Firefox下返回旧的DOMMouseScroll，该事件没有deltaY，按detail×10换算像素，实测滚动距离是原生的10倍
+		 * 2. 不回退mousewheel：不支持wheel的只有Chrome 31、Safari 7以前及Opera 12(Presto)，
+		 *    而本包产物含ES2022静态类字段（至少需Chrome 72、Firefox 75、Safari 14.1），这些浏览器本就无法运行
+		 * 3. Firefox下的行为变化：stopPropagation / preventDefault作用于wheel（原为DOMMouseScroll），外层的wheel监听不再收到已处理的事件，与Chrome、Safari一致；
+		 *    在Firefox中通过派发DOMMouseScroll触发滚动的测试（如new WheelEvent(normalizeWheel.getEventType())）需改为派发wheel
+		 */
+		fn('wheel', this.handleWheel, false);
 
 		// 让触控屏也能实现滑动(模拟) 不用'ontouchend' in document，主要考虑测试
 		if (document.ontouchend || document.ontouchend === null) {
