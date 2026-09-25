@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.19
+
+_2026-09-25_
+
+### Bugfixes
+
+- fix(resize,wheel): ignore unregistered listeners in off ([25e631a](https://github.com/deot/helper/commit/25e631aba663cdbaa2781dfb6a6635a6290dab5e))
+
 ## v1.1.18
 
 _2026-09-24_
