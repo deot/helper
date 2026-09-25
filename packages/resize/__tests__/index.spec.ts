@@ -45,4 +45,29 @@ describe('resize.ts', () => {
 		window.dispatchEvent(new Event('resize'));
 		await Utils.sleep(40);
 	});
+
+	it('off ignores unregistered listeners', async () => {
+		const target = document.createElement('div');
+		target.style.width = '100px';
+		target.style.height = '100px';
+		document.body.appendChild(target);
+
+		const a = vi.fn();
+		const b = vi.fn();
+		const offA = Resize.on(target, a);
+		Resize.on(target, b);
+
+		// 同一元素的实例共享listeners：移除未注册的监听器、重复调用取消函数，都不能误删其他调用方的监听器
+		Resize.off(target, () => {});
+		offA();
+		offA();
+
+		target.style.width = '200px';
+		window.dispatchEvent(new Event('resize'));
+		await Utils.sleep(40);
+		Resize.off(target);
+		target.remove();
+
+		expect(b).toHaveBeenCalled();
+	});
 });

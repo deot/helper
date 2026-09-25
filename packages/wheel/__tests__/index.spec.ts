@@ -121,6 +121,27 @@ describe('wheel.ts', () => {
 		off();
 	});
 
+	it('off ignores unregistered listeners', async () => {
+		const el = make('wheel');
+		const wheel = Wheel.of(el);
+		const a = vi.fn();
+		const b = vi.fn();
+		const offA = wheel.on(a);
+		wheel.on(b);
+
+		// 移除未注册的监听器、重复调用取消函数，都不能误删其他监听器
+		wheel.off(() => {});
+		offA();
+		offA();
+
+		dispatchWheel(el, 0, 10);
+		await Utils.sleep(30);
+		wheel.off();
+
+		expect(a).not.toHaveBeenCalled();
+		expect(b).toHaveBeenCalledWith(0, 10);
+	});
+
 	// Firefox下getEventType()返回DOMMouseScroll，仍需监听标准wheel事件
 	it('listen to wheel even if normalizeWheel prefers DOMMouseScroll', async () => {
 		const spy = vi.spyOn(normalizeWheel, 'getEventType').mockReturnValue('DOMMouseScroll');

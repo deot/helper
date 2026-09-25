@@ -380,7 +380,10 @@ export class Wheel {
 
 	off(fn?: WheelFunction) {
 		if (fn) {
-			this.listeners.splice(this.listeners.indexOf(fn), 1);
+			// 未注册的监听器（indexOf为-1）直接忽略：splice(-1, 1)会误删最后一个
+			const index = this.listeners.indexOf(fn);
+			if (index === -1) return;
+			this.listeners.splice(index, 1);
 		} else {
 			this.listeners = [];
 		}

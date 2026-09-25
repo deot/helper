@@ -69,7 +69,10 @@ export class Resize {
 
 	off(fn?: ResizableListener) {
 		if (fn) {
-			this.listeners.splice(this.listeners.indexOf(fn), 1);
+			// 未注册的监听器（indexOf为-1）直接忽略：splice(-1, 1)会误删最后一个；同一元素的实例共享listeners，误删的可能是其他调用方的
+			const index = this.listeners.indexOf(fn);
+			if (index === -1) return;
+			this.listeners.splice(index, 1);
 		} else {
 			this.listeners = [];
 		}
