@@ -30,6 +30,31 @@ Resize.on(element, listener);
 Resize.off(element, listener);
 ```
 
+### 共用模式
+
+默认每个元素一个 `ResizeObserver`：同时有 N 个元素变化，浏览器就回调 N 次，并且在每次回调之间清空微任务。传入 `{ shared: true }` 后，这些元素共用同一个 `ResizeObserver`，它们的变化由一次回调带回：
+
+```ts
+import { Resize } from '@deot/helper-resize';
+
+const listener = (entries) => {
+	entries.forEach(({ target }) => {
+		// target 为尺寸变化的元素
+	});
+};
+elements.forEach(element => Resize.on(element, listener, { shared: true }));
+elements.forEach(element => Resize.off(element, listener, { shared: true }));
+```
+
+- 适合同时监听一批元素（如列表的行、某个节点的各层祖先）：增减元素不再新建 observer，调用方按微任务合并的处理也只触发一次。
+- 同一个监听函数在一次回调里只执行一次，即使它注册在多个元素上；收到的 `ResizeObserverEntry[]` 只包含它自己监听的元素。默认模式下监听函数不带参数。
+- 一帧内可能不止一次回调：监听函数（或随后的微任务）又改变了更深层被监听元素的尺寸时，浏览器会在同一帧内再回调一轮。
+- 只能通过静态方法使用；实例方法 `Resize.of(element).on()` 始终是默认模式。
+- 与默认模式各自登记、互不影响：`off` 时必须传入相同的 `options`，否则删的是另一种模式下的监听（没有则忽略，不会报错）。
+- 同一个监听函数在同一个元素上重复注册只算一次。
+- 派发过程中被 `off` 的监听函数不再执行。
+- 某个监听函数抛错不影响同一次回调里的其它监听函数，全部执行完后抛出第一个错误。
+
 ## API
 
 ### Resize
@@ -52,21 +77,29 @@ Resize.off(element, listener);
 | --- | --- | --- |
 | `element` | `HTMLElement` | `Resize` |
 
-#### `Resize.on(element, listener)`
+#### `Resize.on(element, listener, options?)`
 
-静态注册监听并返回解绑函数
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `element`、`listener` | `HTMLElement`、`() => any` | `() => void` |
-
-#### `Resize.off(element, listener?)`
-
-删除指定监听；省略 listener 时删除全部
+静态注册监听并返回解绑函数；共用模式下元素首次注册时开始观察
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `element`、`listener` | `HTMLElement`、`() => any` | `void` |
+| `element`、`listener`、`options` | `HTMLElement`、`(entries?) => any`、`{ shared?: boolean }` | `() => void` |
+
+#### `Resize.off(element, listener?, options?)`
+
+删除指定监听；省略 listener 时删除全部（仅限 `options` 对应的模式）。共用模式下元素上没有监听后停止观察
+
+| 参数 | 参数类型 | 返回值 |
+| --- | --- | --- |
+| `element`、`listener`、`options` | `HTMLElement`、`(entries?) => any`、`{ shared?: boolean }` | `void` |
+
+#### `options`
+
+静态 `on` / `off` 的可选参数
+
+| 属性 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| `shared` | 是否使用[共用模式](#共用模式) | `boolean` | `false` |
 
 #### `Resize.on(listener)`
 
@@ -102,7 +135,7 @@ observer 回调；仅在 entries 包含当前元素时通知 listeners
 
 #### `Resize.listeners`
 
-当前元素的监听函数；同一元素创建的实例会复用该数组
+当前元素在默认模式下的监听函数；同一元素创建的实例会复用该数组
 
 | 类型 | 类型 |
 | --- | --- |
@@ -110,7 +143,7 @@ observer 回调；仅在 entries 包含当前元素时通知 listeners
 
 #### `Resize.ro`
 
-首次监听后创建的 observer
+默认模式下首次监听后创建的 observer
 
 | 类型 | 类型 |
 | --- | --- |

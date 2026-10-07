@@ -8,4 +8,12 @@ describe('environment node', () => {
 		off();
 		expect(Resize.off({} as HTMLElement, () => {})).toBe(undefined);
 	});
+
+	it('resize shared', () => {
+		const el = {} as HTMLElement;
+		const off = Resize.on(el, () => {}, { shared: true });
+		expect(typeof off).toBe('function');
+		off();
+		expect(Resize.off(el, () => {}, { shared: true })).toBe(undefined);
+	});
 });

@@ -1,7 +1,18 @@
+import { ResizeShared } from './shared';
+
 type ResizableListener = (...args: any[]) => any;
 
 type ResizableElement = HTMLElement & {
 	__rz__?: Resize;
+};
+
+type ResizableOptions = {
+	/**
+	 * 共用模式：以 shared 注册的元素共用同一个 ResizeObserver，同一轮里所有元素的尺寸变化由一次回调带回
+	 * 	- 同一个监听函数在一次回调里只执行一次（即使注册在多个元素上），参数为这些元素中发生变化的 entries
+	 * 	- 与默认模式各自登记、互不影响：off 时需传入相同的 options
+	 */
+	shared?: boolean;
 };
 
 // 检测DOM尺寸变化JS
@@ -16,20 +27,22 @@ export class Resize {
 	 * Resize.of(el, fn);
 	 * @param el ~
 	 * @param fn ~
+	 * @param options ~
 	 * @returns off
 	 */
-	static on(el: ResizableElement, fn: ResizableListener): Function {
-		return new Resize(el).on(fn);
+	static on(el: ResizableElement, fn: ResizableListener, options?: ResizableOptions): () => void {
+		return options?.shared ? ResizeShared.on(el, fn) : new Resize(el).on(fn);
 	}
 
 	/**
 	 * 要实现Resize.off(el)，el必须侵入式修改挂上__rz__
 	 * @param el ~
 	 * @param fn ~
+	 * @param options ~
 	 * @returns ~
 	 */
-	static off(el: ResizableElement, fn?: ResizableListener): void {
-		return new Resize(el).off(fn);
+	static off(el: ResizableElement, fn?: ResizableListener, options?: ResizableOptions): void {
+		return options?.shared ? ResizeShared.off(el, fn) : new Resize(el).off(fn);
 	}
 
 	listeners: ResizableListener[] = [];
