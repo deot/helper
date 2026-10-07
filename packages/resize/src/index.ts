@@ -8,8 +8,8 @@ type ResizableElement = HTMLElement & {
 
 type ResizableOptions = {
 	/**
-	 * 共用模式：以 shared 注册的元素共用同一个 ResizeObserver，同一轮里所有元素的尺寸变化由一次回调带回
-	 * 	- 同一个监听函数在一次回调里只执行一次（即使注册在多个元素上），参数为这些元素中发生变化的 entries
+	 * 共用模式：以同一个监听函数注册的元素共用一个 ResizeObserver，同一轮里这些元素的尺寸变化由一次回调带回
+	 * 	- 监听函数在一次回调里只执行一次（即使注册在多个元素上），参数为这些元素中发生变化的 entries
 	 * 	- 与默认模式各自登记、互不影响：off 时需传入相同的 options
 	 */
 	shared?: boolean;

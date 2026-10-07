@@ -147,9 +147,8 @@ describe('resize.ts', () => {
 	describe('shared', () => {
 		// 最近一次调用收到的 entries 对应的元素
 		const targetsOf = (fn: any) => fn.mock.lastCall[0].map((entry: any) => entry.target);
-		// 直接调用共用观察器的回调模拟一次派发：entries 只需要 target；首个元素须只被共用模式监听
-		const dispatch = (...targets: Element[]) => {
-			const [observer] = observersOf(targets[0]);
+		// 直接调用观察器的回调模拟一次派发：entries 只需要 target
+		const dispatch = (observer: Observer, ...targets: Element[]) => {
 			observer.callback(targets.map(target => ({ target })));
 		};
 
@@ -174,7 +173,7 @@ describe('resize.ts', () => {
 			expect(plain).toHaveBeenCalledTimes(5);
 		});
 
-		it('observes every shared element with a single observer', () => {
+		it('observes the elements of a listener with one observer of its own', () => {
 			const targets = [create(), create()];
 			const fn = vi.fn();
 			targets.forEach(target => Resize.on(target, fn, shared));
@@ -185,10 +184,33 @@ describe('resize.ts', () => {
 			// 同一元素上两种模式各有各的观察器
 			expect(observersOf(targets[0])).toHaveLength(2);
 			expect(observersOf(targets[0])).toContain(observer);
-			// 之后注册的元素仍由同一个观察器监听
+			// 同一个监听函数之后注册的元素仍由它的观察器监听
 			const later = create();
-			Resize.on(later, vi.fn(), shared);
+			Resize.on(later, fn, shared);
 			expect(observersOf(later)).toEqual([observer]);
+			// 另一个监听函数有自己的观察器，即使监听的是同一个元素
+			Resize.on(later, vi.fn(), shared);
+			expect(observersOf(later)).toHaveLength(2);
+		});
+
+		it('keeps the observer of a listener after its last element was removed', async () => {
+			const [a, b] = [create(), create()];
+			const fn = vi.fn();
+			Resize.on(a, fn, shared);
+			Resize.on(b, fn, shared);
+			const [observer] = observersOf(a);
+
+			Resize.off(a, fn, shared);
+			expect(observersOf(b)).toEqual([observer]);
+			Resize.off(b, fn, shared);
+			expect(observer.targets.size).toBe(0);
+
+			// 再次注册时沿用原来的观察器（不必重建），照常收到回调
+			Resize.on(a, fn, shared);
+			expect(observersOf(a)).toEqual([observer]);
+			await Utils.sleep(50);
+			expect(fn).toHaveBeenCalledTimes(1);
+			expect(targetsOf(fn)).toEqual([a]);
 		});
 
 		it('passes each listener only the entries of its own elements', async () => {
@@ -291,44 +313,45 @@ describe('resize.ts', () => {
 			expect(fn).toHaveBeenCalledTimes(1);
 		});
 
-		it('keeps calling the other listeners when one throws', () => {
+		it('calls each listener from its own observer, so one that throws does not stop the others', () => {
 			const [a, b] = [create(), create()];
-			const error = new Error('first');
+			const error = new Error('bad');
 			const bad = vi.fn(() => {
 				throw error;
 			});
-			const worse = vi.fn(() => {
-				throw new Error('second');
-			});
 			const good = vi.fn();
 			Resize.on(a, bad, shared);
-			Resize.on(a, worse, shared);
+			Resize.on(a, good, shared);
 			Resize.on(b, good, shared);
 
-			// 其余监听照常执行，结束后抛出第一个错误
-			expect(() => dispatch(a, b)).toThrow(error);
-			expect(worse).toHaveBeenCalledTimes(1);
-			expect(targetsOf(good)).toEqual([b]);
+			// 浏览器逐个调用各观察器的回调：抛错只影响抛错的那个监听函数自己
+			const [first, second] = observersOf(a);
+			expect(() => dispatch(first, a)).toThrow(error);
+			dispatch(second, a, b);
+			expect(targetsOf(good)).toEqual([a, b]);
 		});
 
-		it('skips the listeners removed during the dispatch', () => {
+		it('leaves out the elements removed before the callback', () => {
 			const [a, b, c] = [create(), create(), create()];
-			const removed = vi.fn();
-			const kept = vi.fn();
-			const first = vi.fn(() => {
-				Resize.off(b, removed, shared);
-				Resize.off(c, removed, shared);
-			});
-			Resize.on(a, first, shared);
-			Resize.on(b, removed, shared);
-			Resize.on(b, kept, shared);
-			Resize.on(c, removed, shared);
+			const fn = vi.fn();
+			Resize.on(a, fn, shared);
+			Resize.on(b, fn, shared);
+			Resize.on(c, fn, shared);
+			// b 上还有别的监听函数
+			Resize.on(b, vi.fn(), shared);
+			const [observer] = observersOf(a);
 
-			// 没有监听的元素（如刚被 off）出现在 entries 里时直接忽略
-			dispatch(a, b, c, document.createElement('div'));
-			expect(first).toHaveBeenCalledTimes(1);
-			expect(removed).not.toHaveBeenCalled();
-			expect(targetsOf(kept)).toEqual([b]);
+			// 浏览器收集好变化的元素之后、回调之前被 off 的元素（以及从未监听的元素）不带回
+			Resize.off(b, fn, shared);
+			dispatch(observer, a, b, c, document.createElement('div'));
+			expect(targetsOf(fn)).toEqual([a, c]);
+
+			// 一个都不剩时不回调
+			fn.mockClear();
+			Resize.off(a, fn, shared);
+			Resize.off(c, fn, shared);
+			dispatch(observer, a, b, c);
+			expect(fn).not.toHaveBeenCalled();
 		});
 	});
 });
