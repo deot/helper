@@ -45,6 +45,15 @@ export class Resize {
 		return options?.shared ? ResizeShared.off(el, fn) : new Resize(el).off(fn);
 	}
 
+	/**
+	 * 共用模式：删除监听函数在所有元素上的监听，调用方不必记下元素逐个 off
+	 * @param fn ~
+	 * @returns ~
+	 */
+	static disconnect(fn: ResizableListener): void {
+		return ResizeShared.disconnect(fn);
+	}
+
 	listeners: ResizableListener[] = [];
 
 	ro: ResizeObserver | null = null;

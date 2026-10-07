@@ -285,6 +285,35 @@ describe('resize.ts', () => {
 			expect(second).not.toHaveBeenCalled();
 		});
 
+		it('disconnect', async () => {
+			const [a, b] = [create(), create()];
+			const fn = vi.fn();
+			const other = vi.fn();
+			const plain = vi.fn();
+			Resize.on(a, fn, shared);
+			Resize.on(b, fn, shared);
+			Resize.on(b, other, shared);
+			Resize.on(a, plain);
+			await Utils.sleep(50);
+			[fn, other, plain].forEach(mock => mock.mockClear());
+			const observer = observers.find(item => item.targets.has(a) && item.targets.has(b))!;
+
+			// 一次删除该监听函数在所有元素上的监听；同一元素上的其它监听函数、默认模式的监听不受影响
+			Resize.disconnect(fn);
+			expect(observer.targets.size).toBe(0);
+			await resize(a, b);
+			expect(fn).not.toHaveBeenCalled();
+			expect(targetsOf(other)).toEqual([b]);
+			expect(plain).toHaveBeenCalledTimes(1);
+
+			// 没有在监听的函数直接忽略；之后重新注册照常收到回调
+			Resize.disconnect(fn);
+			Resize.disconnect(() => {});
+			Resize.on(a, fn, shared);
+			await Utils.sleep(50);
+			expect(targetsOf(fn)).toEqual([a]);
+		});
+
 		it('keeps the two modes independent', async () => {
 			const target = create();
 			const plain = vi.fn();

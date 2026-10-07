@@ -44,6 +44,9 @@ const listener = (entries) => {
 };
 elements.forEach(element => Resize.on(element, listener, { shared: true }));
 elements.forEach(element => Resize.off(element, listener, { shared: true }));
+
+// 或者一次删除该监听函数在所有元素上的监听，不必记下元素
+Resize.disconnect(listener);
 ```
 
 - 适合同时监听一批元素（如列表的行、某个节点的各层祖先）：增减元素不再新建 observer，调用方按微任务合并的处理也只触发一次。
@@ -55,7 +58,8 @@ elements.forEach(element => Resize.off(element, listener, { shared: true }));
 - 同一个监听函数在同一个元素上重复注册只算一次。
 - 回调之前已被 `off` 的元素不会出现在 `entries` 里；一个都不剩时不回调。
 - 某个监听函数抛错不影响其它监听函数。
-- 漏掉 `off` 时：监听函数和它监听的元素都不再被引用（如组件已销毁、元素已移出文档）后，observer 随它们一起被回收。元素仍在文档里的话监听会一直生效，仍需 `off`。
+- 监听的元素会增减时（如列表的行），调用方不必自己记下它们：结束时 `Resize.disconnect(listener)` 即可。
+- 漏掉 `off` / `disconnect` 时：监听函数还在用的期间，它监听的元素一直被引用着；监听函数和元素都不再被引用（如组件已销毁、元素已移出文档）后，observer 随它们一起被回收。元素仍在文档里的话监听会一直生效，仍需注销。
 
 ## API
 
@@ -94,6 +98,14 @@ elements.forEach(element => Resize.off(element, listener, { shared: true }));
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
 | `element`、`listener`、`options` | `HTMLElement`、`(entries?) => any`、`{ shared?: boolean }` | `void` |
+
+#### `Resize.disconnect(listener)`
+
+共用模式：删除该监听函数在所有元素上的监听；没有在监听时忽略
+
+| 参数 | 参数类型 | 返回值 |
+| --- | --- | --- |
+| `listener` | `(entries?) => any` | `void` |
 
 #### `options`
 

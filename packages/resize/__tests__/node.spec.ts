@@ -15,5 +15,6 @@ describe('environment node', () => {
 		expect(typeof off).toBe('function');
 		off();
 		expect(Resize.off(el, () => {}, { shared: true })).toBe(undefined);
+		expect(Resize.disconnect(() => {})).toBe(undefined);
 	});
 });
