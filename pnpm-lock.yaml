@@ -68,7 +68,7 @@ importers:
         specifier: ^1.1.3
         version: link:../load
       '@deot/helper-resize':
-        specifier: ^1.1.5
+        specifier: ^1.1.6
         version: link:../resize
       '@deot/helper-route':
         specifier: ^1.1.10

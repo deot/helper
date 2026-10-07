@@ -1,5 +1,17 @@
 # @deot/helper-resize ChangeLog
 
+## v1.1.6
+
+_2026-10-07_
+
+### Bugfixes
+
+- fix: observe with one ResizeObserver per listener in shared mode ([b782ffd](https://github.com/deot/helper/commit/b782ffdfe339e1360bccf90c171462555075132f))
+
+### Features
+
+- feat: add Resize.disconnect to remove a shared listener from all its elements ([ad49cc4](https://github.com/deot/helper/commit/ad49cc4cc35c6f9ef858e0c755ecd7ccd5b5d40e))
+
 ## v1.1.5
 
 _2026-10-07_
