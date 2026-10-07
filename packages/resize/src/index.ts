@@ -74,7 +74,8 @@ export class Resize {
 			if (index === -1) return;
 			this.listeners.splice(index, 1);
 		} else {
-			this.listeners = [];
+			// 原地清空：同一元素的实例共享listeners，换成新数组只改了当前实例，元素上的旧数组仍留着监听器，之后再on不会重新observe
+			this.listeners.length = 0;
 		}
 
 		if (!this.listeners.length && this.ro) {

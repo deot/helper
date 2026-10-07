@@ -70,4 +70,29 @@ describe('resize.ts', () => {
 
 		expect(b).toHaveBeenCalled();
 	});
+
+	it('listens again after every listener was removed', async () => {
+		const target = document.createElement('div');
+		target.style.width = '100px';
+		target.style.height = '100px';
+		document.body.appendChild(target);
+
+		const a = vi.fn();
+		const b = vi.fn();
+		Resize.on(target, a);
+		await Utils.sleep(40);
+		expect(a).toHaveBeenCalledTimes(1);
+
+		// 省略监听器清空后，同一元素重新注册仍要能收到回调，且之前的监听器不再保留
+		Resize.off(target);
+		Resize.on(target, b);
+		target.style.width = '200px';
+		window.dispatchEvent(new Event('resize'));
+		await Utils.sleep(40);
+		Resize.off(target);
+		target.remove();
+
+		expect(a).toHaveBeenCalledTimes(1);
+		expect(b).toHaveBeenCalled();
+	});
 });
