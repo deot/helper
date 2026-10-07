@@ -1,5 +1,17 @@
 # @deot/helper-resize ChangeLog
 
+## v1.1.5
+
+_2026-10-07_
+
+### Bugfixes
+
+- fix: listen again after off() removed every listener ([6c0e1b5](https://github.com/deot/helper/commit/6c0e1b53f7521756398eed62a5a60024971c0d8b))
+
+### Features
+
+- feat: add the shared option to observe many elements with one ResizeObserver ([26fd4c5](https://github.com/deot/helper/commit/26fd4c56c487dd3f67c90fef99ae186f32c80bd9))
+
 ## v1.1.4
 
 _2026-09-25_
