@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.22
+
+_2026-10-14_
+
+### Features
+
+- feat(dom): support cancelling scrollIntoView via signal and on re-call for the same element ([696b78d](https://github.com/deot/helper/commit/696b78d88bfa49c840a3fdeefcecc5e3a45ff0ce))
+
 ## v1.1.21
 
 _2026-10-07_
