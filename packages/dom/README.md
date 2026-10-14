@@ -202,7 +202,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `scrollIntoView(el, options?)`
 
-使用 requestAnimationFrame 从 `from` 动画滚动到 `to`
+使用 requestAnimationFrame 从 `from` 动画滚动到 `to`。同一元素上的新调用会取消未完成的旧动画；取消后（含 `signal` 中止）Promise 立即 resolve
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -230,6 +230,7 @@ ScrollerOptions 的配置字段。
 | `from` | `number` | `0` | 起始滚动位置 |
 | `to` | `number` | `0` | 目标滚动位置 |
 | `duration` | `number` | `300` | 动画时长，单位毫秒 |
+| `signal` | `AbortSignal` | — | 中止时停止动画，已中止则不滚动 |
 
 ## 服务端渲染
 
