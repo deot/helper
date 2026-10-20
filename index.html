@@ -6,10 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<meta charset="UTF-8">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-client/dist/index.style.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-renderer/dist/index.style.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-markdown/dist/index.style.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@deot/docs-playground/dist/index.style.css">
+	<meta name="description" content="@deot/helper：按需安装的 JavaScript / TypeScript 工具集，包含函数组合、任务控制、数据处理与浏览器工具。">
 </head>
 <body>
 	<div id="app"></div>
@@ -21,76 +18,105 @@
 			'en-US': { label: 'English' }
 		};
 		const packages = [
-			{ label: 'index', value: 'index' },
-			{ label: 'cache', value: 'cache' },
-			{ label: 'device', value: 'device' },
-			{ label: 'dom', value: 'dom' },
-			{ label: 'emitter', value: 'emitter' },
-			{ label: 'fp', value: 'fp' },
-			{ label: 'is', value: 'is' },
-			{ label: 'load', value: 'load' },
-			{ label: 'resize', value: 'resize' },
-			{ label: 'route', value: 'route' },
-			{ label: 'scheduler', value: 'scheduler' },
-			{ label: 'shared', value: 'shared' },
-			{ label: 'unicode', value: 'unicode' },
-			{ label: 'utils', value: 'utils' },
-			{ label: 'validator', value: 'validator' },
-			{ label: 'wheel', value: 'wheel' }
+			'index', 'cache', 'device', 'dom',
+			'emitter', 'fp', 'is', 'load',
+			'resize', 'route', 'scheduler', 'shared',
+			'unicode', 'utils', 'validator', 'wheel'
 		];
-		const packageReadmes = Object.fromEntries(packages.map(item => [
-			item.value,
-			`packages/${item.value}/README.md`
-		]));
-		const readmes = { guide: 'README.md', ...packageReadmes };
-		const readmeRoutes = Object.fromEntries(Object.entries(readmes).flatMap(([value, source]) => {
-			const route = `/packages/${value}`;
-			return source.endsWith('/README.md')
-				? [[source, route], [source.slice(0, -'/README.md'.length), route]]
-				: [[source, route]];
-		}));
-		const localeReadmes = Object.fromEntries(Object.keys(locales).map(lang => [lang, readmes]));
-		const sidebars = Object.fromEntries(Object.keys(locales).map(lang => [
-			lang,
-			[
+		const readmes = { guide: 'README.md' };
+		const readmeRoutes = { 'README.md': '/packages/guide' };
+
+		for (const name of packages) {
+			const directory = `packages/${name}`;
+			const route = `/packages/${name}`;
+			readmes[name] = `${directory}/README.md`;
+			readmeRoutes[directory] = route;
+			readmeRoutes[readmes[name]] = route;
+		}
+
+		const sidebars = {};
+		for (const lang of Object.keys(locales)) {
+			sidebars[lang] = [
 				{
 					label: lang === 'zh-CN' ? '简介' : 'Introduction',
 					value: '/packages/guide'
 				},
 				{
 					label: 'Packages',
-					children: packages.map(item => ({
-						label: item.label,
-						value: `/packages/${item.value}`
+					children: packages.map(name => ({
+						label: name,
+						value: `/packages/${name}`
 					}))
 				}
-			]
-		]));
+			];
+		}
+
+		const svgDataURL = svg => `data:image/svg+xml,${encodeURIComponent(svg)}`;
+		const featureIcon = (path, color) => svgDataURL(`
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+				fill="none" stroke="${color}" stroke-width="1.8"
+				stroke-linecap="round" stroke-linejoin="round">
+				<path d="${path}"/>
+			</svg>
+		`);
 
 		const createHomeDocument = (lang) => {
 			const t = (zh, en) => (lang === 'zh-CN' ? zh : en);
-			const accent = '#2563eb';
-			const accentSecondary = '#14b8a6';
+			const itemAccents = [
+				'light-dark(#2563eb, #93c5fd)',
+				'light-dark(#7c3aed, #c4b5fd)',
+				'light-dark(#b45309, #fcd34d)'
+			];
 			const action = {
 				label: t('开始使用', 'Quick Start'),
 				to: `/${lang}/packages/guide`,
 				variant: 'solid',
 				size: 'large',
-				color: accent,
-				textColor: '#ffffff'
+				color: '#15803d'
 			};
 			const appearance = {
 				marginTop: 0,
-				marginBottom: 80,
+				marginBottom: 64,
 				paddingTop: 0,
 				paddingBottom: 0,
-				maxWidth: 1200
+				maxWidth: 1536
 			};
 			const block = (id, type, props, customAppearance = appearance) => ({
 				id,
 				module: { type, version: 1, props },
 				appearance: customAppearance
 			});
+			const pipelineExample = [
+				"import { pipe } from '@deot/helper-fp';",
+				'',
+				'const transform = pipe(',
+				'  (value: number) => value + 1,',
+				'  (value: number) => value * 2',
+				');',
+				'',
+				'transform(5);  // 12',
+				'transform(0);  // 2',
+				'transform(10); // 22'
+			].join('\n');
+			const usageExample = [
+				"import { pipe } from '@deot/helper-fp';",
+				"import { get, merge } from '@deot/helper-route';",
+				'',
+				'const normalize = pipe(',
+				'  (value: string) => value.trim(),',
+				'  (value: string) => value.toLowerCase()',
+				');',
+				'',
+				'const url = merge({',
+				"  path: ['search'],",
+				"  query: { q: normalize('  Helper  '), page: 0, preview: false }",
+				'});',
+				'',
+				'console.log(url);',
+				'// /search?q=helper&page=0&preview=false',
+				"console.log(get('page', url));    // 0",
+				"console.log(get('preview', url)); // false"
+			].join('\n');
 
 			return {
 				schemaVersion: 2,
@@ -99,143 +125,275 @@
 					mode: 'sortable',
 					maxWidth: 1920,
 					minHeight: 600,
-					background: '#ffffff'
+					contentWidth: 1536,
+					sidePattern: true,
+					background: ''
 				},
 				blocks: [
 					block('home-hero', 'hero', {
 						eyebrow: '@deot/helper',
-						title: t('面向 JavaScript 开发的实用工具集', 'Practical helpers for JavaScript'),
+						title: t('小工具，按需组合', 'Small helpers. Useful combinations.'),
 						description: t(
-							'按能力拆分为独立包，提供 TypeScript 类型，并遵守 tree-shaking。',
-							'Modular TypeScript utilities designed for tree-shaking and focused imports.'
+							'从数据转换、函数组合到任务控制与浏览器交互。\n'
+								+ '按需安装，使用 ESM 具名导出配合 Tree-shaking。\n'
+								+ '随包提供 TypeScript 声明。',
+							'From data transformations and function composition to task control and browser interactions. '
+								+ 'Install what you need, with named ESM exports for tree-shaking and TypeScript declarations included.'
 						),
 						align: 'left',
-						accent,
-						accentSecondary,
-						background: '',
 						showVisual: true,
-						minHeight: 500,
+						visual: {
+							type: 'code',
+							title: 'transform.ts · 5 → 6 → 12',
+							language: 'typescript',
+							content: pipelineExample
+						},
+						minHeight: 520,
 						highlights: [
-							{ value: '16', label: t('独立包', 'Packages') },
+							{ value: '15 + 1', label: t('功能包 + 聚合入口', 'Packages + collection') },
 							{ value: 'TS', label: t('类型支持', 'Typed') },
-							{ value: 'ESM', label: 'Tree-shaking' }
+							{ value: 'ESM', label: 'Tree-shaking', color: 'var(--docs-color-primary)' }
 						],
 						actions: [action]
-					}, { ...appearance, marginBottom: 64, fullWidth: true }),
+					}, { ...appearance, marginBottom: 40, fullWidth: true }),
 					block('home-features', 'features', {
-						eyebrow: t('设计', 'Design'),
-						title: t('按需选择，也可一次引入', 'Pick a package or use the collection'),
+						eyebrow: t('能力', 'Capabilities'),
+						title: t('从一行转换，到一组任务', 'From one transformation to a queue of tasks'),
 						description: t(
-							'从类型判断、DOM 和缓存，到函数式编程、调度与验证。',
-							'From type guards, DOM and cache helpers to FP, scheduling and validation.'
+							'每个包围绕一类问题组织 API。纯计算与依赖浏览器的能力分开选择，按场景组合。',
+							'Each package addresses a focused problem. '
+								+ 'Choose computational helpers and browser integrations for the task at hand.'
 						),
+						align: 'center',
 						columns: 3,
 						gap: 24,
 						items: [
 							{
-								title: t('模块化', 'Modular'),
-								description: t('独立安装所需能力，控制依赖和产物体积。', 'Install only the capability you need.'),
-								badge: 'Packages',
-								icon: 'grid',
-								accent
+								title: t('处理数据', 'Transform data'),
+								description: t(
+									'类型与实例判断、深层属性读取、URL 查询参数处理，以及 Unicode 压缩编码。',
+									'Check types and instances, read nested properties, handle URL queries and compress Unicode strings.'
+								),
+								badge: 'utils · is · route · unicode',
+								icon: featureIcon('M4 5h16v4H4zM4 15h16v4H4zM8 9v6m8-6v6', '#3b82f6'),
+								accent: itemAccents[0]
 							},
 							{
-								title: 'Tree-shaking',
-								description: t('使用具名导出，让构建工具移除未使用代码。', 'Named exports let bundlers remove unused code.'),
-								badge: 'ESM',
-								icon: 'filter',
-								accent: accentSecondary
+								title: t('组合与调度', 'Compose and schedule'),
+								description: t(
+									'用 curry、pipe 组合函数，以 Task、Job、Parallel 控制串行、周期与并发任务，配合事件订阅与中断器。',
+									'Compose functions with curry and pipe. '
+										+ 'Control serial, recurring and concurrent tasks with Task, Job and Parallel, plus events and an interrupter.'
+								),
+								badge: 'fp · emitter · scheduler',
+								icon: featureIcon('M4 6h5l6 12h5M4 18h5l6-12h5m-3-3 3 3-3 3m0 6 3 3-3 3', '#8b5cf6'),
+								accent: itemAccents[1]
 							},
 							{
-								title: t('跨环境', 'Cross-runtime'),
-								description: t('通用工具支持 Node，DOM 类能力明确标注浏览器环境。', 'Universal helpers support Node; browser-only APIs are documented.'),
-								badge: 'Browser / Node',
-								icon: 'link',
-								accent: '#8b5cf6'
+								title: t('连接浏览器', 'Work with the browser'),
+								description: t(
+									'管理 DOM 事件、Storage 与 IndexedDB 缓存，加载脚本和图片，监听尺寸变化并归一化滚轮与触控增量。',
+									'Manage DOM events, Storage and IndexedDB; load scripts and images, '
+										+ 'observe element sizes and normalize wheel and touch deltas.'
+								),
+								badge: 'dom · cache · load · resize · wheel',
+								icon: featureIcon('M3 4h18v16H3zM3 9h18M7 6.5h.01M10 6.5h.01M9 13l-2 2 2 2m6-4 2 2-2 2', '#d97706'),
+								accent: itemAccents[2]
+							},
+							{
+								title: t('验证输入', 'Validate input'),
+								description: t(
+									'同步与异步自定义规则、嵌套字段和常用正则；失败时以错误数组拒绝 Promise，保留字段名与路径。',
+									'Use synchronous and asynchronous rules, nested fields and common patterns. '
+										+ 'Validation failures reject with an array of errors containing field names and paths.'
+								),
+								badge: 'validator',
+								icon: featureIcon('M4 4h16v16H4zM7 12l3 3 7-7', '#3b82f6'),
+								accent: 'light-dark(#0f766e, #5eead4)'
+							},
+							{
+								title: t('解析设备信息', 'Parse device information'),
+								description: t(
+									'从 User-Agent 解析系统、设备和浏览器标记；需要判断实际能力时，配合浏览器特性检测。',
+									'Parse OS, device and browser flags from a User-Agent string. '
+										+ 'Use browser feature checks when you need to detect actual capabilities.'
+								),
+								badge: 'device',
+								icon: featureIcon('M7 2h10v20H7zM10 5h4m-3 14h2', '#8b5cf6'),
+								accent: 'light-dark(#be185d, #f9a8d4)'
+							},
+							{
+								title: t('共享类型', 'Share types'),
+								description: t(
+									'提供索引对象、可空值、函数签名等公共 TypeScript 类型，以及判断是否缺少 window 的 IS_SERVER 常量。',
+									'Reuse TypeScript types for indexed objects, nullable values and function signatures, '
+										+ 'plus IS_SERVER to check whether window is unavailable.'
+								),
+								badge: 'shared',
+								icon: featureIcon('M9 5H6v14h3m6-14h3v14h-3m-4-4 2-6', '#d97706'),
+								accent: 'light-dark(#475569, #cbd5e1)'
 							}
 						]
 					}),
 					block('home-steps', 'steps', {
 						eyebrow: t('上手', 'Start'),
-						title: t('三步使用工具包', 'Use a helper in three steps'),
+						title: t('三步运行第一个示例', 'Run your first example in three steps'),
+						align: 'center',
 						columns: 3,
 						items: [
-							{ title: t('选择', 'Choose'), description: t('选择独立包或聚合包。', 'Choose a focused package or the collection.'), icon: '01', accent },
-							{ title: t('安装', 'Install'), description: 'pnpm add @deot/helper-utils', icon: '02', accent: accentSecondary },
-							{ title: t('导入', 'Import'), description: t('使用具名导出调用所需 API。', 'Import only the named APIs you use.'), icon: '03', accent: '#8b5cf6' }
+							{
+								title: t('安装', 'Install'),
+								description: 'pnpm add @deot/helper-fp @deot/helper-route',
+								icon: '01',
+								accent: itemAccents[0]
+							},
+							{
+								title: t('导入', 'Import'),
+								description: t(
+									'从 fp 导入 pipe，从 route 导入 merge 和 get；完整代码见下方。',
+									'Import pipe from fp, and merge and get from route. The complete code follows below.'
+								),
+								icon: '02',
+								accent: itemAccents[1]
+							},
+							{
+								title: t('运行', 'Run'),
+								description: t(
+									'生成搜索地址，读取 page → 0、preview → false。',
+									'Generate the search URL, then read page → 0 and preview → false.'
+								),
+								icon: '03',
+								accent: itemAccents[2]
+							}
+						]
+					}),
+					block('home-code', 'code', {
+						eyebrow: t('输入与输出', 'Input and output'),
+						title: t('转换可组合，结果可预期', 'Compose transformations. See the result.'),
+						description: t(
+							'pipe 按传入顺序执行；merge 保留查询值 0 和 false，get 默认将它们解析回数值和布尔值。',
+							'pipe runs functions in the supplied order. merge preserves 0 and false; '
+								+ 'get parses them back into a number and a boolean by default.'
+						),
+						align: 'center',
+						filename: 'search.ts',
+						language: 'typescript',
+						content: usageExample,
+						folds: [],
+						highlightLines: [14, 16, 17]
+					}),
+					block('home-faq', 'faq', {
+						eyebrow: t('使用边界', 'Usage notes'),
+						title: t('选对入口，也选对环境', 'Choose your entry point and runtime'),
+						align: 'center',
+						items: [
+							{
+								question: t('独立包和聚合包怎样选择？', 'Focused package or collection?'),
+								answer: t(
+									'只用单项能力时安装对应子包，例如 @deot/helper-fp。'
+										+ '聚合包 @deot/helper 使用 FP、Utils、Route 等命名空间，并直接导出 Emitter、Validator、Task 等类。'
+										+ '两种入口共享对应的 API 实现，均提供 ESM 与类型声明。',
+									'Install a focused package such as @deot/helper-fp for a smaller dependency scope. '
+										+ '@deot/helper exposes namespaces such as FP, Utils and Route, '
+										+ 'and classes such as Emitter, Validator and Task directly. '
+										+ 'Both share the corresponding API implementations and provide ESM and type declarations.'
+								)
+							},
+							{
+								question: t('怎样配合 Tree-shaking？', 'How do I use tree-shaking?'),
+								answer: t(
+									'优先使用 ESM 具名导入，例如从 @deot/helper-fp 导入 pipe，再由构建工具移除未使用的导出。'
+										+ '独立包可以缩小依赖范围；最终产物仍取决于导入方式、构建配置和模块副作用。',
+									'Prefer named ESM imports, such as pipe from @deot/helper-fp, so your bundler can remove unused exports. '
+										+ 'Focused packages reduce the dependency scope; '
+										+ 'final output still depends on imports, build configuration and module side effects.'
+								)
+							},
+							{
+								question: t('能在 Node.js 或 SSR 中使用吗？', 'Can I use it in Node.js or SSR?'),
+								answer: t(
+									'类型判断、函数组合、事件与验证等通用逻辑可在无 DOM 环境使用。'
+										+ 'DOM 操作、浏览器存储、资源加载、尺寸和滚动监听应在客户端调用；'
+										+ 'utils 中的 Canvas、File 等方法也需要浏览器 API。具体回退行为见各方法说明。',
+									'Type checks, function composition, events and validation work without a DOM. '
+										+ 'Call DOM, browser storage, resource loading, size and scroll APIs on the client; '
+										+ 'Canvas and File helpers also require browser APIs. See each API for its fallback behavior.'
+								)
+							}
 						]
 					}),
 					block('home-cta', 'cta', {
 						eyebrow: t('文档', 'Documentation'),
-						title: t('浏览全部包与 API', 'Explore every package and API'),
-						description: t('从包列表进入安装说明、示例和公共 API。', 'Open any package for installation, examples and public APIs.'),
+						title: t('从一个方法开始', 'Start with one helper'),
+						description: t(
+							'查看安装、参数和返回值，在可交互示例中检查输入与输出，再组合进你的代码。',
+							'Check installation, parameters and return values. '
+								+ 'Explore inputs and outputs in interactive examples, then compose them into your code.'
+						),
 						align: 'center',
-						accent,
-						accentSecondary,
-						background: '',
 						actions: [action]
 					}, { ...appearance, marginBottom: 0, fullWidth: true })
 				]
 			};
 		};
 
-		const pathSegments = location.pathname.split('/');
-		const localeIndex = pathSegments.findIndex(segment => Boolean(locales[segment]));
-		const basePath = localeIndex >= 0
-			? `${pathSegments.slice(0, localeIndex).join('/')}/`
-			: location.pathname.endsWith('/')
-				? location.pathname
-				: new URL('./', location.href).pathname;
-		const logo = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#2563eb"/><text x="32" y="40" fill="#fff" font-family="Georgia,Times New Roman,serif" font-size="25" font-style="italic" font-weight="700" text-anchor="middle">f(x)</text></svg>')}`;
-		if (typeof document !== 'undefined') {
-			const favicon = document.createElement('link');
-			favicon.rel = 'icon';
-			favicon.type = 'image/svg+xml';
-			favicon.href = logo;
-			document.head.appendChild(favicon);
+		const routes = {
+			'/': {
+				content: {
+					'zh-CN': createHomeDocument('zh-CN'),
+					'en-US': createHomeDocument('en-US')
+				}
+			}
+		};
+		for (const value of Object.keys(readmes)) {
+			routes[`/packages/${value}`] = {
+				value,
+				content: 'default',
+				sidebar: sidebars,
+				header: 'default',
+				footer: 'default',
+				extra: null
+			};
 		}
+		routes['*'] = '/packages/guide';
 
-			window.$docs = {
-				base: new URL(basePath, location.origin).href,
-				namespace: '@deot/helper-site',
-				repository: 'https://github.com/deot/helper',
-				theme: { default: 'system' },
-				layout: {
-					header: {
-						brand: {
-							logo,
-							label: '@deot/helper',
-							value: '/'
-						}
+		const logo = svgDataURL(`
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+				<rect width="64" height="64" rx="16" fill="#dcfce7"/>
+				<text x="32" y="41" fill="#166534" stroke="#166534" stroke-width=".3"
+					font-family="Georgia,Times New Roman,serif" font-size="28"
+					font-style="italic" font-weight="700" text-anchor="middle">f(x)</text>
+			</svg>
+		`);
+
+		window.$docs = {
+			namespace: '@deot/helper-site',
+			repository: 'https://github.com/deot/helper',
+			theme: {
+				default: 'system',
+				colors: {
+					'color-primary': { light: '#15803d', dark: '#86efac' },
+					'color-secondary': { light: '#65a30d', dark: '#bef264' }
+				}
+			},
+			layout: {
+				header: {
+					brand: {
+						logo,
+						label: '@deot/helper',
+						value: '/'
 					}
-				},
-				locales,
-				routes: Object.fromEntries([
-					['/', {
-						content: {
-							'zh-CN': createHomeDocument('zh-CN'),
-							'en-US': createHomeDocument('en-US')
-						}
-					}],
-					...Object.keys(readmes).map(value => [`/packages/${value}`, {
-					value,
-					content: 'default',
-					sidebar: sidebars,
-					header: 'default',
-					footer: 'default',
-					extra: null
-				}]),
-				['*', '/packages/guide']
-			]),
+				}
+			},
+			locales,
+			routes,
 			resolve: {
-				markdown: ({ lang, value }) => (
-					localeReadmes[lang] || localeReadmes['zh-CN']
-				)[value],
+				markdown: ({ value }) => readmes[value],
 				resource: ({ source, runtime }) => {
 					if (source === 'README.md' || /^packages\/[^/]+\/README\.md$/.test(source)) {
 						return runtime.mode === 'development'
 							? `/${source}`
-							: new URL(source, repositoryRaw).href;
+							: `${repositoryRaw}${source}`;
 					}
 					return undefined;
 				},
@@ -251,27 +409,41 @@
 					const path = target.pathname.replace(/^\//, '');
 					const route = readmeRoutes[path];
 					if (route) return `/${lang}${route}${target.search}${target.hash}`;
-					return `${new URL(path, repositoryBlob).href}${target.search}${target.hash}`;
+					return `${repositoryBlob}${path}${target.search}${target.hash}`;
 				}
-			},
-			modules: {
-				'@deot/helper-cache': 'https://cdn.jsdelivr.net/npm/@deot/helper-cache@1.1.10/+esm',
-				'@deot/helper-device': 'https://cdn.jsdelivr.net/npm/@deot/helper-device@1.1.3/+esm',
-				'@deot/helper-dom': 'https://cdn.jsdelivr.net/npm/@deot/helper-dom@1.1.5/+esm',
-				'@deot/helper-emitter': 'https://cdn.jsdelivr.net/npm/@deot/helper-emitter@1.1.3/+esm',
-				'@deot/helper-fp': 'https://cdn.jsdelivr.net/npm/@deot/helper-fp@1.1.5/+esm',
-				'@deot/helper-is': 'https://cdn.jsdelivr.net/npm/@deot/helper-is@1.1.3/+esm',
-				'@deot/helper-load': 'https://cdn.jsdelivr.net/npm/@deot/helper-load@1.1.3/+esm',
-				'@deot/helper-resize': 'https://cdn.jsdelivr.net/npm/@deot/helper-resize@1.1.3/+esm',
-				'@deot/helper-route': 'https://cdn.jsdelivr.net/npm/@deot/helper-route@1.1.9/+esm',
-				'@deot/helper-scheduler': 'https://cdn.jsdelivr.net/npm/@deot/helper-scheduler@1.1.8/+esm',
-				'@deot/helper-unicode': 'https://cdn.jsdelivr.net/npm/@deot/helper-unicode@1.1.4/+esm',
-				'@deot/helper-utils': 'https://cdn.jsdelivr.net/npm/@deot/helper-utils@1.1.8/+esm',
-				'@deot/helper-validator': 'https://cdn.jsdelivr.net/npm/@deot/helper-validator@1.1.4/+esm',
-				'@deot/helper-wheel': 'https://cdn.jsdelivr.net/npm/@deot/helper-wheel@1.1.6/+esm'
 			}
 		};
+		if (window.__DOCS_RUNTIME__?.mode === 'development') {
+			window.$docs.modules = {};
+			for (const value of packages) {
+				const name = value === 'index' ? '@deot/helper' : `@deot/helper-${value}`;
+				window.$docs.modules[name] = `/__docs/module/${name}`;
+			}
+		}
 	</script>
-	<script type="module" src="https://cdn.jsdelivr.net/npm/@deot/docs-client/+esm"></script>
+	<script>
+		const entries = [
+			'https://cdn.jsdelivr.net/npm/@deot/docs-launch/+esm',
+			'https://esm.unpkg.com/@deot/docs-launch/dist/index.js'
+		];
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), 15000);
+		const fail = () => {
+			document.querySelector('#app').textContent = '文档入口加载失败，请刷新重试。';
+		};
+		Promise.any(entries.map(async (src) => {
+			const response = await fetch(src, { signal: controller.signal });
+			if (!response.ok || !/(?:java|ecma)script/i.test(response.headers.get('content-type'))) {
+				throw new Error(`Invalid launch response: ${src}`);
+			}
+			return { cdn: src.match(/^https?:.*?(?=@deot\/docs-launch)/)?.[0], source: await response.text() };
+		})).finally(() => {
+			clearTimeout(timer);
+			controller.abort();
+		}).then(({ cdn, source }) => {
+			window.$docs.runtime = { mode: 'production', ...window.$docs.runtime, cdn };
+			document.body.appendChild(Object.assign(document.createElement('script'), { type: 'module', textContent: source, onerror: fail }));
+		}).catch(fail);
+	</script>
 </body>
 </html>

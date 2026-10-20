@@ -51,7 +51,7 @@ const target = $.el('#app');
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { el } from '@deot/helper-dom';
 
@@ -207,6 +207,81 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
 | `el` / `options` | `HTMLElement \| Window` / `ScrollOptions` | 见下表 | `Promise<any>` |
+
+点击滚动后可主动中止，或再次点击另一方向替换旧动画；输出记录每次调用的完成原因和实际位置：
+
+:::playground
+<!--
+<config lang="json5">
+{ views: ['runtime', 'files'] }
+</config>
+-->
+```vue
+<script setup>
+import { onBeforeUnmount, ref } from 'vue';
+import { scrollIntoView } from '@deot/helper-dom';
+
+const scroller = ref(null);
+const target = ref(400);
+const isRunning = ref(false);
+const output = ref([]);
+let current;
+let sequence = 0;
+
+const run = (to) => {
+	if (current && isRunning.value) current.reason = '被新调用替换';
+	const call = { id: ++sequence, controller: new AbortController(), reason: '完成' };
+	current = call;
+	isRunning.value = true;
+	const node = scroller.value;
+	const from = node.scrollTop;
+	output.value = [...output.value.slice(-5), `#${call.id} 开始：${from} → ${to}`];
+	scrollIntoView(node, { from, to, duration: 1200, signal: call.controller.signal }).then(() => {
+		output.value = [...output.value.slice(-5), `#${call.id} ${call.reason}：Promise resolve，当前位置 ${node.scrollTop}`];
+		if (current === call) isRunning.value = false;
+	});
+};
+
+const abort = () => {
+	if (!isRunning.value) return;
+	current.reason = '主动中止';
+	current.controller.abort();
+};
+
+onBeforeUnmount(() => current?.controller.abort());
+</script>
+
+<template>
+	<div class="demo">
+		<label>目标位置 <input v-model.number="target" type="number" min="0" max="540"></label>
+		<div class="controls">
+			<button @click="run(Math.min(540, Math.max(0, Number(target) || 0)))">滚动到目标</button>
+			<button @click="run(0)">滚动回顶部</button>
+			<button :disabled="!isRunning" @click="abort">中止</button>
+		</div>
+		<div ref="scroller" class="scroller"><div class="content">起点<div>终点</div></div></div>
+		<pre>{{ output.join('\n') || '等待操作' }}</pre>
+	</div>
+</template>
+
+<style>
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+label, .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+input, button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+input { width: 100px; }
+button { cursor: pointer; background: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+.scroller { height: 160px; overflow: auto; border: 1px solid #cbd5e1; border-radius: 8px; }
+.content {
+	display: flex; height: 700px; padding: 12px; flex-direction: column; justify-content: space-between;
+	box-sizing: border-box; color: #166534; background: #f0fdf4;
+}
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
+</style>
+```
+:::
+
+`from` 默认是 `0`，不是当前滚动位置；需要接续动画时请传入元素当前的 `scrollTop`。`signal` 已中止时不会开始滚动。取消只停止后续动画帧，不会自动回到起点，也不会抛出 `AbortError`。
 
 #### `ScrollerOptions`
 

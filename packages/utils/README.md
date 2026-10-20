@@ -39,7 +39,7 @@ Utils.preZero(8); // '08'
 | --- | --- | --- | --- |
 | `fn` / `wait` / `options` | `Function` / `number` / `DebounceOptions` | `0` / 见下表 | `Function & { cancel; flush }` |
 
-连续触发三次防抖函数，查看最终执行次数：
+调整触发选项后连续调用，观察首沿/尾沿的执行时机；`cancel()` 丢弃等待调用，`flush()` 立即执行待处理的尾沿调用：
 
 :::playground
 <!--
@@ -51,35 +51,55 @@ Utils.preZero(8); // '08'
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
-import { ref } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { debounce } from '@deot/helper-utils';
 
-const output = ref({ status: '点击运行' });
+const input = ref('helper');
+const wait = ref(400);
+const leading = ref(false);
+const trailing = ref(true);
+const output = ref([]);
+let debounced;
+let start;
 
-const run = () => {
-	const logs = [];
-	const debounced = debounce(() => {
-		logs.push('执行 trailing 调用');
-		output.value = { calls: logs.length, logs };
-	}, 30);
-	debounced(); debounced(); debounced();
-	output.value = { status: '等待 30ms', triggerCount: 3, calls: 0 };
-};
+watch([wait, leading, trailing], () => {
+	debounced?.cancel();
+	output.value = [];
+	start = performance.now();
+	debounced = debounce((value) => {
+		output.value = [...output.value.slice(-7), { value, elapsed: Math.round(performance.now() - start) }];
+	}, Math.max(20, Number(wait.value) || 400), { leading: leading.value, trailing: trailing.value });
+}, { immediate: true });
+
+const trigger = () => debounced(input.value);
+const burst = () => ['A', 'B', 'C'].forEach(value => debounced(value));
+onBeforeUnmount(() => debounced.cancel());
 </script>
 
 <template>
 	<div class="demo">
-		<button @click="run">连续触发三次</button>
-		<strong>输出</strong>
+		<label>输入 <input v-model="input"></label>
+		<label>等待毫秒 <input v-model.number="wait" type="number" min="20"></label>
+		<div class="controls">
+			<label><input v-model="leading" type="checkbox">leading</label><label><input v-model="trailing" type="checkbox">trailing</label>
+		</div>
+		<div class="controls">
+			<button @click="trigger">触发一次</button><button @click="burst">连续触发 A / B / C</button>
+			<button @click="debounced.cancel()">cancel</button><button @click="debounced.flush()">flush</button>
+		</div>
+		<strong>实际执行记录（elapsed：配置后经过的毫秒数）</strong>
 		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
 	</div>
 </template>
 
 <style>
-.demo { display: grid; width: min(100%, 640px); gap: 12px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-button { width: fit-content; padding: 6px 10px; cursor: pointer; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
-pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input:not([type="checkbox"]) { width: 160px; max-width: 100%; box-sizing: border-box; }
+.demo input[type="checkbox"] { width: auto; padding: 0; }
+.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { width: fit-content; cursor: pointer; color: #0f172a; background: #fff; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
 </style>
 ```
 :::
@@ -92,7 +112,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- | --- |
 | `fn` / `wait` / `options` | `Function` / `number` / `ThrottleOptions` | `0` / 见下表 | `Function & { cancel; flush }` |
 
-在一个时间窗口内连续触发，查看节流后的执行次数：
+在同一个时间窗口内连续触发，或多次点击按钮；与防抖不同，后续调用不会不断延后窗口结束时间：
 
 :::playground
 <!--
@@ -102,29 +122,55 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
-import { ref } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { throttle } from '@deot/helper-utils';
 
-const output = ref({ status: '点击运行' });
-const run = () => {
-	let calls = 0;
-	const throttled = throttle(() => {
-		calls += 1;
-		output.value = { triggerCount: 5, calls };
-	}, 40);
-	for (let i = 0; i < 5; i++) throttled();
-};
+const input = ref('helper');
+const wait = ref(400);
+const leading = ref(true);
+const trailing = ref(true);
+const output = ref([]);
+let throttled;
+let start;
+
+watch([wait, leading, trailing], () => {
+	throttled?.cancel();
+	output.value = [];
+	start = performance.now();
+	throttled = throttle((value) => {
+		output.value = [...output.value.slice(-7), { value, elapsed: Math.round(performance.now() - start) }];
+	}, Math.max(20, Number(wait.value) || 400), { leading: leading.value, trailing: trailing.value });
+}, { immediate: true });
+
+const trigger = () => throttled(input.value);
+const burst = () => ['A', 'B', 'C'].forEach(value => throttled(value));
+onBeforeUnmount(() => throttled.cancel());
 </script>
 
 <template>
-	<div class="demo"><button @click="run">连续触发五次</button><pre>{{ JSON.stringify(output, null, 2) }}</pre></div>
+	<div class="demo">
+		<label>输入 <input v-model="input"></label>
+		<label>等待毫秒 <input v-model.number="wait" type="number" min="20"></label>
+		<div class="controls">
+			<label><input v-model="leading" type="checkbox">leading</label><label><input v-model="trailing" type="checkbox">trailing</label>
+		</div>
+		<div class="controls">
+			<button @click="trigger">触发一次</button><button @click="burst">连续触发 A / B / C</button>
+			<button @click="throttled.cancel()">cancel</button><button @click="throttled.flush()">flush</button>
+		</div>
+		<strong>实际执行记录（elapsed：配置后经过的毫秒数）</strong>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
+	</div>
 </template>
 
 <style>
 .demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-button { width: fit-content; padding: 6px 10px; cursor: pointer; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
-pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
+.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input:not([type="checkbox"]) { width: 160px; max-width: 100%; box-sizing: border-box; }
+.demo input[type="checkbox"] { width: auto; padding: 0; }
+.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { width: fit-content; cursor: pointer; color: #0f172a; background: #fff; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
 </style>
 ```
 :::
@@ -137,6 +183,17 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- | --- |
 | `wait` / `immediate` | `number \| { min: number; max: number }` / `(timer, duration, done) => any` | `0` | `Promise<void>` |
 
+```ts
+import { sleep } from '@deot/helper-utils';
+
+await sleep(100); // 约 100ms 后继续
+await sleep({ min: 100, max: 200 }); // 在区间内随机等待
+await sleep(1000, (timer, duration, done) => {
+	clearTimeout(timer); // 提前完成时，调用方负责清理原定时器
+	done(); // 不再等待 1000ms
+});
+```
+
 #### `autoCatch(impl, options?)`
 
 执行并等待实现，捕获异常后交给 onError
@@ -145,6 +202,20 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- | --- |
 | `impl` / `options` | `any \| (() => any)` / `{ onError?: (error) => any }` | `onError: console.error` | `Promise<any \| undefined>` |
 
+```ts
+import { autoCatch } from '@deot/helper-utils';
+
+const errors: string[] = [];
+const options = { onError: (error: Error) => errors.push(error.message) };
+
+await autoCatch(() => 42, options); // 42
+await autoCatch(() => { throw new Error('同步错误'); }, options); // undefined
+await autoCatch(() => Promise.reject(new Error('异步错误')), options); // undefined
+// errors: ['同步错误', '异步错误']
+```
+
+不要用返回值是否为 `undefined` 判断成功：实现函数本身也可能成功返回 `undefined`。如果需要区分失败，请在 `onError` 中记录状态。
+
 #### `toPromise(target, promise)`
 
 为无 then/catch/finally 的对象附加对应方法
@@ -152,6 +223,16 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `target` / `promise` | `object` / `Promise<T>` | `target & PromiseLike<T>` |
+
+```ts
+import { toPromise } from '@deot/helper-utils';
+
+const target = toPromise({ id: 'job-1' }, Promise.resolve(42));
+target.id; // 'job-1'
+await target; // 42；同一对象同时保留业务属性与 then/catch/finally
+```
+
+`target` 如果已经具有 `then`、`catch` 或 `finally`，会抛出错误；该方法不是任意对象的通用 Promise 转换器。
 
 #### `rAF(callback)`
 
@@ -269,7 +350,7 @@ const text = ref('13812345678');
 const from = ref(3);
 const length = ref(4);
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
+
 const output = computed(() => asterisk(text.value, Number(from.value), Number(length.value)));
 </script>
 
@@ -313,7 +394,7 @@ const output = computed(() => asterisk(text.value, Number(from.value), Number(le
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { cloneDeepEasier } from '@deot/helper-utils';
 
@@ -364,6 +445,14 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- | --- |
 | `value` / `parser` / `exit` | `any` / `(value) => any` / `(value) => boolean` | `decodeURIComponent` | `any` |
 
+```ts
+import { flatten } from '@deot/helper-utils';
+
+flatten('%2526'); // '&'，连续解码两层
+flatten('%E0%A4%A'); // '%E0%A4%A'，解码异常时保留最后的值
+flatten('%2526', decodeURIComponent, value => value === '%26'); // '%26'，主动停止
+```
+
 #### `flattenJSONParse(value)`
 
 递归 JSON 解析，并保护超长整数和整段科学计数字符串
@@ -371,6 +460,19 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `value` | `string \| null` | `any` |
+
+```ts
+import { flattenJSONParse } from '@deot/helper-utils';
+
+flattenJSONParse('false'); // false
+flattenJSONParse('0'); // 0
+flattenJSONParse('{"name":"Deot"}'); // { name: 'Deot' }
+flattenJSONParse('9007199254740992'); // '9007199254740992'，保护超出安全范围的正整数字符串
+flattenJSONParse('1E1'); // '1E1'，保留整段科学计数字符串
+flattenJSONParse('not-json'); // 'not-json'，无法解析时原样返回
+```
+
+它不是严格 JSON 校验器；数字保护也不覆盖任意格式的大数，业务金额等精度敏感数据应显式保留字符串。
 
 #### `generateString(size?, alphabet?)`
 
@@ -387,6 +489,16 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `target` / `path` | `object` / `string` | `{ o: object; k: PropertyKey; v: any }` |
+
+```ts
+import { getPropByPath } from '@deot/helper-utils';
+
+const source = { users: [{ name: 'Deot' }] };
+const { o, k, v } = getPropByPath(source, 'users[0].name');
+// o === source.users[0]；k === 'name'；v === 'Deot'
+getPropByPath(source, 'users[0].missing').v; // undefined，末级属性可以不存在
+// getPropByPath(source, 'missing.name'); // 抛出 Error('无效路径!')，中间路径必须存在
+```
 
 #### `getUid(prefix?)`
 
@@ -428,7 +540,7 @@ import { numberToUnit } from '@deot/helper-utils';
 const value = ref(123456789);
 const digits = ref(2);
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
+
 const output = computed(() => numberToUnit(Number(value.value), Number(digits.value)));
 </script>
 <template>
@@ -469,7 +581,7 @@ import { preZero } from '@deot/helper-utils';
 
 const value = ref(8);
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
+
 const output = computed(() => preZero(Number(value.value)));
 </script>
 <template>
@@ -521,7 +633,7 @@ input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { canvasToImage, compressImage, dataURLToFile } from '@deot/helper-utils';
 

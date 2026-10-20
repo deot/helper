@@ -37,7 +37,7 @@ Is.string('value');
 | --- | --- | --- |
 | `value`、`typeName` | `any`、`string` | `boolean` |
 
-输入值和 `typeof` 类型名，查看 `type()` 的判断结果：
+选择真实的 JavaScript 值和 `typeof` 类型名，对照 `type()` 与常用判断函数的结果：
 
 :::playground
 <!--
@@ -50,33 +50,62 @@ Is.string('value');
 ```vue
 <script setup>
 import { computed, ref } from 'vue';
-import { type } from '@deot/helper-is';
+import { array, arrayBuffer, arrayBufferView, date, nil, number, object, plainObject, string, type, typedArray, undef } from '@deot/helper-is';
 
-const input = ref('helper');
+const values = [
+	{ label: '\'helper\'', value: 'helper' },
+	{ label: '123', value: 123 },
+	{ label: 'false', value: false },
+	{ label: 'null', value: null },
+	{ label: 'undefined', value: undefined },
+	{ label: 'NaN', value: NaN },
+	{ label: '[1, 2]', value: [1, 2] },
+	{ label: '{ a: 1 }', value: { a: 1 } },
+	{ label: 'new String(\'helper\')', value: new String('helper') },
+	{ label: 'new Date()', value: new Date() },
+	{ label: 'new ArrayBuffer(4)', value: new ArrayBuffer(4) },
+	{ label: 'new DataView(new ArrayBuffer(4))', value: new DataView(new ArrayBuffer(4)) },
+	{ label: 'new Uint8Array([1, 2])', value: new Uint8Array([1, 2]) }
+];
+const selected = ref(0);
 const typeName = ref('string');
-// Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
-const output = computed(() => type(input.value, typeName.value));
+const tests = { nil, undef, string, number, array, object, plainObject, date, arrayBuffer, arrayBufferView, typedArray };
+const output = computed(() => {
+	const { label, value } = values[selected.value];
+	return {
+		input: label,
+		typeof: typeof value,
+		type: type(value, typeName.value),
+		...Object.fromEntries(Object.entries(tests).map(([name, test]) => [name, test(value)]))
+	};
+});
 </script>
 
 <template>
 	<div class="demo">
-		<label>值 <input v-model="input"></label>
-		<label>类型名 <input v-model="typeName"></label>
+		<label>输入值 <select v-model="selected">
+			<option v-for="(item, index) in values" :key="index" :value="index">{{ item.label }}</option>
+		</select></label>
+		<label>类型名 <select v-model="typeName">
+			<option v-for="name in ['string', 'number', 'boolean', 'object', 'undefined', 'function', '']" :key="name" :value="name">
+				{{ name || '不传类型名' }}
+			</option>
+		</select></label>
 		<strong>输出</strong>
-		<pre>{{ output }}</pre>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
 	</div>
 </template>
 
 <style>
 .demo { display: grid; width: min(100%, 640px); gap: 12px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-.demo label { display: grid; gap: 6px; }
-.demo input, .demo pre { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
-.demo input { width: 100%; max-width: 320px; box-sizing: border-box; }
-.demo pre { margin: 0; background: #f8fafc; }
+.demo label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo select { max-width: 100%; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
 </style>
 ```
 :::
+
+`typeof null` 是 `'object'`，但 `object(null)` 为 `false`；`number(NaN)` 为 `true`，不能用它代替有限数值校验。`DataView` 是 ArrayBuffer view，但不是 typed array。
 
 #### `instance(value, constructor)`
 

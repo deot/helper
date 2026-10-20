@@ -177,7 +177,7 @@ observer 回调；仅在 entries 包含当前元素时通知 listeners
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Resize } from '@deot/helper-resize';
 
@@ -234,3 +234,81 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 </style>
 ```
 :::
+
+下面用同一批元素比较默认与 shared 模式。移除 A 或断开全部仅影响 shared 监听，默认监听仍然工作；重新注册后可继续观察：
+
+:::playground
+<!--
+<config lang="json5">
+{ views: ['runtime', 'files'] }
+</config>
+-->
+```vue
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { Resize } from '@deot/helper-resize';
+
+const boxes = ref([]);
+const width = ref(160);
+const active = ref([]);
+const output = ref({ defaultCalls: 0, sharedCalls: 0, entries: [] });
+const shared = { shared: true };
+
+const defaultListener = () => { output.value.defaultCalls += 1; };
+const sharedListener = (entries) => {
+	output.value.sharedCalls += 1;
+	output.value.entries = entries.map(({ target, contentRect }) => ({ id: target.dataset.id, width: contentRect.width }));
+};
+const register = () => {
+	boxes.value.forEach(node => Resize.on(node, sharedListener, shared));
+	active.value = ['A', 'B'];
+};
+const removeA = () => {
+	const node = boxes.value.find(item => item.dataset.id === 'A');
+	Resize.off(node, sharedListener, shared);
+	active.value = active.value.filter(id => id !== 'A');
+	output.value.entries = [];
+};
+const disconnect = () => {
+	Resize.disconnect(sharedListener);
+	active.value = [];
+	output.value.entries = [];
+};
+
+onMounted(() => {
+	boxes.value.forEach(node => Resize.on(node, defaultListener));
+	register();
+});
+onBeforeUnmount(() => {
+	boxes.value.forEach(node => Resize.off(node, defaultListener));
+	Resize.disconnect(sharedListener);
+});
+</script>
+
+<template>
+	<div class="demo">
+		<div class="controls">
+			<button @click="width = width === 160 ? 240 : 160">同时改变宽度</button>
+			<button @click="removeA">移除 shared A</button>
+			<button @click="disconnect">断开全部 shared</button>
+			<button @click="register">重新注册 shared</button>
+		</div>
+		<div v-for="id in ['A', 'B']" :key="id" ref="boxes" class="shared-box" :data-id="id" :style="{ width: `${width}px` }">
+			{{ id }}：{{ width }}px
+		</div>
+		<div>shared 正在监听：{{ active.join('、') || '无' }}</div>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
+	</div>
+</template>
+
+<style>
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+button { padding: 5px 8px; cursor: pointer; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
+.shared-box { max-width: 100%; padding: 8px; box-sizing: border-box; border-radius: 8px; color: #166534; background: #f0fdf4; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
+</style>
+```
+:::
+
+计数包含注册后的首次尺寸通知；回调批次由浏览器决定，不应把“一帧恰好一次”作为业务保证。注销时必须使用注册时的同一个监听函数。

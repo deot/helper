@@ -64,6 +64,90 @@ try {
 | --- | --- | --- | --- |
 | `source` / `options` | `Record<string, any>` / `ValidateOptions` | 见下表 | `Promise<void>` |
 
+异步检查用户名，并同时验证对象、数组与枚举。可切换验证字段或只取首个错误，观察 `errors[].paths` 与转换前后的值：
+
+:::playground
+<!--
+<config lang="json5">
+{ views: ['runtime', 'files'] }
+</config>
+-->
+```vue
+<script setup>
+import { reactive, ref } from 'vue';
+import { RuleHelper, Validator } from '@deot/helper-validator';
+
+const form = reactive({ username: ' taken ', city: '', member: '', role: 'reader' });
+const field = ref('');
+const first = ref(false);
+const isRunning = ref(false);
+const output = ref({ status: '等待验证' });
+
+const run = async () => {
+	isRunning.value = true;
+	const input = { username: form.username, profile: { city: form.city }, users: [{ name: 'Deot' }, { name: form.member }], role: form.role };
+	const transforms = [];
+	const validator = new Validator({
+		username: [
+			{ required: true, transform: value => value.trim(), message: '用户名必填' },
+			{
+				transform: (value, { paths, original }) => {
+					const result = value.trim();
+					transforms.push({ paths, before: value, after: result, original });
+					return result;
+				},
+				validate: async (value) => {
+					await new Promise(resolve => setTimeout(resolve, 180));
+					if (value === 'taken') throw new Error('用户名已被占用');
+				}
+			}
+		],
+		profile: { fields: { city: RuleHelper.required('城市必填') } },
+		users: { fields: { name: RuleHelper.create({ name: '成员姓名', required: true, maxlength: 8 }) } },
+		role: { enum: ['reader', 'editor'], message: '角色必须是 reader 或 editor' }
+	});
+	try {
+		await validator.validate(input, { fields: field.value ? [field.value] : undefined, first: first.value, original: { form: '用户设置' } });
+		output.value = { status: '通过', input, transforms };
+	} catch (errors) {
+		output.value = { status: '未通过', input, transforms, errors };
+	} finally {
+		isRunning.value = false;
+	}
+};
+</script>
+
+<template>
+	<div class="demo">
+		<label>用户名 <input v-model="form.username" placeholder="taken 会触发异步错误"></label>
+		<label>城市 <input v-model="form.city"></label>
+		<label>第二位成员 <input v-model="form.member"></label>
+		<label>角色 <input v-model="form.role"></label>
+		<label>验证字段 <select v-model="field">
+			<option value="">全部</option>
+			<option v-for="name in ['username', 'profile', 'users', 'role']" :key="name">{{ name }}</option>
+		</select></label>
+		<label class="check"><input v-model="first" type="checkbox">只取首个错误</label>
+		<button :disabled="isRunning" @click="run">{{ isRunning ? '验证中…' : '验证' }}</button>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
+	</div>
+</template>
+
+<style>
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+.demo label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input:not([type="checkbox"]) { width: 180px; max-width: 100%; box-sizing: border-box; }
+.demo input[type="checkbox"] { width: auto; padding: 0; }
+.demo input, .demo select, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { width: fit-content; cursor: pointer; color: #0f172a; background: #fff; }
+.demo button:disabled { opacity: .5; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
+</style>
+```
+:::
+
+`transform` 只影响当前规则接收的值，不会修改 `source`，也不会把转换结果传给下一条规则。异步 `validate` 需要通过 throw/reject 表示失败；resolve 出 `false` 不会被当作失败。`first` 限制错误收集，`fields` 选择顶层字段名，二者都不改变原始输入。
+
 #### `Validator.falsy`
 
 required 规则认定为空的值；数字 `0` 不为空
@@ -122,7 +206,7 @@ const validator = new Validator({
 });
 
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
+
 const run = async () => {
 	try {
 		await validator.validate(form);
@@ -224,7 +308,7 @@ const describeRules = rules => rules
 	.join(' | ');
 
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
+
 const output = computed(() => {
 	const validator = new Validator();
 	validator.updateRules({ value: RuleHelper.create({
@@ -299,6 +383,13 @@ const validator = new Validator({
 		}
 	}
 });
+
+try {
+	await validator.validate({ users: [{ name: 'Deot' }, { name: '' }] });
+} catch (errors) {
+	// errors[0].paths 为 ['users', 1, 'name']
+	// errors[0].message 为 '姓名必填'
+}
 ```
 
 内置正则只用于通用格式校验，不应替代业务层规则或权威数据源验证。

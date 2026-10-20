@@ -57,7 +57,7 @@ import { FP } from '@deot/helper';
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { curry } from '@deot/helper-fp';
 
@@ -105,6 +105,14 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fns` | `Function[]` | `Function` |
 
+```ts
+import { compose } from '@deot/helper-fp';
+
+const double = (value: number) => value * 2;
+const increment = (value: number) => value + 1;
+compose(double, increment)(3); // 8：先 3 + 1，再乘 2
+```
+
 #### `pipe(...fns)`
 
 从左向右组合函数
@@ -112,6 +120,16 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `fns` | `Function[]` | `Function` |
+
+```ts
+import { pipe } from '@deot/helper-fp';
+
+const double = (value: number) => value * 2;
+const increment = (value: number) => value + 1;
+pipe(double, increment)(3); // 7：先 3 * 2，再加 1
+```
+
+两者都同步传递返回值，不会自动 await Promise；异步链可结合 `then$` / `catch$`。
 
 #### `partial(fn, ...args)`
 
@@ -121,6 +139,16 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fn` / `args` | `Function` / `any[]` | `Function` |
 
+```ts
+import { partial } from '@deot/helper-fp';
+
+const format = (prefix: string, name: string, suffix: string) => `${prefix}${name}${suffix}`;
+partial(format, '你好，')('Deot', '！'); // '你好，Deot！'
+partial(format, partial.placeholder, 'Deot')('Hello, ', '!'); // 'Hello, Deot!'
+```
+
+`partial.placeholder` 就是 `partial` 自身，用它标记需要从后续调用补入的位置；剩余实参会追加到末尾。
+
 #### `then$(fn, thenable)`
 
 调用 `thenable.then(fn)`
@@ -128,6 +156,13 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `fn` / `thenable` | `Function` / `PromiseLike<any>` | `PromiseLike<any>` |
+
+```ts
+import { pipe, then$ } from '@deot/helper-fp';
+
+const doubleAsync = pipe(Promise.resolve.bind(Promise), then$((value: number) => value * 2));
+await doubleAsync(3); // 6
+```
 
 #### `catch$(fn, promise)`
 
@@ -137,6 +172,13 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fn` / `promise` | `Function` / `Promise<any>` | `Promise<any>` |
 
+```ts
+import { catch$ } from '@deot/helper-fp';
+
+await catch$((error: Error) => `fallback: ${error.message}`, Promise.reject(new Error('offline')));
+// 'fallback: offline'；也支持 catch$(fn)(promise)
+```
+
 #### `memoize(fn, resolver?)`
 
 按首个参数或 resolver 返回值缓存结果
@@ -144,6 +186,21 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `fn` / `resolver` | `Function` / `Function` | `Function` |
+
+```ts
+import { memoize } from '@deot/helper-fp';
+
+let calls = 0;
+const sum = memoize((a: number, b: number) => { calls += 1; return a + b; });
+sum(1, 2); // 3
+sum(1, 9); // 3；默认只用第一个实参作键，calls 仍为 1
+
+const pairSum = memoize((a: number, b: number) => a + b, (a: number, b: number) => JSON.stringify([a, b]));
+pairSum(1, 2); // 3
+pairSum(1, 9); // 10；resolver 区分全部实参
+```
+
+缓存不会自动过期；无形参（`fn.length === 0`）的函数会被原样返回，不创建缓存。
 
 #### `map(fn, value)`
 
@@ -153,6 +210,13 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fn` / `value` | `Function` / `any[] \| object` | `any[] \| object` |
 
+```ts
+import { map } from '@deot/helper-fp';
+
+map((value: number) => value * 2)([1, 2]); // [2, 4]
+map((value: number) => value * 2, { a: 1, b: 2 }); // { a: 2, b: 4 }
+```
+
 #### `filter(fn, value)`
 
 筛选数组或对象值
@@ -161,6 +225,13 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fn` / `value` | `Function` / `any[] \| object` | `any[] \| object` |
 
+```ts
+import { filter } from '@deot/helper-fp';
+
+filter((value: number) => value > 1)([1, 2, 3]); // [2, 3]
+filter((value: number) => value > 1, { a: 1, b: 2 }); // { b: 2 }
+```
+
 #### `reduce(fn, initialValue, value)`
 
 从左向右归并数组
@@ -168,6 +239,12 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `fn` / `initialValue` / `value` | `Function` / `any` / `any[]` | `any` |
+
+```ts
+import { reduce } from '@deot/helper-fp';
+
+reduce((sum: number, value: number) => sum + value, 0)([1, 2, 3]); // 6
+```
 
 #### `reverse(value)`
 
@@ -229,6 +306,14 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `fn` / `value` | `Function` / `any` | `any` |
 
+```ts
+import { pipe, tap } from '@deot/helper-fp';
+
+const logs: number[] = [];
+pipe(tap((value: number) => logs.push(value)), (value: number) => value * 2)(3); // 6
+// logs: [3]；tap 返回输入 3，而不是 push 的返回值
+```
+
 #### `alternation(first, second)`
 
 first 结果为 falsy 时执行 second
@@ -236,6 +321,14 @@ first 结果为 falsy 时执行 second
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `first` / `second` | `Function` / `Function` | `Function` |
+
+```ts
+import { alternation } from '@deot/helper-fp';
+
+const display = alternation((value: string) => value.trim(), () => '匿名');
+display(' Deot '); // 'Deot'
+display('   '); // '匿名'；0、false 等其它 falsy 结果同样触发后备分支
+```
 
 #### `sequence(...fns)`
 
@@ -245,6 +338,14 @@ first 结果为 falsy 时执行 second
 | --- | --- | --- |
 | `fns` | `Function[]` | `(value?: any) => void` |
 
+```ts
+import { sequence } from '@deot/helper-fp';
+
+const logs: string[] = [];
+sequence((value: number) => logs.push(`A:${value}`), (value: number) => logs.push(`B:${value}`))(3);
+// logs: ['A:3', 'B:3']；两个函数收到同一个输入，不传递前一步结果
+```
+
 #### `fork(join, left, right)`
 
 对同一输入执行两个分支，再由 join 合并
@@ -252,6 +353,17 @@ first 结果为 falsy 时执行 second
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `join` / `left` / `right` | `Function` / `Function` / `Function` | `Function` |
+
+```ts
+import { fork } from '@deot/helper-fp';
+
+const average = fork(
+	(sum: number, count: number) => sum / count,
+	(values: number[]) => values.reduce((sum, value) => sum + value, 0),
+	(values: number[]) => values.length
+);
+average([2, 4, 6]); // 4
+```
 
 ### Pointed
 
@@ -494,7 +606,7 @@ IO 函数式容器的创建、映射与取值 API。
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { Either, IO, Maybe, Monad, Pointed, Task } from '@deot/helper-fp';
 
@@ -700,6 +812,12 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `collection` / `done` | `any[] \| ((value) => any[] \| Promise<any[]>)` / `Function` | `Task` |
 
+```ts
+import { Task } from '@deot/helper-fp';
+
+await Task.of(10).reduce([1, 2, 3], async (sum, value) => sum + value).toPromise(); // 16
+```
+
 #### `Task.start()` / `Task.immediate()`
 
 从父节点开始任务链
@@ -760,6 +878,89 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | `record` | `[string, Function] \| null` | `restart()` 重建任务链时使用的方法记录 |
 | `_ready` / `_pasuer` | `Function` | 解除启动或暂停门闩的实现回调，不建议直接调用 |
 
+输入初始值，串行执行“加一 → 乘二”。运行过程中可以暂停、恢复或取消；`restart()` 会创建并启动一条新链：
+
+:::playground
+<!--
+<config lang="json5">
+{ views: ['runtime', 'files'] }
+</config>
+-->
+```vue
+<script setup>
+import { onBeforeUnmount, ref } from 'vue';
+import { Task } from '@deot/helper-fp';
+
+const input = ref(10);
+const status = ref('未开始');
+const isPaused = ref(false);
+const output = ref({});
+let task;
+let generation = 0;
+const wait = () => new Promise(resolve => setTimeout(resolve, 600));
+
+const observe = (node) => {
+	task = node;
+	const id = ++generation;
+	status.value = '运行中';
+	isPaused.value = false;
+	output.value = {};
+	node.toPromise().then((result) => {
+		if (id !== generation) return;
+		status.value = '已完成';
+		output.value = { result, valueOf: node.valueOf(), toString: node.toString(), isComplete: node.isComplete };
+	}, (error) => {
+		if (id === generation) { status.value = '失败'; output.value = { error: String(error) }; }
+	});
+};
+const run = () => {
+	task?.cancel();
+	observe(Task.of(Number(input.value) || 0)
+		.map(async (value) => { await wait(); return value + 1; })
+		.map(async (value) => { await wait(); return value * 2; }));
+};
+const pause = () => { task.pasue(); isPaused.value = true; status.value = '已暂停'; };
+const resume = () => { task.resume(); isPaused.value = false; status.value = '运行中'; };
+const cancel = () => {
+	task.cancel();
+	generation += 1;
+	isPaused.value = false;
+	status.value = '已取消';
+	output.value = { isCancel: task.isCancel, isComplete: task.isComplete };
+};
+const restart = () => observe(task.restart());
+onBeforeUnmount(() => { generation += 1; task?.cancel(); });
+</script>
+
+<template>
+	<div class="demo">
+		<label>初始值 <input v-model.number="input" type="number"></label>
+		<div class="controls">
+			<button @click="run">新建并运行</button>
+			<button :disabled="status !== '运行中'" @click="pause">暂停</button>
+			<button :disabled="!isPaused" @click="resume">恢复</button>
+			<button :disabled="!['运行中', '已暂停'].includes(status)" @click="cancel">取消</button>
+			<button :disabled="!task" @click="restart">restart 原始输入</button>
+		</div>
+		<div>{{ status }}（每一步约 600ms）</div>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
+	</div>
+</template>
+
+<style>
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input { width: 100px; }
+.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { cursor: pointer; color: #0f172a; background: #fff; }
+.demo button:disabled { opacity: .5; cursor: default; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
+</style>
+```
+:::
+
+暂停在任务节点之间生效，不会中止已经进入的异步函数。取消后的原链 Promise 可能保持 pending，不能靠 `await task.toPromise()` 等待取消完成；`restart()` 返回新 Task，必须使用其返回值。底层请求和定时器的清理仍由调用方负责。
+
 ### Job
 
 按固定间隔重复执行任务，适合轮询或周期工作。
@@ -800,7 +1001,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `Job.restart()`
 
-清理中断状态并重新执行
+清除取消状态并重新执行；不会自动解除暂停，暂停中的任务应先 `resume()`
 
 | 返回值 |
 | --- |
@@ -815,6 +1016,77 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | `leaf` | `Task \| (() => Promise<any>)` | 原始任务 | `any` |
 
 `Job` 还公开 `original`、`task`、`interval`、`isStart`，以及继承自 `ATask` 的中断状态。它会发布 `fulfilled`、`rejected` 事件。
+
+下面依次演示启动、暂停、恢复、取消和重启。每一轮输出序号；暂停和取消后等待一个间隔，验证序号停止增长，再进入下一阶段：
+
+:::playground
+<!--
+<config lang="json5">
+{ views: ['runtime', 'files'] }
+</config>
+-->
+```vue
+<script setup>
+import { onBeforeUnmount, ref } from 'vue';
+import { Job } from '@deot/helper-fp';
+
+const interval = ref(200);
+const isRunning = ref(false);
+const output = ref([]);
+let job;
+let isDisposed = false;
+
+const run = async () => {
+	isRunning.value = true;
+	output.value = [];
+	let tick = 0;
+	const delay = Math.max(50, Number(interval.value) || 200);
+	const current = Job.of(async () => ++tick, delay);
+	job = current;
+	const next = action => new Promise(resolve => current.once('fulfilled', (value) => { action(); resolve(value); }));
+	const wait = () => new Promise(resolve => setTimeout(resolve, delay + 50));
+	const first = next(() => current.pasue());
+	current.start();
+	output.value.push({ method: 'start → pasue', value: await first });
+	await wait();
+	if (isDisposed) return;
+	output.value.push({ method: '暂停后等待一个间隔', tick, isPasue: current.isPasue });
+	const second = next(() => current.cancel());
+	current.resume();
+	output.value.push({ method: 'resume → cancel', value: await second });
+	await wait();
+	if (isDisposed) return;
+	output.value.push({ method: '取消后等待一个间隔', tick, isCancel: current.isCancel });
+	const third = next(() => current.cancel());
+	current.restart();
+	output.value.push({ method: 'restart → cancel', value: await third });
+	isRunning.value = false;
+};
+
+onBeforeUnmount(() => { isDisposed = true; job?.cancel(); });
+</script>
+
+<template>
+	<div class="demo">
+		<label>间隔毫秒 <input v-model.number="interval" type="number" min="50" :disabled="isRunning"></label>
+		<button :disabled="isRunning" @click="run">{{ isRunning ? '执行中…' : '运行生命周期' }}</button>
+		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
+	</div>
+</template>
+
+<style>
+.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
+.demo label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input { width: 100px; }
+.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { width: fit-content; cursor: pointer; color: #0f172a; background: #fff; }
+.demo button:disabled { opacity: .5; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
+</style>
+```
+:::
+
+`interval` 是每轮任务完成后再等待的时间，不是固定时钟的触发频率。函数形式的任务在暂停或取消时不会中断已进入的函数；不要在上一次调用尚未结束时反复 `restart()`，网络请求仍需自行处理 `AbortSignal`。
 
 ### Parallel
 
@@ -864,7 +1136,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `Parallel.restart()`
 
-取消后恢复原始任务并重新启动
+取消后恢复原始任务并重新启动；不会自动解除暂停，暂停中的任务应先 `resume()`
 
 | 返回值 |
 | --- |
@@ -888,7 +1160,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 `Parallel` 公开 `original`、`task`、`tasks`、`concurrency`、`options`、`isStart`、`target` 和 `_target` 状态。`target` 是当前 `start()` Promise，`_target` 保存其 resolve/reject；后两者属于实现状态，不建议业务代码修改。
 
-输入初始值和并发数，分别查看串行归并、周期任务的主动结束，以及并发任务的完成顺序：
+调整并发数和错误策略，观察调度完成事件。运行中可以修改并发数、暂停、恢复或取消；结束后 `restart()` 重新执行同一组任务：
 
 :::playground
 <!--
@@ -900,76 +1172,93 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
 import { onBeforeUnmount, ref } from 'vue';
-import { Job, Parallel, Task } from '@deot/helper-fp';
+import { Parallel } from '@deot/helper-fp';
 
-const input = ref(10);
 const concurrency = ref(2);
-const output = ref({ status: '点击运行' });
-let activeJob;
+const skipError = ref(true);
+const fail = ref(false);
+const status = ref('未开始');
+const isControlling = ref(false);
+const output = ref([]);
+let parallel;
 
-const run = async () => {
-	activeJob?.cancel();
-	const value = Number(input.value) || 0;
-	const task = Task.of(value).reduce([1, 2, 3], (sum, item) => sum + item);
-	const taskResult = await task.toPromise();
-
-	let tick = 0;
-	const jobValues = [];
-	activeJob = Job.of(async () => ++tick, 20);
-	await new Promise((resolve) => {
-		activeJob.on('fulfilled', (result) => {
-			jobValues.push(result);
-			if (jobValues.length === 3) {
-				activeJob.cancel();
-				resolve();
-			}
-		});
-		activeJob.start();
-	});
-
-	const parallelValues = [];
-	const delays = [45, 10, 25, 5];
-	const parallel = Parallel.of(
-		delays.map((delay, index) => () => new Promise((resolve) => {
-			setTimeout(() => resolve(`任务 ${index + 1}（${delay}ms）`), delay);
-		})),
-		Math.max(1, Number(concurrency.value) || 1)
+const run = () => {
+	output.value = [];
+	const shouldFail = fail.value;
+	parallel = Parallel.of(
+		[1, 2, 3, 4, 5, 6].map(id => async () => {
+			await new Promise(resolve => setTimeout(resolve, id % 2 ? 600 : 400));
+			if (shouldFail && id === 4) throw new Error('任务 4 失败');
+			return { id };
+		}),
+		Math.max(1, Math.floor(Number(concurrency.value) || 1)),
+		{ skipError: skipError.value }
 	);
-	parallel.on('fulfilled', result => parallelValues.push(result));
-	await parallel.start();
-
-	output.value = {
-		task: { input: value, collection: [1, 2, 3], result: taskResult },
-		job: { values: jobValues, isCancel: activeJob.isCancel },
-		parallel: { concurrency: parallel.concurrency, fulfilled: parallelValues }
-	};
+	parallel.on('fulfilled', value => output.value.push({ event: 'fulfilled', ...value }));
+	parallel.on('rejected', error => output.value.push({ event: 'rejected', message: error.message }));
+	observe(parallel.start());
 };
-
-onBeforeUnmount(() => activeJob?.cancel());
+const observe = (promise) => {
+	status.value = '运行中';
+	promise.then(() => { status.value = '已完成'; }, (error) => {
+		status.value = '异常结束';
+		output.value.push({ startPromise: 'reject', message: error.message });
+	});
+};
+const setConcurrency = () => {
+	const actual = parallel.setConcurrency(Math.max(1, Math.floor(Number(concurrency.value) || 1)));
+	output.value.push({ method: 'setConcurrency', value: actual });
+};
+const pause = () => { parallel.pasue(); status.value = '已暂停'; };
+const resume = () => { parallel.resume(); status.value = '运行中'; };
+const cancel = async () => {
+	isControlling.value = true;
+	if (parallel.isPasue) parallel.resume();
+	await parallel.cancel();
+	status.value = '已取消';
+	isControlling.value = false;
+};
+const restart = () => { output.value = []; observe(parallel.restart()); };
+onBeforeUnmount(() => parallel?.cancel());
 </script>
 
 <template>
 	<div class="demo">
-		<label>初始值 <input v-model="input" type="number"></label>
-		<label>并发数 <input v-model="concurrency" type="number" min="1" max="4"></label>
-		<button @click="run">运行任务分组</button>
-		<strong>输出</strong>
+		<label>并发数 <input v-model.number="concurrency" type="number" min="1" max="6"></label>
+		<div class="controls">
+			<label><input v-model="skipError" type="checkbox">skipError</label>
+			<label><input v-model="fail" type="checkbox">让任务 4 失败</label>
+		</div>
+		<div class="controls">
+			<button :disabled="isControlling || ['运行中', '已暂停'].includes(status)" @click="run">新建并运行</button>
+			<button :disabled="status !== '运行中' || isControlling" @click="setConcurrency">应用并发数</button>
+			<button :disabled="status !== '运行中' || isControlling" @click="pause">暂停</button>
+			<button :disabled="status !== '已暂停' || isControlling" @click="resume">恢复</button>
+			<button :disabled="!['运行中', '已暂停'].includes(status) || isControlling" @click="cancel">取消</button>
+			<button :disabled="!['已完成', '已取消'].includes(status) || isControlling" @click="restart">restart</button>
+		</div>
+		<div>{{ status }}；每个任务耗时约 400–600ms，错误策略在新建时读取。</div>
 		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
 	</div>
 </template>
 
 <style>
 .demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-label { display: grid; grid-template-columns: 72px minmax(0, 180px); align-items: center; gap: 8px; }
-input, button { min-height: 32px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
-input { width: 100%; }
-button { width: fit-content; cursor: pointer; background: #fff; }
-pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
+.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.demo input[type="number"] { width: 100px; }
+.demo input[type="checkbox"] { width: auto; padding: 0; }
+.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+.demo button { cursor: pointer; color: #0f172a; background: #fff; }
+.demo button:disabled { opacity: .5; cursor: default; }
+.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
 </style>
 ```
 :::
+
+数组任务通过 `pop()` 从末尾取出，事件按实际完成顺序发出，不保证与输入数组同序。`skipError: true` 会发出 `rejected` 后继续；`false` 会使 `start()` reject，已经开始的函数不会因此被自动中止。
+
+暂停会延后结果通知与后续调度，但不能撤销已发出的请求；不要在暂停期间提高并发数，`setConcurrency()` 本身会立即尝试补充队列。取消后原来的 `start()` Promise 保持 pending，`await cancel()` 与等待原 Promise 是两回事。
 
 ## 参考
 
