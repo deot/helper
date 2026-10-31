@@ -202,7 +202,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `scrollIntoView(el, options?)`
 
-使用 requestAnimationFrame 从 `from` 动画滚动到 `to`。同一元素上的新调用会取消未完成的旧动画；取消后（含 `signal` 中止）Promise 立即 resolve
+使用 requestAnimationFrame 从 `from` 动画滚动到 `to`，`axis: 'x'` 时为横向（`scrollLeft`），默认纵向（`scrollTop`）。同一元素同一方向上的新调用会取消未完成的旧动画，横纵向动画互不影响；取消后（含 `signal` 中止）Promise 立即 resolve
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -306,6 +306,7 @@ ScrollerOptions 的配置字段。
 | `to` | `number` | `0` | 目标滚动位置 |
 | `duration` | `number` | `300` | 动画时长，单位毫秒 |
 | `signal` | `AbortSignal` | — | 中止时停止动画，已中止则不滚动 |
+| `axis` | `'x' \| 'y'` | `'y'` | 滚动方向：`'x'` 写 `scrollLeft`，`'y'` 写 `scrollTop`；`el` 为 `window` 时只改对应方向，另一方向保持不变 |
 
 ## 服务端渲染
 

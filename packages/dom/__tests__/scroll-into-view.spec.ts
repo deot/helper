@@ -122,6 +122,64 @@ describe('scroll-into-view.ts', () => {
 			expect(writes).toEqual([100, 200]);
 		});
 
+		it('axis x writes scrollLeft', async () => {
+			const writes = { x: [] as number[], y: [] as number[] };
+			const scroller = {
+				set scrollLeft(v: number) {
+					writes.x.push(v);
+				},
+				set scrollTop(v: number) {
+					writes.y.push(v);
+				}
+			} as unknown as HTMLElement;
+
+			const task = $.scrollIntoView(scroller, { from: 0, to: 600, axis: 'x' });
+			flushAll();
+			await task;
+			expect(writes).toEqual({ x: [100, 200, 300, 400, 500, 600], y: [] });
+		});
+
+		it('x and y animations on the same element do not cancel each other', async () => {
+			const writes = { x: [] as number[], y: [] as number[] };
+			const scroller = {
+				set scrollLeft(v: number) {
+					writes.x.push(v);
+				},
+				set scrollTop(v: number) {
+					writes.y.push(v);
+				}
+			} as unknown as HTMLElement;
+
+			const tasks = [
+				$.scrollIntoView(scroller, { from: 0, to: 600, axis: 'x' }),
+				$.scrollIntoView(scroller, { from: 0, to: 600 })
+			];
+			flushAll();
+			await Promise.all(tasks);
+			expect(writes).toEqual({
+				x: [100, 200, 300, 400, 500, 600],
+				y: [100, 200, 300, 400, 500, 600]
+			});
+		});
+
+		it('window keeps the other axis', async () => {
+			const scrollTo = window.scrollTo;
+			const calls: number[][] = [];
+			window.scrollTo = ((x: number, y: number) => calls.push([x, y])) as unknown as typeof window.scrollTo;
+
+			const tasks = [
+				$.scrollIntoView(window, { from: 0, to: 100, duration: 50, axis: 'x' }),
+				$.scrollIntoView(window, { from: 0, to: 100, duration: 50 })
+			];
+			flushAll();
+			await Promise.all(tasks);
+			window.scrollTo = scrollTo;
+			expect(calls).toEqual([
+				[100, window.scrollY],
+				[window.scrollX, 100]
+			]);
+		});
+
 		it('signal aborted before start', async () => {
 			const { scroller, writes } = createScroller();
 			const controller = new AbortController();
