@@ -1,5 +1,13 @@
 # @deot/helper ChangeLog
 
+## v1.1.23
+
+_2026-10-31_
+
+### Features
+
+- feat(dom): support horizontal scrolling in scrollIntoView via axis option ([fdd4562](https://github.com/deot/helper/commit/fdd45625baa02f793ff7faba44a10b443eab0364))
+
 ## v1.1.22
 
 _2026-10-14_
