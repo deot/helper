@@ -319,6 +319,30 @@ describe('wheel.ts', () => {
 		off();
 	});
 
+	// 需在'mousemove'之前：该用例会把document.ontouchend改为undefined
+	it('touch: false skips touch simulation', async () => {
+		const el = make('wheel');
+		const handler = vi.fn();
+		const off = Wheel.of(el, {
+			touch: false,
+			shouldWheelX: () => true,
+			shouldWheelY: () => true
+		}).on(handler);
+
+		dispatchTouch(el, 'touchstart', 0, 0);
+		dispatchTouch(el, 'touchmove', 10, 0);
+		dispatchTouch(el, 'touchend', 10, 0);
+		await Utils.sleep(30);
+		expect(handler).not.toHaveBeenCalled();
+
+		// 回退为中键拖动模拟
+		dispatchMouse(el, 100, 0);
+		await Utils.sleep(30);
+		off();
+
+		expect(handler).toHaveBeenCalledWith(100, 0);
+	});
+
 	it('mousemove', async () => {
 		expect.assertions(2);
 		Object.defineProperty(document, 'ontouchend', { value: undefined });

@@ -192,6 +192,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- | --- | --- |
 | `native` | `true` | 到达边界后是否保持原生“松开后父层再滚动”的阈值行为 |
 | `freedom` | `false` | 是否允许 X/Y 同时自由滚动；关闭时按手势角度锁定主方向 |
+| `touch` | `true` | 触控设备上是否模拟触摸滑动；`false` 时不监听 touch 事件，交由浏览器原生滚动（容器需 `overflow: auto/scroll`） |
 | `shouldWheelX(deltaX, deltaY)` | 容器 X 轴边界判断 | 是否消费本次横向增量 |
 | `shouldWheelY(deltaY, deltaX)` | 容器 Y 轴边界判断 | 是否消费本次纵向增量 |
 | `stopPropagation(deltaX, deltaY)` | `() => true` | 消费滚动时是否阻止事件冒泡 |

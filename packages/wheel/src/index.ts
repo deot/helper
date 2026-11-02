@@ -12,6 +12,7 @@
  * 		- 需要松开后触发：Wheel.of(el, { native: true })
  * 3. `overflow: hidden;` 这样可自定义滚动条样式
  * 4. 对移动端也做了兼容处理，在`overflow: hidden;`的情况下也可滑动
+ * 		- 跳过触摸模拟，使用原生滚动：Wheel.of(el, { touch: false })
  */
 import normalizeWheel from 'normalize-wheel';
 
@@ -51,6 +52,13 @@ export interface WheelOptions {
 	 * 自由滑动
 	 */
 	freedom?: boolean;
+
+	/**
+	 * 是否在触控设备上模拟触摸滑动
+	 * 默认: true
+	 * false：不监听touch事件，交由浏览器原生滚动（容器需可原生滚动，如`overflow: auto;`）
+	 */
+	touch?: boolean;
 }
 
 interface ScrollOptions {
@@ -164,6 +172,7 @@ export class Wheel {
 		this.options = {
 			native: true,
 			freedom: false,
+			touch: true,
 			stopPropagation: () => true,
 			shouldWheelX: deltaX => Wheel.shouldWheelX(el, deltaX),
 			shouldWheelY: deltaY => Wheel.shouldWheelY(el, deltaY),
@@ -359,7 +368,8 @@ export class Wheel {
 		fn('wheel', this.handleWheel, false);
 
 		// 让触控屏也能实现滑动(模拟) 不用'ontouchend' in document，主要考虑测试
-		if (document.ontouchend || document.ontouchend === null) {
+		// `touch: false`时跳过模拟，交由原生滚动
+		if (this.options.touch && (document.ontouchend || document.ontouchend === null)) {
 			fn('touchstart', this.handleTouchStart, false);
 			fn('touchmove', this.handleTouchMove, { passive: false });
 			fn('touchend', this.handleTouchEnd, false);
