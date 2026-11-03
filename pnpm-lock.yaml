@@ -89,7 +89,7 @@ importers:
         specifier: ^1.1.4
         version: link:../validator
       '@deot/helper-wheel':
-        specifier: ^1.1.8
+        specifier: ^1.1.9
         version: link:../wheel
 
   packages/is: {}

@@ -1,5 +1,13 @@
 # @deot/helper-wheel ChangeLog
 
+## v1.1.9
+
+_2026-11-03_
+
+### Features
+
+- feat: add touch option to skip touch simulation for native scrolling ([7bc65a1](https://github.com/deot/helper/commit/7bc65a105c43b2d331ad638f7c1165e831350247))
+
 ## v1.1.8
 
 _2026-09-25_
