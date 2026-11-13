@@ -1,33 +1,31 @@
-import { flattenJSONParse, flatten } from '@deot/helper-utils';
+import { flatten } from '@deot/helper-utils';
+import { extractSearch, eachQuery, resolveParser } from './query';
+import type { QueryParser } from './query';
 
-interface GetOptions {
+export interface GetOptions {
 	url?: string;
-	parse?: boolean | ((v: string) => any);
+	parse?: QueryParser;
 }
 
-export const get = (
+export const get = <T = any>(
 	key: string,
 	url?: string | GetOptions,
 	options?: GetOptions
-) => {
+): T | null => {
 	const options$ = {
-		parse: flattenJSONParse,
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
 
 	const url$ = options$.url || (typeof window === 'undefined' ? '' : window.location.search);
+	const parser = resolveParser(options$.parse);
 
-	const match = url$
-		.substring(url$.indexOf('?') + 1)
-		.match(new RegExp('(^|&)' + key + '=([^&]*)'));
+	// 重复的 key 取第一个；key 同时按原文与解码后比较
+	const match = eachQuery(extractSearch(url$, true))
+		.find(([k]) => k === key || flatten(k) === key);
 
-	let value = match != null ? match[2] : null;
+	if (!match) return null;
+	const value = flatten(match[1]);
 
-	if (value === null) return null;
-	value = flatten(value);
-
-	return typeof options$.parse === 'function'
-		? options$.parse(value as string)
-		: value;
+	return parser ? parser(value) : value;
 };

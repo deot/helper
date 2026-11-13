@@ -1,36 +1,47 @@
-/**
- * https://www.30secondsofcode.org/js/s/get-url-parameters/
- * https://www.30secondsofcode.org/js/s/query-string-to-object/
- */
-import { flattenJSONParse, flatten } from '@deot/helper-utils';
+import { flatten, hasOwn } from '@deot/helper-utils';
+import { extractSearch, eachQuery, resolveParser } from './query';
+import type { QueryParser } from './query';
 
-interface ParseOptions {
+export interface ParseOptions {
 	url?: string;
-	parse?: boolean | ((v: string) => any);
+	parse?: QueryParser;
 }
-export const parse = (url?: string | ParseOptions, options?: ParseOptions) => {
+
+export interface ParsedRoute {
+	origin: string;
+	path: string;
+	query: {
+		[key: string]: any;
+	};
+}
+
+export const parse = (url?: string | ParseOptions, options?: ParseOptions): ParsedRoute => {
 	const options$ = {
-		parse: flattenJSONParse,
 		...(typeof url === 'object' ? url : { url }),
 		...options
 	};
 
 	const url$ = options$.url || (typeof window === 'undefined' ? '' : `${window.location.pathname}${window.location.search}`);
+	const parser = resolveParser(options$.parse);
 
-	const [prefix, search] = url$.split('?');
+	const index = url$.indexOf('?');
+	const prefix = index === -1 ? url$ : url$.slice(0, index);
 	const query: { [key: string]: any } = {};
 
-	if (search) {
-		Array
-			.from((search.match(/[^?=&]+=[^&]*/g) || []))
-			.forEach((v: string) => {
-				const [key, value] = v.split('=');
-				const value$ = flatten(value);
-				query[key] = typeof options$.parse === 'function'
-					? options$.parse(value$)
-					: value$;
-			});
-	}
+	eachQuery(extractSearch(url$)).forEach(([k, v]) => {
+		const key = flatten(k);
+		// 重复的 key 取第一个，与 get 保持一致
+		if (hasOwn(query, key)) return;
+
+		const value = flatten(v);
+		// 不直接赋值，避免 `__proto__` 改写 query 的原型
+		Object.defineProperty(query, key, {
+			value: parser ? parser(value) : value,
+			enumerable: true,
+			writable: true,
+			configurable: true
+		});
+	});
 
 	const pIndex = prefix.indexOf('://');
 	const sIndex = prefix.indexOf('/', pIndex === -1 ? 0 : pIndex + 3);
