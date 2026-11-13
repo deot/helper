@@ -126,6 +126,8 @@ source.off(); // 清空全局 listeners
 
 实例方法均返回当前实例，便于连续注册。回调返回 `false` 时，同一组中后续回调停止执行；普通 `function` 回调的 `this` 为构造时传入的 context。
 
+回调内调用 `on` / `off` / `once` 不影响本轮 `emit`，下一轮生效；`once` 注册的回调可用原回调 `off(event, callback)` 解绑。
+
 每次运行都会依次调用工厂创建、三种 `on`、`once`、`emit` 和两种 `off`：
 
 :::playground
@@ -138,7 +140,7 @@ source.off(); // 清空全局 listeners
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { ref } from 'vue';
 import { Emitter } from '@deot/helper-emitter';
 

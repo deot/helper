@@ -38,9 +38,16 @@ describe('emitter.ts', () => {
 		const handle = () => count++;
 
 		source.on(evt, handle);
+		source.on(handle);
 		expect(source.events[evt].length).toBe(1);
+		expect(source.listeners.length).toBe(1);
 		source.off();
 		expect(source.listeners.length).toBe(0);
+
+		// 无参只清空监听器，具名事件保留
+		source.emit(evt);
+		expect(source.events[evt].length).toBe(1);
+		expect(count).toBe(1);
 	});
 
 	it('off by event', () => {
@@ -52,7 +59,10 @@ describe('emitter.ts', () => {
 		source.on(evt, handle);
 		expect(source.events[evt].length).toBe(1);
 		source.off(evt);
-		expect(source.listeners.length).toBe(0);
+		expect(source.events[evt]).toBe(undefined);
+
+		source.emit(evt);
+		expect(count).toBe(0);
 	});
 
 	it('off by event & callback', () => {
@@ -61,10 +71,140 @@ describe('emitter.ts', () => {
 		let count = 0;
 		const handle = () => count++;
 
+		const other = () => count += 10;
+
 		source.on(evt, handle);
-		expect(source.events[evt].length).toBe(1);
+		source.on(evt, other);
+		expect(source.events[evt].length).toBe(2);
 		source.off(evt, handle);
-		expect(source.listeners.length).toBe(0);
+		expect(source.events[evt]).toEqual([other]);
+
+		source.emit(evt);
+		expect(count).toBe(10);
+
+		source.off(evt, other);
+		expect(source.events[evt]).toBe(undefined);
+	});
+
+	it('off by original callback after once', () => {
+		const evt = '[event-name]';
+		const source = new Emitter();
+		let count = 0;
+		const handle = () => count++;
+
+		source.once(evt, handle);
+		source.off(evt, handle);
+		source.emit(evt);
+
+		expect(source.events[evt]).toBe(undefined);
+		expect(count).toBe(0);
+	});
+
+	it('once does not skip following callbacks', () => {
+		const evt = '[event-name]';
+		const source = new Emitter();
+		const logs: string[] = [];
+
+		source.once(evt, () => logs.push('once'));
+		source.on(evt, () => logs.push('b'));
+		source.on(evt, () => logs.push('c'));
+
+		source.emit(evt);
+		expect(logs).toEqual(['once', 'b', 'c']);
+
+		source.emit(evt);
+		expect(logs).toEqual(['once', 'b', 'c', 'b', 'c']);
+	});
+
+	it('once return false', () => {
+		const evt = '[event-name]';
+		const source = new Emitter();
+		const logs: string[] = [];
+
+		source.on(evt, () => logs.push('a'));
+		source.once(evt, () => false);
+		source.on(evt, () => logs.push('c'));
+
+		source.emit(evt);
+		expect(logs).toEqual(['a']);
+
+		source.emit(evt);
+		expect(logs).toEqual(['a', 'a', 'c']);
+	});
+
+	it('off inside callback does not skip following callbacks', () => {
+		const evt = '[event-name]';
+		const source = new Emitter();
+		const logs: string[] = [];
+		const a = () => {
+			logs.push('a');
+			source.off(evt, a);
+		};
+
+		source.on(evt, a);
+		source.on(evt, () => logs.push('b'));
+
+		source.emit(evt);
+		expect(logs).toEqual(['a', 'b']);
+
+		source.emit(evt);
+		expect(logs).toEqual(['a', 'b', 'b']);
+	});
+
+	it('off inside listener does not skip following listeners', () => {
+		const source = new Emitter();
+		const logs: string[] = [];
+
+		source.on(() => {
+			logs.push('a');
+			source.off();
+		});
+		source.on(() => logs.push('b'));
+
+		source.emit();
+		expect(logs).toEqual(['a', 'b']);
+
+		source.emit();
+		expect(logs).toEqual(['a', 'b']);
+	});
+
+	it('on inside callback takes effect from next emit', () => {
+		const evt = '[event-name]';
+		const source = new Emitter();
+		let count = 0;
+		const handle = () => {
+			count++;
+			source.on(evt, handle);
+		};
+
+		source.on(evt, handle);
+
+		source.emit(evt);
+		expect(count).toBe(1);
+
+		source.emit(evt);
+		expect(count).toBe(3);
+	});
+
+	it('event names on Object.prototype', () => {
+		const source = new Emitter();
+		let count = 0;
+		const handle = () => count++;
+
+		['constructor', 'toString', 'hasOwnProperty', '__proto__'].forEach((evt) => {
+			expect(() => source.emit(evt)).not.toThrow();
+			expect(count).toBe(0);
+
+			source.on(evt, handle);
+			source.emit(evt);
+			expect(count).toBe(1);
+
+			source.off(evt, handle);
+			source.emit(evt);
+			expect(count).toBe(1);
+
+			count = 0;
+		});
 	});
 
 	it('once', () => {

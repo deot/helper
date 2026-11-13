@@ -9,7 +9,8 @@ export class Emitter {
 		return new Emitter(context);
 	}
 
-	events: Record<string, Function[]> = {};
+	// 无原型对象，避免`toString`、`constructor`等事件名与原型链属性冲突
+	events: Record<string, Function[]> = Object.create(null);
 
 	listeners: Function[] = [];
 
@@ -43,7 +44,8 @@ export class Emitter {
 		if (typeof event === 'string' && !callback) {
 			delete this.events[event];
 		} else if (typeof event === 'string' && this.events[event] && callback) {
-			this.events[event] = this.events[event].filter((item: any) => item !== callback);
+			// `origin`用于匹配`once`的包装函数
+			this.events[event] = this.events[event].filter((item: any) => item !== callback && item.origin !== callback);
 			this.events[event].length === 0 && delete this.events[event];
 		} else if (typeof event === 'undefined') {
 			this.listeners = [];
@@ -55,10 +57,11 @@ export class Emitter {
 		const self = this.context;
 		/* istanbul ignore else -- @preserve */
 		if (typeof event === 'string' && typeof callback === 'function') {
-			const fn = (...args: any[]) => {
+			const fn: Function & { origin?: Function } = (...args: any[]) => {
 				this.off(event, fn);
-				callback.apply(self, args);
+				return callback.apply(self, args);
 			};
+			fn.origin = callback;
 			this.on(event, fn);
 		}
 		return this;
@@ -66,17 +69,19 @@ export class Emitter {
 
 	emit(event?: any, ...args: any[]) {
 		const self = this.context;
-		const hasBind = this.events[event]?.length;
+		// 遍历的是快照：回调内的`on/off/once`不影响本轮执行，下一轮生效
 		// 每个订阅器都会触发，直到某个返回false
-		if (hasBind) {
-			for (let i = 0; this.events[event] && i < this.events[event].length; i++) {
-				if (this.events[event][i].apply(self, args) === false) break;
+		const callbacks = this.events[event]?.slice();
+		if (callbacks?.length) {
+			for (let i = 0; i < callbacks.length; i++) {
+				if (callbacks[i].apply(self, args) === false) break;
 			}
 		}
 
 		// 每个监听器都会触发，直到某个返回false
-		for (let i = 0; i < this.listeners.length; i++) {
-			if (this.listeners[i].apply(self, [event].concat(args)) === false) break;
+		const listeners = this.listeners.slice();
+		for (let i = 0; i < listeners.length; i++) {
+			if (listeners[i].apply(self, [event].concat(args)) === false) break;
 		}
 
 		return this;
