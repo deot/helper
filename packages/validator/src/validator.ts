@@ -51,8 +51,33 @@ export interface ValidatorRule {
 	fields?: ValidatorRules;
 }
 
-export type ValidatorMutipleRule = ValidatorRule | Validate | Pattern | boolean;
-export type ValidatorRules = Record<string, ValidatorMutipleRule | ValidatorMutipleRule[]>;
+export type ValidatorMultipleRule = ValidatorRule | Validate | Pattern | boolean;
+
+/**
+ * @deprecated 拼写错误，请使用 `ValidatorMultipleRule`
+ */
+export type ValidatorMutipleRule = ValidatorMultipleRule;
+export type ValidatorRules = Record<string, ValidatorMultipleRule | ValidatorMultipleRule[]>;
+
+const hasOwn = (target: object, key: string) => Object.prototype.hasOwnProperty.call(target, key);
+const isObject = (v: any) => !!v && typeof v === 'object';
+
+// fields只作用于对象或非空的对象数组，其余交给validate（如required）
+const isNestable = (v: any) => (Array.isArray(v) ? (!!v.length && v.every(isObject)) : isObject(v));
+
+// 带g/y的正则test会记录lastIndex，同一个值的结果会交替变化
+const toRegExp = (pattern: Pattern) => {
+	if (typeof pattern === 'string') return new RegExp(pattern);
+	return /[gy]/.test(pattern.flags)
+		? new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, ''))
+		: pattern;
+};
+
+// throw / reject的内容可能是Error、字符串或空，其余情况交由rule.message
+const toMessage = (e: any): string => {
+	if (typeof e === 'string') return e;
+	return e && typeof e.message === 'string' ? e.message : '';
+};
 
 export class Validator {
 	static falsy = [undefined, null, ''];
@@ -93,100 +118,114 @@ export class Validator {
 					rule$ = { required: rule$ };
 				}
 
-				// Rule
-				const { validate, pattern, required, enum: enum$ = [] } = rule$;
+				// Rule，拷贝一份，不改动外部传入的规则
+				const rule$$: ValidatorRule = { ...rule$ };
+				const { validate, pattern, required, enum: enum$ = [] } = rule$$;
 
-				if (validate && rule$.fields) {
-					rule$.fields = undefined;
+				// 自定义validate优先，fields和内置规则不再生效
+				if (validate) {
+					rule$$.fields = undefined;
+					return rule$$;
 				}
-				// pattern
-				if (!validate && pattern) {
-					const pattern$ = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
-					return {
-						...rule$,
-						validate: v => pattern$.test(v)
-					};
-				}
+
+				// 内置规则可以同时声明，需全部通过
+				const checks: ((v: any) => boolean)[] = [];
 
 				// required, 注意v = 0 时，是存在值的，这里只认定falsy中的undefined, null和''
-				if (!validate && required) {
-					return {
-						...rule$,
-						validate: v => (Array.isArray(v)
-							? (!!v.length && v.every(j => Validator.falsy.every(i => j !== i)))
-							: Validator.falsy.every(i => v !== i))
-					};
+				if (required) {
+					checks.push(v => (Array.isArray(v)
+						? (!!v.length && v.every(j => Validator.falsy.every(i => j !== i)))
+						: Validator.falsy.every(i => v !== i)));
+				}
+
+				// pattern, null / undefined按空字符串处理，避免匹配到'null' / 'undefined'
+				if (pattern) {
+					const pattern$ = toRegExp(pattern);
+					checks.push(v => pattern$.test(v ?? ''));
 				}
 
 				// enum
-				if (!validate && enum$.length) {
-					return {
-						...rule$,
-						validate: v => enum$.some(i => v === i)
-					};
+				if (enum$.length) {
+					checks.push(v => enum$.some(i => v === i));
 				}
 
-				return rule$;
+				if (checks.length) {
+					rule$$.validate = v => checks.every(check => check(v));
+				}
+
+				return rule$$;
 			});
 		});
 	}
 
-	async validate(source: Record<string, any>, options?: ValidateOptions): Promise<any> {
+	async validate(source: Record<string, any>, options?: ValidateOptions): Promise<void> {
 		options = options || {};
+		source = source || {};
 
-		if (!Object.keys(this.rules).length) {
+		// 没有规则的字段直接跳过（含原型上的键）
+		const needCheckFields = (options.fields || Object.keys(this.rules))
+			.filter(field => hasOwn(this.rules, field));
+
+		if (!needCheckFields.length) {
 			return;
 		}
 
-		const needCheckFields = options.fields || Object.keys(this.rules);
+		const original = typeof options.original === 'undefined'
+			? this.original
+			: options.original;
 		const errors: InternalValidateError[] = [];
 
 		for (let i = 0; i < needCheckFields.length; i++) {
 			const field = needCheckFields[i];
 			const rules = this.rules[field];
 			const value = source[field];
-			const original = typeof options.original === 'undefined'
-				? this.original
-				: options.original;
 
 			for (let j = 0; j < rules.length; j++) {
 				const rule = rules[j];
-				const { validate = () => {}, transform = (x: any) => x, fields: fields$ } = rule;
+				const { validate, transform, fields: fields$ } = rule;
 
 				const paths = [...this.paths, field];
 				if (typeof options._index !== 'undefined') {
 					paths.splice(paths.length - 1, 0, options._index);
 				}
 
-				const value$ = transform!(value, { field, source, paths, original });
+				let value$ = value;
+				let result: any;
+				let message$ = '';
 
-				if (fields$) {
-					const isArray = Array.isArray(value$);
-					const value$$ = isArray ? value$ : [value$];
-					if (value$$.every((v: any) => v && typeof v === 'object')) {
+				// 同步抛错与异步reject一致，都视为当前规则未通过
+				try {
+					if (transform) {
+						value$ = transform(value, { field, source, paths, original });
+					}
+
+					if (fields$ && isNestable(value$)) {
+						const isArray = Array.isArray(value$);
+						const value$$ = isArray ? value$ : [value$];
 						const validator = new Validator(fields$, paths, original);
 						for (let k = 0; k < value$$.length; k++) {
 							try {
 								await validator.validate(value$$[k], { _index: isArray ? k : undefined, first: options.first, original });
 							} catch (errors$: any) {
 								errors.push(...errors$);
-								if (errors$.length && options.first) break;
+								if (options.first) break;
 							}
 						}
+						if (errors.length && options.first) break;
 						continue;
 					}
+
+					result = validate ? validate(value$, { field, source, paths, original }) : undefined;
+					// 异步结果与同步结果使用同一套判定
+					if (result && typeof result.then === 'function') {
+						result = await result;
+					}
+				} catch (e: any) {
+					result = false;
+					message$ = toMessage(e);
 				}
 
-				let result = validate!(value$, { field, source, paths, original });
-				let message$ = '';
-				if (result instanceof Promise) {
-					try {
-						await result;
-					} catch (e: any) {
-						result = false;
-						message$ = e.message || e;
-					}
-				} else if (typeof result === 'string') {
+				if (typeof result === 'string') {
 					message$ = result;
 					result = false;
 				}

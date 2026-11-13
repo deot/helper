@@ -180,4 +180,26 @@ describe('validator.ts', () => {
 			expect(e[0].message).toMatch('类型错误');
 		}
 	});
+
+	it('array object, required & empty', async () => {
+		const message = 'users is required';
+		const validator = new Validator({
+			users: {
+				required: true,
+				message,
+				fields: {
+					age: true
+				}
+			},
+			others: {
+				fields: {
+					age: true
+				}
+			}
+		});
+
+		// 空数组不进入fields，required仍需生效
+		await expect(validator.validate({ users: [], others: [] })).rejects.toMatchObject([{ message, paths: ['users'] }]);
+		await expect(validator.validate({ users: [{ age: 1 }], others: [] })).resolves.toBeUndefined();
+	});
 });

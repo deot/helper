@@ -117,4 +117,12 @@ describe('validator.ts', () => {
 			expect(1).toBe(1);
 		}
 	});
+
+	it('number, range message', () => {
+		const message = (range: [number?, number?]) => RuleHelper.create({ range }).pop()!.message;
+
+		expect(message([0, 10])).toBe('值 取值范围: 0~10');
+		expect(message([undefined, 10])).toBe('值 取值范围: *~10');
+		expect(message([0, undefined])).toBe('值 取值范围: 0~*');
+	});
 });

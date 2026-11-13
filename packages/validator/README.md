@@ -146,7 +146,7 @@ const run = async () => {
 ```
 :::
 
-`transform` 只影响当前规则接收的值，不会修改 `source`，也不会把转换结果传给下一条规则。异步 `validate` 需要通过 throw/reject 表示失败；resolve 出 `false` 不会被当作失败。`first` 限制错误收集，`fields` 选择顶层字段名，二者都不改变原始输入。
+`transform` 只影响当前规则接收的值，不会修改 `source`，也不会把转换结果传给下一条规则。同步与异步 `validate` 的判定一致：返回或 resolve 出 `false`、错误字符串，以及 throw/reject，都表示失败；`transform` 抛错同样记为该规则失败。`first` 限制错误收集，`fields` 选择顶层字段名（没有规则的字段会被跳过），二者都不改变原始输入。
 
 #### `Validator.falsy`
 
@@ -244,10 +244,10 @@ const run = async () => {
 | --- | --- | --- | --- | --- |
 | `ValidatorRule` | `required` | `boolean` | `false` | 非空规则；数组还要求每项非空 |
 | `ValidatorRule` | `enum` | `(string \| number \| boolean \| null \| undefined)[]` | `[]` | 枚举值规则 |
-| `ValidatorRule` | `pattern` | `RegExp \| string` | — | 正则表达式或正则字符串 |
+| `ValidatorRule` | `pattern` | `RegExp \| string` | — | 正则表达式或正则字符串；`null` / `undefined` 按空字符串匹配，`g` / `y` 标志不生效 |
 | `ValidatorRule` | `transform` | `(value, context) => any` | 原样返回 | 验证前转换值 |
-| `ValidatorRule` | `validate` | `(value, context) => Promise<any> \| boolean \| string \| void` | — | 自定义验证；`false`、错误字符串或 rejected Promise 表示失败 |
-| `ValidatorRule` | `fields` | `ValidatorRules` | — | 验证嵌套对象或对象数组；与 validate 同时存在时以 validate 为准 |
+| `ValidatorRule` | `validate` | `(value, context) => Promise<any> \| boolean \| string \| void` | — | 自定义验证；返回或 resolve 出 `false`、错误字符串，以及 throw / reject 都表示失败；存在时 `required`、`pattern`、`enum` 不再生效 |
+| `ValidatorRule` | `fields` | `ValidatorRules` | — | 验证嵌套对象或非空的对象数组；与 validate 同时存在时以 validate 为准 |
 | `ValidatorRule` | `message` | `string \| ((error) => string)` | `''` | 失败消息或消息生成器 |
 | `ValidatorRule` | `[key: string]` | `any` | — | 允许规则携带额外业务字段 |
 | `ValidateOptions` | `fields` | `string[]` | 全部规则字段 | 只验证指定字段 |
@@ -258,14 +258,14 @@ const run = async () => {
 | `Transform` | — | `(value: any, context: ValidateContext) => any` | — | 字段校验前的值转换函数类型 |
 | `Validate` | — | `(value: any, context: ValidateContext) => Promise<any> \| boolean \| string \| void` | — | 可单独导入的自定义校验函数类型 |
 | `ValidateError` | `message?` / `value` / `field` / `paths` | `string` / `any` / `string` / `(string \| number)[]` | — | validate reject 的错误项结构 |
-| `ValidatorMutipleRule` | — | `ValidatorRule \| Validate \| RegExp \| string \| boolean` | — | 单条规则支持的简写联合类型 |
-| `ValidatorRules` | — | `Record<string, ValidatorMutipleRule \| ValidatorMutipleRule[]>` | — | 字段到一条或多条规则的映射 |
+| `ValidatorMultipleRule` | — | `ValidatorRule \| Validate \| RegExp \| string \| boolean` | — | 单条规则支持的简写联合类型；旧名 `ValidatorMutipleRule` 仍可用，已标记废弃 |
+| `ValidatorRules` | — | `Record<string, ValidatorMultipleRule \| ValidatorMultipleRule[]>` | — | 字段到一条或多条规则的映射 |
 
 #### `RuleHelper`
 
 根据常用配置生成 `ValidatorRule[]`，减少必填、格式、类型和范围规则的重复声明。
 
-下表中的 `RuleOptions` 是 `RuleHelper.create()` 参数结构的文档名称，源码未将它作为独立类型导出。
+下表中的 `RuleOptions` 是 `RuleHelper.create()` 的参数类型，可单独导入。
 
 | API | 参数 | 参数类型 | 默认值 | 返回值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -354,7 +354,7 @@ pre { background: #f8fafc; }
 | `number` | 正负整数或小数 | `number4` | 4 位数字 |
 | `number6` | 6 位数字 | `integer` | 非零开头的正整数 |
 | `email` | 常见邮箱格式 | `date` | `YYYY-MM-DD`、`/` 或 `.` 分隔日期 |
-| `time` | `YYYY-MM-DD HH:mm` 格式 | `identity` | 至少 6 位字母或数字 |
+| `time` | `YYYY-MM-DD HH:mm` 格式，秒可选 | `identity` | 至少 6 位字母或数字 |
 | `price` | 最多 11 位整数、2 位小数的价格 | `mobile` | 中国大陆手机号段格式 |
 | `tel` | 带区号和连字符的固定电话 | `wechat` | 至少 5 位字母、数字、下划线或连字符 |
 | `name` | 中文、字母、数字、下划线或连字符 | `dataURL` | Data URL |
@@ -371,7 +371,7 @@ pre { background: #f8fafc; }
 | `(value, context) => result` | `{ validate: fn }` |
 | `ValidatorRule` | 完整规则对象 |
 
-`ValidatorRule` 支持 `required`、`enum`、`pattern`、`transform`、`validate`、`fields` 和 `message`。`validate` 可返回 boolean、错误字符串、void 或 Promise；Promise rejection 的 message 会进入错误结果。
+`ValidatorRule` 支持 `required`、`enum`、`pattern`、`transform`、`validate`、`fields` 和 `message`。同一条规则里声明的 `required`、`pattern`、`enum` 需要全部通过；提供 `validate` 后以 `validate` 为准。`validate` 可返回 boolean、错误字符串、void 或 Promise，Promise resolve 出的结果按同样方式判定；throw 或 rejection 的 message 会进入错误结果，没有 message 时使用规则的 `message`。
 
 嵌套对象或数组使用 `fields`：
 

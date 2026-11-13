@@ -26,6 +26,10 @@ describe('regular-expression.ts', () => {
 		expect(RegExps.email.test('1@xx.b')).toBe(true);
 		expect(RegExps.email.test('1@xx')).toBe(false);
 		expect(RegExps.email.test('@xx.com')).toBe(false);
+		expect(RegExps.email.test('first.last@xx.com')).toBe(true);
+		expect(RegExps.email.test('xx+tag@xx.com.cn')).toBe(true);
+		expect(RegExps.email.test('a@bcd')).toBe(false);
+		expect(RegExps.email.test('a@b.c <script>')).toBe(false);
 	});
 
 	it('date', async () => {
@@ -39,6 +43,9 @@ describe('regular-expression.ts', () => {
 	it('time', async () => {
 		expect(RegExps.time.test('1111-11-11 11:11')).toBe(true);
 		expect(RegExps.time.test('1111/11/11/11/11')).toBe(false);
+		expect(RegExps.time.test('1111-11-11 11:11:11')).toBe(true);
+		expect(RegExps.time.test('xx1111-11-11 11:11')).toBe(false);
+		expect(RegExps.time.test('1111-11-11 11:11xx')).toBe(false);
 	});
 
 	it('identity', async () => {
@@ -51,6 +58,13 @@ describe('regular-expression.ts', () => {
 		expect(RegExps.price.test('0.11')).toBe(true);
 		expect(RegExps.price.test('1.111')).toBe(false);
 		expect(RegExps.price.test('11223344556.111')).toBe(false);
+		expect(RegExps.price.test('0')).toBe(true);
+		expect(RegExps.price.test('10')).toBe(true);
+		expect(RegExps.price.test('11223344556.11')).toBe(true);
+		expect(RegExps.price.test('1122334455667')).toBe(false);
+		expect(RegExps.price.test('012')).toBe(false);
+		expect(RegExps.price.test('00')).toBe(false);
+		expect(RegExps.price.test('1.')).toBe(false);
 	});
 
 	it('mobile', async () => {
@@ -83,6 +97,10 @@ describe('regular-expression.ts', () => {
 
 	it('dataURL', async () => {
 		expect(RegExps.dataURL.test('data:image/png;base64,aa==')).toBe(true);
+		expect(RegExps.dataURL.test('data:image/svg+xml;base64,aa==')).toBe(true);
+		expect(RegExps.dataURL.test('data:font/woff2;base64,aa==')).toBe(true);
+		expect(RegExps.dataURL.test('data:text/plain;charset=utf-8,aa')).toBe(true);
+		expect(RegExps.dataURL.test('data:,aa')).toBe(true);
 		expect(RegExps.dataURL.test('')).toBe(false);
 		expect(RegExps.dataURL.test('1️⃣')).toBe(false);
 		expect(RegExps.dataURL.test('·')).toBe(false);
@@ -92,5 +110,10 @@ describe('regular-expression.ts', () => {
 		expect(RegExps.url.test('https://xx.com')).toBe(true);
 		expect(RegExps.url.test('http://xx.com')).toBe(true);
 		expect(RegExps.url.test('xx.com')).toBe(false);
+		expect(RegExps.url.test('weixin://dl/business?t=1')).toBe(true);
+		expect(RegExps.url.test('see http://xx.com')).toBe(false);
+		expect(RegExps.url.test('http://xx.com xx')).toBe(false);
+		expect(RegExps.url.test('_^://xx.com')).toBe(false);
+		expect(RegExps.url.test('http://')).toBe(false);
 	});
 });

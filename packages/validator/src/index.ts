@@ -6,4 +6,5 @@ import * as RegExps from './reg-exps';
 import * as RuleHelper from './helper';
 
 export * from './validator';
+export type { RuleOptions } from './helper';
 export { RegExps, RuleHelper };

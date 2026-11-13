@@ -2,7 +2,7 @@ import type { ValidatorRule } from '../validator';
 import { Validator } from '../validator';
 import { number as numberPattern } from '../reg-exps';
 
-interface RuleOptions {
+export interface RuleOptions {
 	[key: string]: any;
 	type?: 'number' | 'string' | 'array';
 	range?: [number?, number?];
@@ -33,7 +33,7 @@ export const create = (options?: RuleOptions): ValidatorRule[] => {
 		required: `${name} 必填`,
 		pattern: `请输入正确的 ${name}`,
 		type: `${name} 类型错误`,
-		range: `${name} 取值范围: ${range[0] || '*'}~${range[1] || '*'}`,
+		range: `${name} 取值范围: ${range[0] ?? '*'}~${range[1] ?? '*'}`,
 		maxlength: `${name} 长度不超过 ${maxlength}`,
 		...options.messages,
 	};
