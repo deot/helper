@@ -1,38 +1,43 @@
 import { IS_SERVER } from './_constants';
+import { applyAttrs, load } from './_utils';
+import type { LoadAttrs } from './_utils';
 
-interface LoadScriptOptions {
+export interface LoadScriptOptions {
 	async?: boolean;
+	attrs?: LoadAttrs;
 }
-export const script = (src: string, options?: LoadScriptOptions) => {
+
+export const script = (src: string, options?: LoadScriptOptions): Promise<1> | undefined => {
 	if (IS_SERVER) return;
 
-	if (script.cache.has(src)) {
-		return script.cache.get(src);
-	}
-
-	const target = new Promise((resolve, reject) => {
+	return load(script.cache, 'script', src, (resolve, reject) => {
 		const el = document.createElement('script');
-		const isNeedSync = options?.async === false;
-		if (!isNeedSync) {
-			el.src = src;
-			el.onload = () => resolve(1);
-			el.onerror = (e) => {
-				script.cache.delete(src);
-				reject(e);
-			};
-		} else {
+		applyAttrs(el, options?.attrs);
+
+		if (options?.async === false) {
 			const xhr = new XMLHttpRequest();
 			xhr.open('GET', src, false); // Deprecation
 			xhr.send();
-			el.innerHTML = xhr.responseText;
+
+			const { status } = xhr;
+			if (!((status >= 200 && status < 300) || status === 304)) {
+				return reject(new Error(`HTTP ${status}`));
+			}
+
+			el.text = xhr.responseText;
+			document.head.appendChild(el);
+			return resolve(1);
 		}
 
-		document.getElementsByTagName('head')[0].appendChild(el);
-		isNeedSync && resolve(1);
-	});
+		el.onload = () => resolve(1);
+		el.onerror = (e) => {
+			el.remove();
+			reject(e);
+		};
+		el.src = src;
 
-	script.cache.set(src, target);
-	return target;
+		document.head.appendChild(el);
+	});
 };
 
-script.cache = new Map();
+script.cache = new Map<string, Promise<1>>();

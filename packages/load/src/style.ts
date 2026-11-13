@@ -1,55 +1,51 @@
 import { IS_SERVER } from './_constants';
 
-interface LoadStyleCodeOptions {
+export interface LoadStyleCodeOptions {
 	id?: string | HTMLElement;
 }
 
-export const style = (value: string, options?: LoadStyleCodeOptions) => {
+const getElement = (id?: string | HTMLElement) => {
+	return typeof id === 'string' ? document.getElementById(id) : id;
+};
+
+export const style = (value: string, options?: LoadStyleCodeOptions): void => {
 	if (IS_SERVER) return;
 
-	if (options?.id) {
-		const el = typeof options.id === 'string'
-			? document.getElementById(options.id)
-			: options.id;
+	const id = options?.id;
+	const current = getElement(id);
 
-		if (el) {
-			el.innerHTML = value;
-			return;
+	if (current) {
+		const code = current.textContent || '';
+		if (code !== value) {
+			// 旧内容已不在文档中，不清理会导致之后同样的 code 无法再注入
+			style.cache.delete(code);
+			current.textContent = value;
 		}
+		return;
 	}
 
-	if (style.cache.has(value)) return;
+	// 指定了 id 时以 id 为准，仅未指定时才按 code 去重
+	if (!id && style.cache.has(value)) return;
 	style.cache.add(value);
 
 	const el = document.createElement('style');
-
-	/* istanbul ignore else -- @preserve */
-	if (options?.id && typeof options.id === 'string') {
-		el.setAttribute('id', options.id);
+	if (id) {
+		el.setAttribute('id', id as string);
 	}
 
-	el.innerHTML = value;
+	el.textContent = value;
 
-	document.getElementsByTagName('head')[0].appendChild(el);
+	document.head.appendChild(el);
 };
 
-export const removeStyle = (id: string | HTMLElement) => {
+export const removeStyle = (id: string | HTMLElement): void => {
 	if (IS_SERVER) return;
 
-	if (id) {
-		const el = typeof id === 'string'
-			? document.getElementById(id)
-			: id;
+	const el = getElement(id);
+	if (!el) return;
 
-		if (!el) return;
-
-		const code = el.innerHTML;
-		document.getElementsByTagName('head')[0].removeChild(el);
-
-		if (style.cache.has(code)) {
-			style.cache.delete(code);
-		}
-	}
+	style.cache.delete(el.textContent || '');
+	el.remove();
 };
 
-style.cache = new Set();
+style.cache = new Set<string>();

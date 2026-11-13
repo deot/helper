@@ -1,34 +1,52 @@
 import { IS_SERVER } from './_constants';
+import { load } from './_utils';
 
-// TODO: 增加maxTries
-export const image = (src: string) => {
+export interface LoadImageOptions {
+	// 总尝试次数，默认 1（不重试）
+	maxTries?: number;
+	crossOrigin?: '' | 'anonymous' | 'use-credentials';
+}
+
+export interface LoadImageResult {
+	source: string;
+	width: number;
+	height: number;
+}
+
+export const image = (src: string, options?: LoadImageOptions): Promise<LoadImageResult> | undefined => {
 	if (IS_SERVER) return;
 
-	if (image.cache.has(src)) {
-		return image.cache.get(src);
-	}
+	const { maxTries = 1, crossOrigin } = options || {};
 
-	const target = new Promise((resolve, reject) => {
-		const el = new Image();
-		el.src = src;
-		el.onload = () => {
-			const value = {
-				source: src,
-				width: el.naturalWidth,
-				height: el.naturalHeight,
+	return load(image.cache, 'image', src, (resolve, reject) => {
+		const run = (tries: number) => {
+			const el = new Image();
+			if (typeof crossOrigin === 'string') {
+				el.crossOrigin = crossOrigin;
+			}
+
+			el.onload = () => {
+				resolve({
+					source: src,
+					width: el.naturalWidth,
+					height: el.naturalHeight,
+				});
 			};
-			resolve(value);
+
+			el.onerror = (e) => {
+				if (tries < maxTries) {
+					run(tries + 1);
+				} else {
+					reject(e);
+				}
+			};
+
+			el.src = src;
 		};
 
-		el.onerror = (e) => {
-			image.cache.delete(src);
-			reject(e);
-		};
+		run(1);
 	});
-
-	image.cache.set(src, target);
-	return target;
 };
 
 image.placeholder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P48OP/fwAJqgPnYfITggAAAABJRU5ErkJggg==';
-image.cache = new Map();
+image.cache = new Map<string, Promise<LoadImageResult>>();

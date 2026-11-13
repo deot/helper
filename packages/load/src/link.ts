@@ -1,28 +1,28 @@
 import { IS_SERVER } from './_constants';
+import { applyAttrs, load } from './_utils';
+import type { LoadAttrs } from './_utils';
 
-export const link = (src: string) => {
+export interface LoadLinkOptions {
+	attrs?: LoadAttrs;
+}
+
+export const link = (src: string, options?: LoadLinkOptions): Promise<1> | undefined => {
 	if (IS_SERVER) return;
 
-	if (link.cache.has(src)) {
-		return link.cache.get(src);
-	}
-
-	const target = new Promise((resolve, reject) => {
+	return load(link.cache, 'link', src, (resolve, reject) => {
 		const el = document.createElement('link');
-		el.type = 'text/css';
 		el.rel = 'stylesheet';
-		el.href = src;
+		applyAttrs(el, options?.attrs);
+
 		el.onload = () => resolve(1);
 		el.onerror = (e) => {
-			link.cache.delete(src);
+			el.remove();
 			reject(e);
 		};
+		el.href = src;
 
-		document.getElementsByTagName('head')[0].appendChild(el);
+		document.head.appendChild(el);
 	});
-
-	link.cache.set(src, target);
-	return target;
 };
 
-link.cache = new Map();
+link.cache = new Map<string, Promise<1>>();
