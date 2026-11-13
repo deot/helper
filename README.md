@@ -62,7 +62,7 @@
 | [load](packages/load) | [![npm][npm-load-image]][npm-load-url] | 脚本、样式和图片加载 |
 | [resize](packages/resize) | [![npm][npm-resize-image]][npm-resize-url] | 基于 ResizeObserver 的尺寸监听 |
 | [route](packages/route) | [![npm][npm-route-image]][npm-route-url] | URL 路径与查询参数处理 |
-| [scheduler](packages/scheduler) | [![npm][npm-scheduler-image]][npm-scheduler-url] | 中断器及任务调度入口 |
+| [scheduler](packages/scheduler) | [![npm][npm-scheduler-image]][npm-scheduler-url] | 中断器、串行 / 轮询 / 并发任务调度 |
 | [shared](packages/shared) | [![npm][npm-shared-image]][npm-shared-url] | 公共常量和 TypeScript 类型 |
 | [unicode](packages/unicode) | [![npm][npm-unicode-image]][npm-unicode-url] | Unicode 压缩、编码与解码 |
 | [utils](packages/utils) | [![npm][npm-utils-image]][npm-utils-url] | 常用数据、函数、图片和调度工具 |

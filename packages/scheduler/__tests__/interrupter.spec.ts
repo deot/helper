@@ -1,6 +1,89 @@
 import { Interrupter } from '@deot/helper-scheduler';
 
+const sleep = (s: number) => new Promise((_) => { setTimeout(_, s || 0); });
+const timeout = (s: number) => sleep(s).then(() => 'TIMEOUT');
+
 describe('interrupter.ts', () => {
+	it('next + finish, same tick', async () => {
+		const interrupter = new Interrupter();
+
+		interrupter.next(1);
+		interrupter.finish(2);
+		await sleep(5);
+
+		// next的后续不应该在结束后又生成新的一轮
+		expect(await Promise.race([interrupter, timeout(20)])).toBe(1);
+		expect(await Promise.race([interrupter, timeout(20)])).toBe(1);
+	});
+
+	it('nextWithError + finish, same tick', async () => {
+		expect.assertions(2);
+		const interrupter = new Interrupter();
+
+		interrupter.nextWithError(new Error('1'));
+		interrupter.finish(2);
+		await sleep(5);
+
+		try {
+			await Promise.race([interrupter, timeout(20)]);
+		} catch (e: any) {
+			expect(e.message).toBe('1');
+		}
+		expect(interrupter._finish).toBe(true);
+	});
+
+	it('next, repeat in same tick', async () => {
+		const interrupter = new Interrupter();
+
+		interrupter.next(1);
+		interrupter.next(2);
+		expect(await interrupter).toBe(1);
+
+		// 只会生成一轮，后续的等待者不会落在被遗弃的那一轮上
+		await sleep(5);
+		setTimeout(() => interrupter.next(3), 5);
+		expect(await Promise.race([interrupter, timeout(30)])).toBe(3);
+	});
+
+	it('next + nextWithError, same tick', async () => {
+		const interrupter = new Interrupter();
+
+		interrupter.next(1);
+		interrupter.nextWithError(new Error('2'));
+		expect(await interrupter).toBe(1);
+
+		await sleep(5);
+		setTimeout(() => interrupter.next(3), 5);
+		expect(await Promise.race([interrupter, timeout(30)])).toBe(3);
+	});
+
+	it('finishWithError / nextWithError, without waiter', async () => {
+		expect.assertions(2);
+		const interrupter = new Interrupter();
+
+		// 没有等待者时不应产生unhandledRejection
+		await interrupter.nextWithError(new Error('next'));
+		interrupter.finishWithError(new Error('finish'));
+		await sleep(5);
+
+		// 之后的等待者仍然能收到异常
+		try {
+			await interrupter;
+		} catch (e: any) {
+			expect(e.message).toBe('finish');
+		}
+		expect(interrupter._finish).toBe(true);
+	});
+
+	it('types', async () => {
+		const interrupter = Interrupter.of<number>();
+		interrupter.finish(1);
+
+		expectTypeOf(interrupter).toEqualTypeOf<Interrupter<number>>();
+		expectTypeOf(await interrupter).toEqualTypeOf<number>();
+		expectTypeOf(interrupter.then(String)).toEqualTypeOf<Promise<string>>();
+	});
+
 	it('next', async () => {
 		const interrupter = new Interrupter();
 		const next = vi.fn(interrupter.next);

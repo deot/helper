@@ -8,10 +8,11 @@
     "dist"
   ],
   "license": "MIT",
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@deot/helper-fp": "^1.1.6"
+    "@deot/helper-emitter": "^1.1.3"
   }
 }
