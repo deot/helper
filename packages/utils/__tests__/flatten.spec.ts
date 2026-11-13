@@ -12,6 +12,7 @@ describe('flatten.ts', () => {
 	});
 
 	it('maxTries: 1000', () => {
+		expect.assertions(1);
 		const v1 = '我';
 		let v2 = v1;
 		Array.from({ length: 1001 }).forEach(() => {
@@ -22,6 +23,10 @@ describe('flatten.ts', () => {
 		} catch (e: any) {
 			expect(v2).toBe(e.message);
 		}
+	});
+
+	it('maxTries: parser 不收敛', () => {
+		expect(() => Utils.flatten('a', v => v + 'a')).toThrow('a');
 	});
 
 	it('error input', () => {

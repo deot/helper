@@ -35,6 +35,10 @@ export const compressImage = (file: File, options?: CompressImageOptions): Promi
 		reader.onload = (e) => {
 			el.src = (e.target as any).result as string;
 		};
+		// 文件读取失败（被删除、无权限等），否则 Promise 永远不会结束
+		reader.onerror = () => {
+			reject(reader.error);
+		};
 		// 缩放图片需要的canvas
 		const canvas = document.createElement('canvas');
 		const context = canvas.getContext('2d') as CanvasRenderingContext2D;

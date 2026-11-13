@@ -14,7 +14,12 @@ export const rIC: RIC = (typeof window !== 'undefined' && window.requestIdleCall
 	});
 export const cIC: CIC = (typeof window !== 'undefined' && window.cancelIdleCallback) || ((id: any) => clearTimeout(id));
 
-// @deprecated
+/**
+ * @deprecated 使用 `rIC`
+ */
 export const ric = rIC;
-// @deprecated
+
+/**
+ * @deprecated 使用 `cIC`
+ */
 export const cic = cIC;

@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import * as Utils from '@deot/helper-utils';
 
 describe('compress-image.ts', () => {
@@ -85,5 +84,36 @@ describe('compress-image.ts', () => {
 
 		expect(result1.dataURL).toBe(base64);
 		expect(result2.file.name).toBe('__filename');
+	});
+
+	it('error: 文件读取失败', async () => {
+		expect.assertions(1);
+		const error = new Error('NotReadableError');
+		const FileReader$ = globalThis.FileReader;
+
+		Object.defineProperty(globalThis, 'Image', {
+			value: class Image {}
+		});
+		Object.defineProperty(globalThis, 'FileReader', {
+			value: class FileReader {
+				onerror!: any;
+
+				error = error;
+
+				readAsDataURL() {
+					setTimeout(() => {
+						this.onerror && this.onerror();
+					}, 10);
+				}
+			}
+		});
+
+		try {
+			await Utils.compressImage(file);
+		} catch (e) {
+			expect(e).toBe(error);
+		} finally {
+			Object.defineProperty(globalThis, 'FileReader', { value: FileReader$ });
+		}
 	});
 });

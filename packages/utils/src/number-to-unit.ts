@@ -9,10 +9,12 @@
  *      5660000 => 566万
  *      44440000 => 4444万
  *      11111000 => 1111.1万
+ *      99999999 => 1亿（四舍五入后满 10000 时进位到下一级单位）
  *      444400000 => 4.44亿
- *      40000000,00000000,00000000 => 4000万亿亿
- *      4,00000000,00000000,00000000 => 4亿亿亿
+ *      1666000000000 => 1.67万亿
+ *      -50000 => -5万
  *
+ * 超过 Number.MAX_SAFE_INTEGER 的值按 Number.MAX_SAFE_INTEGER 处理（9007.2万亿）
  */
 
 const getDigit = (integer: number) => {
@@ -24,41 +26,31 @@ const getDigit = (integer: number) => {
 	return digit;
 };
 
-const addWan = (integer: number, num: number, mutiple: number, decimalDigit: number) => {
-	const digit = getDigit(integer);
-	if (digit > 3) {
-		let remainder = digit % 8;
-		if (remainder >= 5) { // ‘十万’、‘百万’、‘千万’显示为‘万’
-			remainder = 4;
-		}
-		return Math.round(num / Math.pow(10, remainder + mutiple - decimalDigit)) / Math.pow(10, decimalDigit) + '万'; // eslint-disable-line
-	} else {
-		return Math.round(num / Math.pow(10, mutiple - decimalDigit)) / Math.pow(10, decimalDigit) + ''; // eslint-disable-line
-	}
+const round = (number: number, exponent: number, decimalDigit: number) => {
+	return Math.round(number / Math.pow(10, exponent - decimalDigit)) / Math.pow(10, decimalDigit);
 };
 
-export const numberToUnit = (number: number, decimalDigit?: number) => {
+export const numberToUnit = (number: number, decimalDigit?: number): string | number => {
+	if (number < 0) {
+		const result = numberToUnit(-number, decimalDigit);
+		return typeof result === 'number' ? -result : `-${result}`;
+	}
 	if (number > Number.MAX_SAFE_INTEGER) {
 		number = Number.MAX_SAFE_INTEGER;
 	}
+	// 不足一万（含 NaN）原样返回
+	if (!(number >= 10000)) return number;
+
 	decimalDigit = decimalDigit == null ? 2 : decimalDigit;
-	const integer = Math.floor(number);
-	const digit = getDigit(integer);
+
 	// ['个', '十', '百', '千', '万', '十万', '百万', '千万'];
-	const unit: string[] = [];
-	if (digit > 3) {
-		const multiple = Math.floor(digit / 8);
-		if (multiple >= 1) {
-			let tmp = Math.round(integer / Math.pow(10, 8 * multiple)); // eslint-disable-line
-			unit.push(addWan(tmp, number, 8 * multiple, decimalDigit));
-			for (let i = 0; i < multiple; i++) {
-				unit.push('亿');
-			}
-			return unit.join('');
-		} else {
-			return addWan(integer, number, 0, decimalDigit);
-		}
-	} else {
-		return number;
+	// 每 4 位一级：4 -> 万，8 -> 亿，12 -> 万亿，16 -> 亿亿
+	let exponent = Math.floor(getDigit(Math.floor(number)) / 4) * 4;
+	let value = round(number, exponent, decimalDigit);
+	if (value >= 10000) {
+		exponent += 4;
+		value = round(number, exponent, decimalDigit);
 	}
+
+	return value + (exponent % 8 ? '万' : '') + '亿'.repeat(Math.floor(exponent / 8));
 };

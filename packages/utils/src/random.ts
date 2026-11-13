@@ -1,22 +1,26 @@
-// 氛围随机：均匀
+// 范围随机：均匀
 export const range = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 // 加权随机：概率，用户传入的权重
 export const probs = (weights: number[]) => {
-	const sum = weights.reduce((pre, cur) => pre + (!cur || cur <= 0 ? 0 : cur), 0);
+	// 非正数、NaN 一律视为 0，求和与抽取使用同一份权重
+	const weights$ = weights.map(i => (i > 0 ? i : 0));
+	const sum = weights$.reduce((pre, cur) => pre + cur, 0);
 	if (!sum) {
 		throw new Error('不可能得到索引值');
 	}
-	const probs$ = weights.map(i => i / sum);
-	let index = 0;
-	let r = Math.random();
-	// 如果 r 小于 0，我可以选择，否则尝试下一个。
-	while (r > 0) {
-		r -= probs$[index];
-		index++;
+
+	let r = Math.random() * sum;
+	let last = -1;
+	for (let i = 0; i < weights$.length; i++) {
+		if (!weights$[i]) continue;
+		last = i;
+		r -= weights$[i];
+		if (r < 0) return i;
 	}
-	index--;
-	return index;
+
+	// 浮点累加误差兜底：落在最后一个有效权重上
+	return last;
 };

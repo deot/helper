@@ -2,7 +2,7 @@ import { range } from './random';
 
 export const sleep = (
 	wait?: number | { min: number; max: number },
-	immediate?: (timer: ReturnType<typeof global.setTimeout>, duration: number, done: Function) => any
+	immediate?: (timer: ReturnType<typeof setTimeout>, duration: number, done: Function) => any
 ) => {
 	let duration: number;
 	if (typeof wait === 'object') {

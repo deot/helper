@@ -37,7 +37,7 @@ Utils.preZero(8); // '08'
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
-| `fn` / `wait` / `options` | `Function` / `number` / `DebounceOptions` | `0` / 见下表 | `Function & { cancel; flush }` |
+| `fn` / `wait` / `options` | `Function` / `number` / `DebounceOptions` | `0` / 见下表 | `Debounced<T>` |
 
 调整触发选项后连续调用，观察首沿/尾沿的执行时机；`cancel()` 丢弃等待调用，`flush()` 立即执行待处理的尾沿调用：
 
@@ -106,11 +106,11 @@ onBeforeUnmount(() => debounced.cancel());
 
 #### `throttle(fn, wait?, options?)`
 
-基于 debounce 的节流函数
+基于 debounce 的节流函数；尾沿执行后会继续占用一个时间窗，保证相邻两次执行的间隔不小于 `wait`
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
-| `fn` / `wait` / `options` | `Function` / `number` / `ThrottleOptions` | `0` / 见下表 | `Function & { cancel; flush }` |
+| `fn` / `wait` / `options` | `Function` / `number` / `ThrottleOptions` | `0` / 见下表 | `Debounced<T>` |
 
 在同一个时间窗口内连续触发，或多次点击按钮；与防抖不同，后续调用不会不断延后窗口结束时间：
 
@@ -300,7 +300,7 @@ await target; // 42；同一对象同时保留业务属性与 then/catch/finally
 
 #### `DebounceOptions`
 
-`debounce()` 的配置结构。`DebounceOptions` 是文档名称，不是可单独导入的类型。
+`debounce()` 的配置结构，可通过 `import type { DebounceOptions } from '@deot/helper-utils'` 导入。
 
 ##### 字段
 
@@ -312,7 +312,7 @@ await target; // 42；同一对象同时保留业务属性与 then/catch/finally
 
 #### `ThrottleOptions`
 
-`throttle()` 的配置结构。`ThrottleOptions` 是文档名称，不是可单独导入的类型。
+`throttle()` 的配置结构，可通过 `import type { ThrottleOptions } from '@deot/helper-utils'` 导入。
 
 ##### 字段
 
@@ -321,11 +321,21 @@ await target; // 42；同一对象同时保留业务属性与 then/catch/finally
 | `leading` | `boolean` | `true` | 是否在时间窗开始时执行 |
 | `trailing` | `boolean` | `true` | 是否在时间窗结束时执行 |
 
+#### `Debounced<T>`
+
+`debounce()` / `throttle()` 的返回类型，可通过 `import type { Debounced } from '@deot/helper-utils'` 导入。调用参数与原函数 `T` 一致，返回值为 `void`；原函数以 `Function` 声明时参数不做约束。
+
+| 成员 | 类型 | 说明 |
+| --- | --- | --- |
+| `(...args)` | `(...args: Parameters<T>) => void` | 按防抖/节流规则调用原函数 |
+| `cancel` | `() => void` | 丢弃等待中的调用 |
+| `flush` | `() => void` | 立即执行等待中的尾沿调用 |
+
 ### 数据、对象与字符串
 
 #### `asterisk(value, from?, length?)`
 
-将指定区间替换为 `*`
+将指定区间替换为 `*`；`from` / `length` 可传 `0`，负数与 `NaN` 按 `0` 处理，小数向下取整
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -455,7 +465,7 @@ flatten('%2526', decodeURIComponent, value => value === '%26'); // '%26'，主�
 
 #### `flattenJSONParse(value)`
 
-递归 JSON 解析，并保护超长整数和整段科学计数字符串
+递归 JSON 解析，并在每一层保护超出安全范围的整数和整段科学计数字符串
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -467,7 +477,9 @@ import { flattenJSONParse } from '@deot/helper-utils';
 flattenJSONParse('false'); // false
 flattenJSONParse('0'); // 0
 flattenJSONParse('{"name":"Deot"}'); // { name: 'Deot' }
-flattenJSONParse('9007199254740992'); // '9007199254740992'，保护超出安全范围的正整数字符串
+flattenJSONParse('9007199254740992'); // '9007199254740992'，保护超出安全范围的整数字符串
+flattenJSONParse('-9007199254740992'); // '-9007199254740992'，负数同样保护
+flattenJSONParse('"9007199254740992"'); // '9007199254740992'，嵌套在字符串内的也保护
 flattenJSONParse('1E1'); // '1E1'，保留整段科学计数字符串
 flattenJSONParse('not-json'); // 'not-json'，无法解析时原样返回
 ```
@@ -498,7 +510,12 @@ const { o, k, v } = getPropByPath(source, 'users[0].name');
 // o === source.users[0]；k === 'name'；v === 'Deot'
 getPropByPath(source, 'users[0].missing').v; // undefined，末级属性可以不存在
 // getPropByPath(source, 'missing.name'); // 抛出 Error('无效路径!')，中间路径必须存在
+// getPropByPath({ a: null }, 'a.b'); // 抛出 Error('无效路径!')，末级所属对象不能是 null / undefined
+// getPropByPath({}, '__proto__.x'); // 抛出 Error('无效路径!')
+// getPropByPath({}, 'constructor.prototype.x'); // 抛出 Error('无效路径!')
 ```
+
+为避免调用方写回 `o[k]` 时污染原型，路径中不允许出现 `__proto__`；`constructor` / `prototype` 只有作为普通对象的自有属性时才能作为中间路径。
 
 #### `getUid(prefix?)`
 
@@ -519,6 +536,11 @@ getPropByPath(source, 'users[0].missing').v; // undefined，末级属性可以�
 #### `numberToUnit(number, decimalDigit?)`
 
 转换为万、亿等中文数量单位
+
+- 不足一万时原样返回 `number`，其余返回 `string`
+- 四舍五入后满 `10000` 会进位到下一级单位：`99999999` → `'1亿'`
+- 负数保留符号：`-50000` → `'-5万'`
+- 超过 `Number.MAX_SAFE_INTEGER` 的值按 `Number.MAX_SAFE_INTEGER` 处理（`'9007.2万亿'`）
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -560,7 +582,7 @@ input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
 
 #### `preZero(number)`
 
-小于 10 的数字补前导零
+小于 10 的数字补前导零；负数保留符号，如 `-5` → `'-05'`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -605,7 +627,7 @@ input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
 
 #### `probs(weights)`
 
-按正权重随机返回数组下标；无有效权重时抛错
+按正权重随机返回数组下标；非正数与 `NaN` 权重视为 `0`，对应下标不会被返回；无有效权重时抛错
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -677,7 +699,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `compressImage(file, options?)`
 
-等比缩放到最大尺寸并通过 Canvas 编码
+等比缩放到最大尺寸并通过 Canvas 编码；文件读取失败或图片加载失败时 reject
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -685,7 +707,10 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `dataURLToFile(dataURL, filename?, filetype?)`
 
-将完整或纯 Base64 Data URL 转为 File
+将 Data URL 或纯 Base64 内容转为 File
+
+- 带 `data:` 前缀时使用其自带的 MIME，支持 base64 与百分号编码（如 `data:image/svg+xml,%3Csvg...`）两种内容
+- 不带前缀时视为纯 Base64，MIME 取 `filetype`，否则从文件名扩展名推断（`.jpg` → `image/jpeg`，`.svg` → `image/svg+xml`）
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
