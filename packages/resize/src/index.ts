@@ -1,12 +1,10 @@
 import { ResizeShared } from './shared';
 
-type ResizableListener = (...args: any[]) => any;
+export type ResizableListener = (...args: any[]) => any;
 
-type ResizableElement = HTMLElement & {
-	__rz__?: Resize;
-};
+export type ResizableSharedListener = (entries: ResizeObserverEntry[]) => any;
 
-type ResizableOptions = {
+export type ResizableOptions = {
 	/**
 	 * 共用模式：以同一个监听函数注册的元素共用一个 ResizeObserver，同一轮里这些元素的尺寸变化由一次回调带回
 	 * 	- 监听函数在一次回调里只执行一次（即使注册在多个元素上），参数为这些元素中发生变化的 entries
@@ -15,33 +13,48 @@ type ResizableOptions = {
 	shared?: boolean;
 };
 
+type ResizableState = {
+	listeners: ResizableListener[];
+	ro: ResizeObserver | null;
+};
+
+/**
+ * 元素 -> 默认模式下的监听状态
+ *
+ * 状态跟着元素走，而不是跟着实例走：同一元素的所有实例（无论创建先后）与静态方法读写的是同一份，
+ * 元素被回收时一并回收，不必往元素上挂属性
+ */
+const states = new WeakMap<Element, ResizableState>();
+
 // 检测DOM尺寸变化JS
 export class Resize {
-	el: ResizableElement;
+	el: Element;
 
-	static of(el: ResizableElement) {
+	static of(el: Element) {
 		return new Resize(el);
 	}
 
 	/**
-	 * Resize.of(el, fn);
+	 * Resize.on(el, fn);
 	 * @param el ~
 	 * @param fn ~
 	 * @param options ~
 	 * @returns off
 	 */
-	static on(el: ResizableElement, fn: ResizableListener, options?: ResizableOptions): () => void {
+	static on(el: Element, fn: ResizableSharedListener, options: { shared: true }): () => void;
+	static on(el: Element, fn: ResizableListener, options?: ResizableOptions): () => void;
+	static on(el: Element, fn: ResizableListener, options?: ResizableOptions): () => void {
 		return options?.shared ? ResizeShared.on(el, fn) : new Resize(el).on(fn);
 	}
 
 	/**
-	 * 要实现Resize.off(el)，el必须侵入式修改挂上__rz__
+	 * Resize.off(el, fn);
 	 * @param el ~
-	 * @param fn ~
+	 * @param fn 省略时删除该元素的全部监听（仅限 options 对应的模式）
 	 * @param options ~
 	 * @returns ~
 	 */
-	static off(el: ResizableElement, fn?: ResizableListener, options?: ResizableOptions): void {
+	static off(el: Element, fn?: ResizableListener, options?: ResizableOptions): void {
 		return options?.shared ? ResizeShared.off(el, fn) : new Resize(el).off(fn);
 	}
 
@@ -54,54 +67,84 @@ export class Resize {
 		return ResizeShared.disconnect(fn);
 	}
 
-	listeners: ResizableListener[] = [];
+	private state: ResizableState;
 
-	ro: ResizeObserver | null = null;
-
-	constructor(el: ResizableElement) {
+	constructor(el: Element) {
 		this.el = el;
 
-		const rz = el.__rz__;
-		if (rz && rz instanceof Resize) {
-			this.listeners = rz.listeners;
-			this.ro = rz.ro;
+		let state = states.get(el);
+		if (!state) {
+			state = { listeners: [], ro: null };
+			states.set(el, state);
 		}
+		this.state = state;
+	}
+
+	get listeners(): ResizableListener[] {
+		return this.state.listeners;
+	}
+
+	get ro(): ResizeObserver | null {
+		return this.state.ro;
 	}
 
 	handleResize = (entries: ResizeObserverEntry[]) => {
 		/* istanbul ignore else -- @preserve */
 		if (entries.some(i => i.target === this.el)) {
-			this.listeners?.forEach((fn: any) => fn());
+			const { listeners } = this.state;
+			const errors: unknown[] = [];
+			// 遍历的是快照：监听函数里 off（如只听一次）不会让后面的被跳过，本轮新注册的下一轮才执行；
+			// 本轮已被 off 的不再执行
+			listeners.slice().forEach((fn) => {
+				if (!listeners.includes(fn)) return;
+				try {
+					fn();
+				} catch (e) {
+					errors.push(e);
+				}
+			});
+
+			// 某个监听函数抛错不影响其它监听函数，错误照常抛出：
+			// 第一个在全部执行完后原样抛出（与只有它一个时的表现相同），其余的各自异步抛出，不被吞掉
+			if (errors.length) {
+				errors.slice(1).forEach(e => setTimeout(() => {
+					throw e;
+				}));
+				throw errors[0];
+			}
 		}
 	};
 
 	on(fn: ResizableListener) {
 		if (typeof ResizeObserver === 'undefined') return () => {};
-		if (!this.listeners.length) {
-			this.ro = this.ro || new ResizeObserver(this.handleResize);
-			this.ro.observe(this.el);
 
-			this.el.__rz__ = this;
+		const { state } = this;
+		// 同一个监听函数在同一个元素上重复注册只算一次
+		if (!state.listeners.includes(fn)) {
+			if (!state.listeners.length) {
+				state.ro = state.ro || new ResizeObserver(this.handleResize);
+				state.ro.observe(this.el);
+			}
+
+			state.listeners.push(fn);
 		}
-
-		this.listeners.push(fn);
 
 		return () => this.off(fn);
 	}
 
 	off(fn?: ResizableListener) {
+		const { listeners, ro } = this.state;
 		if (fn) {
-			// 未注册的监听器（indexOf为-1）直接忽略：splice(-1, 1)会误删最后一个；同一元素的实例共享listeners，误删的可能是其他调用方的
-			const index = this.listeners.indexOf(fn);
+			// 未注册的监听器（indexOf为-1）直接忽略：splice(-1, 1)会误删最后一个，误删的可能是其他调用方的
+			const index = listeners.indexOf(fn);
 			if (index === -1) return;
-			this.listeners.splice(index, 1);
+			listeners.splice(index, 1);
 		} else {
-			// 原地清空：同一元素的实例共享listeners，换成新数组只改了当前实例，元素上的旧数组仍留着监听器，之后再on不会重新observe
-			this.listeners.length = 0;
+			listeners.length = 0;
 		}
 
-		if (!this.listeners.length && this.ro) {
-			this.ro.disconnect();
+		if (!listeners.length && ro) {
+			ro.disconnect();
 		}
 	}
 }

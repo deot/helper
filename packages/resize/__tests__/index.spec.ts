@@ -144,6 +144,181 @@ describe('resize.ts', () => {
 		expect(b).toHaveBeenCalled();
 	});
 
+	it('shares the state with an instance created before any listener', async () => {
+		const target = create();
+		// 先创建实例、之后才有监听：它与静态方法、之后创建的实例仍是同一份状态
+		const early = Resize.of(target);
+		const a = vi.fn();
+		const b = vi.fn();
+		Resize.on(target, a);
+		early.on(b);
+
+		expect(observersOf(target)).toHaveLength(1);
+		expect(early.listeners).toBe(Resize.of(target).listeners);
+		expect(early.ro).toBe(Resize.of(target).ro);
+		// 状态不挂在元素上
+		expect('__rz__' in target).toBe(false);
+		await Utils.sleep(50);
+		expect(a).toHaveBeenCalledTimes(1);
+		expect(b).toHaveBeenCalledTimes(1);
+
+		// 静态 off 能删掉静态 on 注册的监听，不受先创建的实例影响
+		Resize.off(target, a);
+		await resize(target);
+		expect(a).toHaveBeenCalledTimes(1);
+		expect(b).toHaveBeenCalledTimes(2);
+
+		// 省略监听器时连同实例注册的一起清空，并停止观察
+		Resize.off(target);
+		expect(observersOf(target)).toHaveLength(0);
+		await resize(target);
+		expect(b).toHaveBeenCalledTimes(2);
+	});
+
+	it('shares the state between instances created before any listener', async () => {
+		const target = create();
+		const [first, second] = [Resize.of(target), Resize.of(target)];
+		const a = vi.fn();
+		const b = vi.fn();
+		first.on(a);
+		second.on(b);
+
+		expect(first.listeners).toBe(second.listeners);
+		expect(observersOf(target)).toHaveLength(1);
+
+		// 任一实例都能删掉另一个实例注册的监听
+		second.off(a);
+		await Utils.sleep(50);
+		expect(a).not.toHaveBeenCalled();
+		expect(b).toHaveBeenCalledTimes(1);
+
+		first.off();
+		expect(observersOf(target)).toHaveLength(0);
+	});
+
+	it('calls the listeners after one that removes itself', async () => {
+		const target = create();
+		const calls: string[] = [];
+		const off = Resize.on(target, () => {
+			calls.push('a');
+			off();
+		});
+		Resize.on(target, () => calls.push('b'));
+		// 回调内注册的监听下一轮才执行
+		const late = vi.fn();
+		const offOnce = Resize.on(target, () => {
+			offOnce();
+			Resize.on(target, late);
+		});
+		await Utils.sleep(50);
+		expect(calls).toEqual(['a', 'b']);
+		expect(late).not.toHaveBeenCalled();
+
+		await resize(target);
+		expect(calls).toEqual(['a', 'b', 'b']);
+		expect(late).toHaveBeenCalledTimes(1);
+	});
+
+	it('does not call a listener removed earlier in the same callback', async () => {
+		const target = create();
+		const removed = vi.fn();
+		const kept = vi.fn();
+		Resize.on(target, () => Resize.off(target, removed));
+		Resize.on(target, removed);
+		Resize.on(target, kept);
+		await Utils.sleep(50);
+
+		expect(removed).not.toHaveBeenCalled();
+		expect(kept).toHaveBeenCalledTimes(1);
+	});
+
+	it('ignores a listener registered twice on the same element', async () => {
+		const target = create();
+		const fn = vi.fn();
+		Resize.on(target, fn);
+		Resize.of(target).on(fn);
+		await Utils.sleep(50);
+
+		expect(fn).toHaveBeenCalledTimes(1);
+		expect(Resize.of(target).listeners).toHaveLength(1);
+
+		// 重复注册只算一次：off 一次即删除并停止观察
+		Resize.off(target, fn);
+		expect(observersOf(target)).toHaveLength(0);
+		await resize(target);
+		expect(fn).toHaveBeenCalledTimes(1);
+	});
+
+	it('exposes the state of an element through Resize.of', () => {
+		const target = create();
+		// 直接调用 handleResize 模拟一次派发：entries 只需要 target
+		const dispatch = () => Resize.of(target).handleResize([{ target }] as any);
+
+		// 未监听：没有监听函数与观察器，派发是空操作
+		expect(Resize.of(target).listeners).toHaveLength(0);
+		expect(Resize.of(target).ro).toBe(null);
+		dispatch();
+
+		const fn = vi.fn();
+		Resize.on(target, fn);
+		expect(Resize.of(target).listeners).toEqual([fn]);
+		expect(observersOf(target)).toEqual([Resize.of(target).ro]);
+		dispatch();
+		expect(fn).toHaveBeenCalledTimes(1);
+	});
+
+	it('calls the remaining listeners after one that throws', () => {
+		const target = create();
+		const dispatch = () => Resize.of(target).handleResize([{ target }] as any);
+		const [first, second] = [new Error('first'), new Error('second')];
+		const good = vi.fn();
+		const offFirst = Resize.on(target, () => {
+			throw first;
+		});
+		Resize.on(target, good);
+		Resize.on(target, () => {
+			throw second;
+		});
+
+		// 派发期间记下定时器回调，不真正执行
+		const timers: (() => void)[] = [];
+		const spy = vi.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: any) => timers.push(fn)) as any);
+		let thrown: unknown;
+		try {
+			dispatch();
+		} catch (e) {
+			thrown = e;
+		}
+
+		// 后面的监听函数照常执行；第一个错误原样抛出，其余的各自经定时器抛出
+		expect(thrown).toBe(first);
+		expect(good).toHaveBeenCalledTimes(1);
+		expect(timers).toHaveLength(1);
+		expect(timers[0]).toThrow(second);
+
+		// 只有一个出错时不用定时器
+		offFirst();
+		timers.length = 0;
+		expect(dispatch).toThrow(second);
+		expect(good).toHaveBeenCalledTimes(2);
+		expect(timers).toHaveLength(0);
+
+		spy.mockRestore();
+		// 观察器的首次回调之前删除：不让抛错的监听函数在用例之外执行
+		Resize.off(target);
+	});
+
+	it('observes svg elements', () => {
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		document.body.appendChild(svg);
+		const off = Resize.on(svg, vi.fn());
+
+		expect(observersOf(svg)).toHaveLength(1);
+		off();
+		expect(observersOf(svg)).toHaveLength(0);
+		svg.remove();
+	});
+
 	describe('shared', () => {
 		// 最近一次调用收到的 entries 对应的元素
 		const targetsOf = (fn: any) => fn.mock.lastCall[0].map((entry: any) => entry.target);

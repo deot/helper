@@ -30,6 +30,17 @@ Resize.on(element, listener);
 Resize.off(element, listener);
 ```
 
+### 默认模式
+
+每个元素一个 `ResizeObserver`，监听状态按元素登记：同一元素的所有实例（无论创建先后）与静态方法读写的是同一份，不会往元素上挂属性。
+
+- 监听函数不带参数。
+- 元素上的第一个监听函数注册后会收到一次首次通知（浏览器开始观察时派发）；元素已经在被监听时再注册的监听函数不会收到，要等到下一次尺寸变化。
+- 同一个监听函数在同一个元素上重复注册只算一次，`off` 一次即删除。
+- 监听函数里可以 `off`（如只听一次）：后面的监听函数不会被跳过，本轮已被 `off` 的不再执行；监听函数里新注册的下一轮才执行。
+- 某个监听函数抛错不影响其它监听函数，错误照常抛出。
+- 元素可以是任意 `Element`（包括 SVG 元素）。
+
 ### 共用模式
 
 默认每个元素一个 `ResizeObserver`：同时有 N 个元素变化，浏览器就回调 N 次，并且在每次回调之间清空微任务。传入 `{ shared: true }` 后，以同一个监听函数注册的元素共用一个 `ResizeObserver`，它们的变化由一次回调带回：
@@ -69,11 +80,11 @@ Resize.disconnect(listener);
 
 #### `new Resize(element)`
 
-创建实例；复用元素上已有监听状态
+创建实例；与同一元素的其它实例、静态方法共享监听状态
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `element` | `HTMLElement` | `Resize` |
+| `element` | `Element` | `Resize` |
 
 #### `Resize.of(element)`
 
@@ -81,7 +92,7 @@ Resize.disconnect(listener);
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `element` | `HTMLElement` | `Resize` |
+| `element` | `Element` | `Resize` |
 
 #### `Resize.on(element, listener, options?)`
 
@@ -89,7 +100,7 @@ Resize.disconnect(listener);
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `element`、`listener`、`options` | `HTMLElement`、`(entries?) => any`、`{ shared?: boolean }` | `() => void` |
+| `element`、`listener`、`options` | `Element`、`(entries?) => any`、`{ shared?: boolean }` | `() => void` |
 
 #### `Resize.off(element, listener?, options?)`
 
@@ -97,7 +108,7 @@ Resize.disconnect(listener);
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `element`、`listener`、`options` | `HTMLElement`、`(entries?) => any`、`{ shared?: boolean }` | `void` |
+| `element`、`listener`、`options` | `Element`、`(entries?) => any`、`{ shared?: boolean }` | `void` |
 
 #### `Resize.disconnect(listener)`
 
@@ -133,7 +144,7 @@ Resize.disconnect(listener);
 
 #### `Resize.handleResize(entries)`
 
-observer 回调；仅在 entries 包含当前元素时通知 listeners
+observer 回调；仅在 entries 包含当前元素时通知 listeners，遍历的是 listeners 的快照。可用 `Resize.of(element).handleResize([{ target: element }])` 在测试里模拟一次派发
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -145,21 +156,21 @@ observer 回调；仅在 entries 包含当前元素时通知 listeners
 
 | 类型 |
 | --- |
-| `HTMLElement` |
+| `Element` |
 
 #### `Resize.listeners`
 
-当前元素在默认模式下的监听函数；同一元素创建的实例会复用该数组
+当前元素在默认模式下的监听函数（只读）；同一元素的所有实例读到的是同一个数组
 
-| 类型 | 类型 |
+| 类型 | 默认值 |
 | --- | --- |
 | `Function[]` | `[]` |
 
 #### `Resize.ro`
 
-默认模式下首次监听后创建的 observer
+默认模式下首次监听后创建的 observer（只读）；同一元素的所有实例读到的是同一个
 
-| 类型 | 类型 |
+| 类型 | 默认值 |
 | --- | --- |
 | `ResizeObserver \| null` | `null` |
 
