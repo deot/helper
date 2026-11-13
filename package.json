@@ -16,7 +16,7 @@
     "link": "ddc link",
     "docs:dev": "doc dev --workspace .",
     "dev": "ddc dev",
-    "build": "ddc build --script-formats=es,cjs,umd,iife",
+    "build": "ddc build",
     "update": "ddc update",
     "test": "ddc test",
     "add": "ddc add",
@@ -43,7 +43,7 @@
   },
   "homepage": "https://github.com/deot/helper#readme",
   "devDependencies": {
-    "@deot/dev": "^2.9.15",
-    "@deot/docs": "1.2.7"
+    "@deot/dev": "^2.10.1",
+    "@deot/docs": "^1.2.11"
   }
 }
