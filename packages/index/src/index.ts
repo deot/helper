@@ -11,7 +11,7 @@ import * as Route from '@deot/helper-route';
 import * as $ from '@deot/helper-dom';
 import * as Is from '@deot/helper-is';
 
-import { Interrupter, Task, Job, Parallel } from '@deot/helper-scheduler';
+import { Interrupter, Task, Job, Parallel, CancelError, isCancelError } from '@deot/helper-scheduler';
 import { Emitter } from '@deot/helper-emitter';
 import { Resize } from '@deot/helper-resize';
 import { Wheel } from '@deot/helper-wheel';
@@ -42,5 +42,7 @@ export {
 	Interrupter,
 	Task,
 	Job,
-	Parallel
+	Parallel,
+	CancelError,
+	isCancelError
 };
