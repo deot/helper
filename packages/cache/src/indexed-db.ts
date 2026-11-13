@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { ACache } from './cache';
 
 const ALLOW = (() => {
@@ -65,7 +64,10 @@ export class IndexedDBStore extends ACache {
 		});
 
 		this.pending.push(target);
-		target.finally(() => this.close(target));
+
+		// 不使用`target.finally`：它派生的Promise无人处理，失败时会额外触发`unhandledrejection`
+		const done = () => this.close(target).catch(/* istanbul ignore next */ () => {});
+		target.then(done, done);
 		return target;
 	}
 
@@ -74,10 +76,10 @@ export class IndexedDBStore extends ACache {
 	 * @param request ~
 	 * @returns ~
 	 */
-	private async task(request: IDBRequest): Promise<any> {
+	private task<T = any>(request: IDBRequest<T>): Promise<T> {
 		return new Promise((resolve, reject) => {
-			request.onsuccess = resolve;
-			request.onerror = reject;
+			request.onsuccess = () => resolve(request.result);
+			request.onerror = () => reject(request.error);
 		});
 	}
 
@@ -185,10 +187,7 @@ export class IndexedDBStore extends ACache {
 		const { name } = this.options;
 		const request = window.indexedDB.deleteDatabase(name);
 
-		await new Promise((resolve, reject) => {
-			request.onsuccess = resolve;
-			request.onerror = reject;
-		});
+		await this.task(request);
 	}
 
 	/**
@@ -206,11 +205,7 @@ export class IndexedDBStore extends ACache {
 			};
 
 			const request = os.add(state);
-
-			await new Promise((resolve, reject) => {
-				request.onsuccess = resolve;
-				request.onerror = reject;
-			});
+			await this.task(request);
 
 			return state;
 		});
@@ -223,11 +218,10 @@ export class IndexedDBStore extends ACache {
 	 */
 	read(id: string): Promise<State | undefined> {
 		return this.concurrent<State | undefined>(async () => {
-			const os = await this.openObjectStore();
+			const os = await this.openObjectStore('readonly');
 			const request = os.get(id);
-			await this.task(request);
 
-			return request.result;
+			return this.task(request);
 		});
 	}
 
@@ -272,23 +266,10 @@ export class IndexedDBStore extends ACache {
 	 */
 	search(): Promise<State[]> {
 		return this.concurrent<State[]>(async () => {
-			const os = await this.openObjectStore();
-			const request = os.openCursor();
+			const os = await this.openObjectStore('readonly');
+			const request = os.getAll();
 
-			const rowData: State[] = [];
-			await new Promise((resolve, reject) => {
-				request.onsuccess = () => {
-					const cursor = request.result;
-					if (cursor) {
-						rowData.push(cursor.value);
-						cursor.continue();
-					} else {
-						resolve(rowData);
-					}
-				};
-				request.onerror = reject;
-			});
-			return rowData;
+			return this.task(request);
 		});
 	}
 

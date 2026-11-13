@@ -1,5 +1,6 @@
 export class MemoryStorage {
-	store: Record<string, any> = {};
+	// 无原型对象，避免`toString`、`constructor`等key读到原型上的值
+	store: Record<string, any> = Object.create(null);
 
 	getItem(key: string) {
 		return this.store[key] || null;

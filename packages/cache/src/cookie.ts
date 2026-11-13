@@ -2,21 +2,33 @@ import { ACache } from './cache';
 
 interface Options {
 	// 时间：默认12小时、，单位：天
-	days: number;
+	days?: number;
 	// 域名下的路径：默认：/
 	path?: string;
 	// 域名
 	domain?: string;
 }
 
+// 只读探测，避免模块加载时写入多余的cookie
 const ALLOW = (() => {
 	try {
-		document.cookie = 'test';
-		return true;
+		return typeof document.cookie === 'string';
 	} catch (_) {
 		return false;
 	}
 })();
+
+// key可能含有正则元字符，如`a.b`、`user[id]`
+const escapeRegExp = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// 其他来源写入的值可能不是合法的URI编码，如`100%`
+const decode = (v: string) => {
+	try {
+		return decodeURIComponent(v);
+	} catch {
+		return v;
+	}
+};
 
 class CookieStore extends ACache {
 	/**
@@ -27,9 +39,9 @@ class CookieStore extends ACache {
 	get(key: string): any {
 		if (!ALLOW) return null;
 
-		const r = new RegExp('(?:^|;+|\\s+)' + key + '=([^;]*)');
+		const r = new RegExp('(?:^|;+|\\s+)' + escapeRegExp(key) + '=([^;]*)');
 		const m = window.document.cookie.match(r);
-		const value = !m ? null : decodeURIComponent(m[1]);
+		const value = !m ? null : decode(m[1]);
 
 		return this.options.get!(value);
 	}
@@ -48,8 +60,8 @@ class CookieStore extends ACache {
 		expires.setTime(expires.getTime() + (days ? 3600000 * 24 * days : 0.5 * 24 * 60 * 60 * 1000)); // 默认12小时
 
 		value = this.options.set!(typeof value === 'string' ? value : JSON.stringify(value));
-		// eslint-disable-next-line max-len
-		document.cookie = `${key}=${encodeURIComponent(value)};expires=${expires.toString()};path=${path || '/'};${domain ? `domain=${domain};` : ''}`;
+
+		document.cookie = `${key}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=${path || '/'};${domain ? `domain=${domain};` : ''}`;
 	}
 
 	/**

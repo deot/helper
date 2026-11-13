@@ -8,12 +8,12 @@ const formatKey = (key: string, versions: Array<string | number | undefined>) =>
 	return `${version ? `${PREFIX_NAME}${version}:` : ''}${key}`;
 };
 
+// 只判断能否访问，不做写入探测：
+// 1. 不占用、不误删业务自己的key
+// 2. 容量已满时仍可读取已有数据，写入失败由`set`回退到内存
 const ALLOW = (() => {
-	const test = 'test';
 	try {
-		window.localStorage.setItem(test, test);
-		window.localStorage.removeItem(test);
-		return true;
+		return !!window.localStorage && !!window.sessionStorage;
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (_) {
 		return false;
@@ -42,13 +42,16 @@ class StorageStore extends ACache {
 		if (!ALLOW) return;
 
 		const { version, versions: keepVersions } = this.options;
+		// 未设置版本时不清理
+		if (!version) return;
+
 		const versions = [version, ...keepVersions!];
-		// 清除之前的缓存
+		// 清除之前的缓存，带上分隔符精确匹配，避免版本`1`保留`12:`、`1.1:`
 		Object.keys(window.localStorage).forEach((item) => {
 			/* istanbul ignore else -- @preserve */
 			if (
-				item.includes(PREFIX_NAME)
-				&& !versions.some(i => item.includes(`${PREFIX_NAME}${i}`))
+				item.startsWith(PREFIX_NAME)
+				&& !versions.some(i => item.startsWith(`${PREFIX_NAME}${i}:`))
 			) {
 				window.localStorage.removeItem(item);
 			}
@@ -70,6 +73,8 @@ class StorageStore extends ACache {
 
 		try {
 			window[invoke].setItem(key, value);
+			// 写入成功后清掉内存中的旧值，否则`get`会优先读到它
+			this[invoke].removeItem(key);
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (error) {
 			this[invoke].setItem(key, value);

@@ -36,6 +36,20 @@ describe('indexed-db.ts', () => {
 		expect(data.name).toBe('name');
 	});
 
+	it('write, duplicate key', async () => {
+		const onUnhandled = vi.fn();
+		process.on('unhandledRejection', onUnhandled);
+
+		const data = await IndexedDB.write({ name: 'name' });
+		const error = await IndexedDB.write(data).catch(e => e);
+
+		expect(error.name).toBe('ConstraintError');
+
+		await new Promise(resolve => setTimeout(resolve, 10));
+		process.off('unhandledRejection', onUnhandled);
+		expect(onUnhandled).not.toHaveBeenCalled();
+	});
+
 	it('search', async () => {
 		await IndexedDB.write({ key: 'name0' });
 		await IndexedDB.write({ key: 'name0' });
