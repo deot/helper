@@ -31,7 +31,7 @@ const selected: Nullable<string> = null;
 | `AnyFunction<T = void>` | `T`：返回值类型 | `(...args: any[]) => T` | 任意参数函数 |
 | `Nullable<T>` | `T`：原始类型 | `T \| null` | 可空类型 |
 | `Customized<Origin = any, Extend = any>` | 原始类型、扩展类型 | `Origin & Extend` | 交叉组合类型 |
-| `TimeoutHandle` | — | `ReturnType<typeof global.setTimeout>` | 当前环境的定时器句柄 |
+| `TimeoutHandle` | — | `ReturnType<typeof setTimeout>` | 当前环境的定时器句柄 |
 
 该包不包含业务逻辑，适合被其他包作为轻量基础依赖。
 

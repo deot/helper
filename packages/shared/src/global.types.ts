@@ -13,4 +13,4 @@ export interface AnyFunction<T = void> {
 
 export type Nullable<T> = T | null;
 export type Customized<Origin = any, Extend = any> = Origin & Extend;
-export type TimeoutHandle = ReturnType<typeof global.setTimeout>;
+export type TimeoutHandle = ReturnType<typeof setTimeout>;
