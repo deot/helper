@@ -41,7 +41,6 @@ decode(value); // '你好，world'
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
 import { computed, ref } from 'vue';
 import { encode } from '@deot/helper-unicode';
 
@@ -92,7 +91,6 @@ import { decode, encode } from '@deot/helper-unicode';
 
 const input = ref(encode('你好，@deot/helper'));
 // Template 中直接使用。
-// eslint-disable-next-line no-useless-assignment
 const output = computed(() => {
 	try {
 		return { value: decode(input.value), error: null };
@@ -138,6 +136,10 @@ Base64 解码并解压为 Unicode 字符串
 
 ## 运行环境
 
-实现依赖全局 `btoa` 和 `atob`，并使用 `fflate` 完成压缩。目标运行环境需要提供这两个 Base64 API；现代浏览器和较新的 Node.js 均已支持。
+实现依赖全局 `btoa`、`atob` 和 `TextDecoder`，并使用 `fflate` 完成压缩。目标运行环境需要提供这些 API；现代浏览器和较新的 Node.js 均已支持。
 
-`atou` 会识别当前 zlib 格式，同时保留对早期未压缩 Unicode Base64 数据的兼容解码。
+`atou` 会识别任意压缩级别的 zlib 数据并校验其 adler32，同时保留对早期未压缩 Unicode Base64 数据的兼容解码：数据不是 zlib 格式，或按 zlib 解压失败时，按旧格式解码。字符串开头的 BOM（`\uFEFF`）会原样保留。
+
+孤立的代理项（如 `'\uD800'`）不是合法的 Unicode 文本，无法用 UTF-8 表示，`utoa` 会把它替换为 `\uFFFD`，与 `TextEncoder` 的行为一致。需要严格校验时，可在编码前用 `String.prototype.isWellFormed()` 判断。
+
+解码失败时抛出的错误类型取决于失败位置：非法 Base64 抛出 `DOMException`，zlib 数据损坏抛出 `Error`，旧格式数据不是合法 UTF-8 抛出 `URIError`。
