@@ -1,3 +1,3 @@
 import { instance } from './instance';
 
-export const formEl = (v?: any) => instance(v, 'HTMLFormElement');
+export const formEl = (v?: any): v is HTMLFormElement => instance(v, 'HTMLFormElement');

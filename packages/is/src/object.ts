@@ -1,4 +1,3 @@
 import { type } from './type';
-import { nil } from './nil';
 
-export const object = (v?: any) => !nil(v) && type(v, 'object');
+export const object = (v?: any): v is Record<PropertyKey, any> => v !== null && type(v, 'object');

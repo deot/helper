@@ -1,1 +1,4 @@
-export const buffer = (v?: any) => !!(v?.constructor?.isBuffer?.(v));
+export const buffer = (v?: any): boolean => {
+	const constructor = v?.constructor;
+	return typeof constructor?.isBuffer === 'function' && !!constructor.isBuffer(v);
+};

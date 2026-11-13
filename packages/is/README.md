@@ -17,6 +17,23 @@ array([]); // true
 number(NaN); // true，按 typeof 判断
 plainObject({}); // true
 nil(null); // true
+nil(undefined); // true
+```
+
+判断器都是类型守卫（`type`、`buffer` 除外），通过后 TypeScript 会自动收窄类型：
+
+```ts
+import { nil, string, instance } from '@deot/helper-is';
+
+const format = (value?: string | number | null) => {
+	if (nil(value)) return ''; // value: null | undefined
+	if (string(value)) return value.trim(); // value: string
+	return value.toFixed(2); // value: number
+};
+
+const parse = (value: unknown) => {
+	if (instance(value, Date)) return value.getTime(); // value: Date
+};
 ```
 
 聚合包以 `Is` 命名空间提供相同函数：
@@ -50,7 +67,10 @@ Is.string('value');
 ```vue
 <script setup>
 import { computed, ref } from 'vue';
-import { array, arrayBuffer, arrayBufferView, date, nil, number, object, plainObject, string, type, typedArray, undef } from '@deot/helper-is';
+import {
+	array, arrayBuffer, arrayBufferView, bigint, date, nil, number, object,
+	plainObject, string, symbol, thenable, type, typedArray, undef
+} from '@deot/helper-is';
 
 const values = [
 	{ label: '\'helper\'', value: 'helper' },
@@ -59,6 +79,9 @@ const values = [
 	{ label: 'null', value: null },
 	{ label: 'undefined', value: undefined },
 	{ label: 'NaN', value: NaN },
+	{ label: '1n', value: 1n },
+	{ label: 'Symbol(\'helper\')', value: Symbol('helper') },
+	{ label: 'Promise.resolve()', value: Promise.resolve() },
 	{ label: '[1, 2]', value: [1, 2] },
 	{ label: '{ a: 1 }', value: { a: 1 } },
 	{ label: 'new String(\'helper\')', value: new String('helper') },
@@ -69,7 +92,7 @@ const values = [
 ];
 const selected = ref(0);
 const typeName = ref('string');
-const tests = { nil, undef, string, number, array, object, plainObject, date, arrayBuffer, arrayBufferView, typedArray };
+const tests = { nil, undef, string, number, bigint, symbol, array, object, plainObject, thenable, date, arrayBuffer, arrayBufferView, typedArray };
 const output = computed(() => {
 	const { label, value } = values[selected.value];
 	return {
@@ -87,7 +110,11 @@ const output = computed(() => {
 			<option v-for="(item, index) in values" :key="index" :value="index">{{ item.label }}</option>
 		</select></label>
 		<label>类型名 <select v-model="typeName">
-			<option v-for="name in ['string', 'number', 'boolean', 'object', 'undefined', 'function', '']" :key="name" :value="name">
+			<option
+				v-for="name in ['string', 'number', 'boolean', 'bigint', 'symbol', 'object', 'undefined', 'function', '']"
+				:key="name"
+				:value="name"
+			>
 				{{ name || '不传类型名' }}
 			</option>
 		</select></label>
@@ -105,19 +132,27 @@ const output = computed(() => {
 ```
 :::
 
-`typeof null` 是 `'object'`，但 `object(null)` 为 `false`；`number(NaN)` 为 `true`，不能用它代替有限数值校验。`DataView` 是 ArrayBuffer view，但不是 typed array。
+`typeof null` 是 `'object'`，但 `object(null)` 为 `false`；`number(NaN)` 为 `true`，不能用它代替有限数值校验。`nil` 同时接受 `null` 与 `undefined`，`undef` 只接受 `undefined`。`DataView` 是 ArrayBuffer view，但不是 typed array。
 
 #### `instance(value, constructor)`
 
-`instanceof`；字符串从全局对象读取构造器
+传入构造函数时使用 `instanceof`，并收窄为该构造函数的实例类型；传入字符串时比较 `Object.prototype.toString.call(value)` 的标签（如 `'Date'` 对应 `[object Date]`）
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `value`、`constructor` | `any`、`Function \| string` | `boolean` |
 
+```ts
+instance([], Array); // true
+instance(new Date(), 'Date'); // true
+instance(new File([], 'a.js'), 'Blob'); // false，标签为 File
+```
+
+字符串形式不依赖全局构造器，可以跨 realm（如 iframe 内创建的对象）判断，在没有对应全局对象的环境中也只会返回 `false`；但它会受自定义 `Symbol.toStringTag` 影响。下文的 `date`、`regexp`、`blob`、`file` 等均基于这种标签比较。
+
 #### `nil(value)`
 
-仅当值严格等于 `null` 时返回 `true`
+值为 `null` 或 `undefined` 时返回 `true`；只判断 `undefined` 用 `undef`，只判断 `null` 直接写 `value === null`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -163,6 +198,22 @@ const output = computed(() => {
 | --- | --- | --- |
 | `value` | `any` | `boolean` |
 
+#### `symbol(value)`
+
+判断值是否为原始 `symbol` 类型
+
+| 参数 | 类型 | 返回值 |
+| --- | --- | --- |
+| `value` | `any` | `boolean` |
+
+#### `bigint(value)`
+
+判断值是否为原始 `bigint` 类型；`number(1n)` 为 `false`
+
+| 参数 | 类型 | 返回值 |
+| --- | --- | --- |
+| `value` | `any` | `boolean` |
+
 #### `array(value)`
 
 使用 `Array.isArray()` 判断数组
@@ -197,7 +248,7 @@ const output = computed(() => {
 
 #### `arrayBufferView(value)`
 
-使用 `ArrayBuffer.isView()` 判断 DataView 或 TypedArray；旧环境回退检查 `.buffer`
+使用 `ArrayBuffer.isView()` 判断 DataView 或 TypedArray
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -213,7 +264,7 @@ const output = computed(() => {
 
 #### `buffer(value)`
 
-通过构造器的 `isBuffer()` 判断 Node.js Buffer
+通过构造器的 `isBuffer()` 判断 Node.js Buffer（含浏览器端的 Buffer polyfill）
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -221,7 +272,7 @@ const output = computed(() => {
 
 #### `date(value)`
 
-判断 `Date` 实例
+判断 `Date` 实例；不校验日期是否有效，`date(new Date('invalid'))` 仍为 `true`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -237,7 +288,7 @@ const output = computed(() => {
 
 #### `blob(value)`
 
-判断浏览器 `Blob` 实例；无全局构造器的环境安全返回 `false`
+判断 `Blob` 实例，`File` 继承自 `Blob`，同样返回 `true`；无全局构造器的环境安全返回 `false`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -245,7 +296,7 @@ const output = computed(() => {
 
 #### `file(value)`
 
-判断浏览器 `File` 实例；无全局构造器的环境安全返回 `false`
+判断 `File` 实例，普通 `Blob` 返回 `false`；无全局构造器的环境安全返回 `false`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -286,6 +337,14 @@ const output = computed(() => {
 #### `stream(value)`
 
 非空对象且具有 `pipe` 函数
+
+| 参数 | 类型 | 返回值 |
+| --- | --- | --- |
+| `value` | `any` | `boolean` |
+
+#### `thenable(value)`
+
+对象或函数且具有 `then` 函数，Promise 及任何遵循 Promises/A+ 的对象都会返回 `true`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |

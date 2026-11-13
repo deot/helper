@@ -1,1 +1,1 @@
-export const array = (v?: any) => Array.isArray(v);
+export const array = (v?: any): v is any[] => Array.isArray(v);

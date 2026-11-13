@@ -1,3 +1,3 @@
 import { type } from './type';
 
-export const string = (v?: any) => type(v, 'string');
+export const string = (v?: any): v is string => type(v, 'string');

@@ -1,3 +1,3 @@
 import { instance } from './instance';
 
-export const file = (v?: any) => instance(v, 'File');
+export const file = (v?: any): v is File => instance(v, 'File');

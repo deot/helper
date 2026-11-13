@@ -1,6 +1,6 @@
 import { instance } from './instance';
 
-export const plainObject = (v?: any) => {
+export const plainObject = (v?: any): v is Record<PropertyKey, any> => {
 	if (!instance(v, 'Object')) {
 		return false;
 	}
