@@ -42,13 +42,17 @@ Wheel.of(ewheel, wheelOptions).enable();
 const efree = make('freedom');
 Wheel.of(efree, { ...wheelOptions, freedom: true }).enable();
 
-// native：触底或触底时，触底或触底时，如果父层存在滚动层，需要松开后，父层才能继续再滑动（原生行为）
+// native：触顶或触底时，如果父层存在滚动层，需要松开后，父层才能继续再滑动（原生行为）
 const enative = make('native');
 Wheel.of(enative).enable();
 
 // continue：继续滑动
 const econtinue = make('continue');
 Wheel.of(econtinue, { native: false }).enable();
+
+// decay：触摸松手后的惯性逐渐减速（默认匀速滑300ms后停下）
+const edecay = make('decay');
+Wheel.of(edecay, { decay: true }).enable();
 
 // original
 make('original');

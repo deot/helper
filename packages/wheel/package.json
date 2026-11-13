@@ -4,6 +4,7 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -11,7 +12,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "normalize-wheel": "^1.0.1"
-  }
+  "dependencies": {}
 }

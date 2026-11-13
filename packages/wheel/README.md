@@ -72,7 +72,7 @@ const off = wheel.on((deltaX, deltaY) => {
 
 #### `Wheel.on(listener)`
 
-监听按帧合并后的增量
+监听按帧合并后的增量；同一个 listener 重复注册只算一次。某个 listener 抛错不影响其它 listener，错误照常抛出
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -80,7 +80,7 @@ const off = wheel.on((deltaX, deltaY) => {
 
 #### `Wheel.off(listener?)`
 
-删除指定或全部 listener，必要时解绑 DOM 事件
+删除指定或全部 listener。全部删除后解绑 DOM 事件，并取消尚未派发的增量、进行中的惯性和边界等待，此后不再有任何回调
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -105,14 +105,19 @@ const off = wheel.on((deltaX, deltaY) => {
 | `deltaX` / `deltaY` | `number` | 当前动画帧累计的滚动增量 |
 | `isTouching` | `boolean` | 是否处于触控手势中 |
 | `startTime` / `startX` / `startY` / `moveX` / `moveY` | `number` | 触控或中键拖动的手势状态 |
-| `needThresholdWait` / `timer` | `boolean` / `any` | 原生边界切换的等待状态与定时器 |
+| `needThresholdWait` / `timer` | `boolean` / 定时器 ID 或 `null` | 原生边界切换的等待状态与定时器 |
 | `animationFrameID` | `number \| null` | 当前合并增量的动画帧 ID |
 | `handleTouchStart(event)` / `handleTouchMove(event)` / `handleTouchEnd(event)` | `(event: TouchEvent) => void` | 触控事件处理器 |
+| `handleTouchCancel()` | `() => void` | 触控被系统取消时结束手势 |
 | `handleMouseMove(event)` | `MouseEvent` | 中键拖动处理器 |
 | `handleWheel(event)` | `WheelEvent` | 原生滚轮处理器 |
-| `clear()` / `didWheel()` | `() => void` | 清理累计状态 / 在动画帧中发布累计增量 |
+| `clear()` / `didWheel()` | `() => void` | 结束边界等待 / 在动画帧中发布累计增量 |
 
 事件处理器和手势状态虽然在当前声明中可见，但由 `enable()` 管理；业务代码通常只需使用 `on()`、`off()` 和 `enable()`。
+
+缩放手势不接管：`ctrl` + 滚轮、触控板捏合和多指触摸交给浏览器处理。中键拖动与触摸模拟并存。
+
+边界判断与默认滚动按 `clientWidth` / `clientHeight` 计算，容器带边框时也能滚到末尾。
 
 在容器上滚动，或点击按钮派发一次滚轮事件，观察合并后的帧增量和边界判断：
 
@@ -126,7 +131,7 @@ const off = wheel.on((deltaX, deltaY) => {
 -->
 ```vue
 <script setup>
-/* eslint-disable no-useless-assignment */
+
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { Wheel } from '@deot/helper-wheel';
 
@@ -186,13 +191,14 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 配置滚动方向判断、事件传播和原生边界行为。
 
-表中的 `WheelFunction<T>` 表示 `(deltaX: number, deltaY: number) => T`，是源码内部类型，不可从包中单独导入。
+表中的 `WheelFunction<T>` 表示 `(deltaX: number, deltaY: number) => T`，可与 `WheelOptions` 一起从包中导入。
 
 | 选项 | 默认值 | 说明 |
 | --- | --- | --- |
-| `native` | `true` | 到达边界后是否保持原生“松开后父层再滚动”的阈值行为 |
+| `native` | `true` | 一段手势滚到边界后，是否保持原生“松开后父层再滚动”的行为；停手（30ms 内没有新的滚动）后再滚，父层直接跟随 |
 | `freedom` | `false` | 是否允许 X/Y 同时自由滚动；关闭时按手势角度锁定主方向 |
 | `touch` | `true` | 触控设备上是否模拟触摸滑动；`false` 时不监听 touch 事件，交由浏览器原生滚动（容器需 `overflow: auto/scroll`） |
+| `decay` | `false` | 触摸松手后的惯性是否逐渐减速。`false`：按整段手势的平均速度匀速再滑 300ms；`true`：按松手前约 100ms 的速度起步并逐渐减速到停，松手前已停住则没有惯性。两种惯性都会在再次按住、滑到边界或 `off()` 时停下 |
 | `shouldWheelX(deltaX, deltaY)` | 容器 X 轴边界判断 | 是否消费本次横向增量 |
 | `shouldWheelY(deltaY, deltaX)` | 容器 Y 轴边界判断 | 是否消费本次纵向增量 |
 | `stopPropagation(deltaX, deltaY)` | `() => true` | 消费滚动时是否阻止事件冒泡 |
