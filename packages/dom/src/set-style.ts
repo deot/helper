@@ -1,6 +1,6 @@
 import { IS_SERVER } from './_constants';
 
-export const setStyle = (el: HTMLElement, name?: object | string, value?: any) => {
+export const setStyle = (el: HTMLElement | SVGElement, name?: object | string, value?: any) => {
 	if (IS_SERVER || !name) return;
 
 	if (typeof name === 'object') {
@@ -10,6 +10,9 @@ export const setStyle = (el: HTMLElement, name?: object | string, value?: any) =
 				setStyle(el, prop, name[prop]);
 			}
 		}
+	} else if (name.startsWith('--')) {
+		// 自定义属性(--*)按属性名赋值不生效，只能通过 setProperty 写入；空值即移除
+		el.style.setProperty(name, value == null ? '' : String(value));
 	} else {
 		el.style[name] = value;
 	}

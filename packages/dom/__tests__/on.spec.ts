@@ -21,4 +21,26 @@ describe('on.ts', () => {
 		el.dispatchEvent(new Event('click'));
 		el.dispatchEvent(new Event('click'));
 	});
+
+	it('window / document / EventTarget', () => {
+		const targets: EventTarget[] = [window, document, new EventTarget()];
+		targets.forEach((target) => {
+			let count = 0;
+			const off = $.on(target, 'custom', () => count++);
+			target.dispatchEvent(new Event('custom'));
+			off();
+			target.dispatchEvent(new Event('custom'));
+
+			$.once(target, 'custom', () => count++);
+			target.dispatchEvent(new Event('custom'));
+			target.dispatchEvent(new Event('custom'));
+
+			const handler = () => count++;
+			$.on(target, 'custom', handler);
+			$.off(target, 'custom', handler);
+			target.dispatchEvent(new Event('custom'));
+
+			expect(count).toBe(2);
+		});
+	});
 });

@@ -2,19 +2,21 @@ import { IS_SERVER } from './_constants';
 import { isScroller } from './is-scroller';
 import type { ScrollerOptions } from './is-scroller';
 
-export const getScroller = (el?: HTMLElement, options?: ScrollerOptions) => {
+export const getScroller = (el?: Element, options?: ScrollerOptions) => {
 	if (IS_SERVER || !el) return null;
 
-	let parent = el;
+	let parent: any = el;
 	while (parent) {
-		if ([window, document, document.documentElement].includes(parent)) {
+		if (parent === window || parent === document || parent === document.documentElement) {
 			return window;
 		}
-		if (isScroller(parent as HTMLElement, options)) {
-			return parent;
+		// ShadowRoot、DocumentFragment 等非元素节点没有样式，跳过
+		if (parent.nodeType === 1 && isScroller(parent, options)) {
+			return parent as HTMLElement;
 		}
 
-		parent = parent?.parentNode as HTMLElement;
+		// 按渲染结构向上：slot 分发的节点先到 slot，ShadowRoot 再到宿主
+		parent = parent.assignedSlot || parent.parentNode || parent.host;
 	}
-	return parent;
+	return null;
 };

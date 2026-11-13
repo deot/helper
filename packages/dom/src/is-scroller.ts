@@ -6,7 +6,7 @@ export interface ScrollerOptions {
 	direction?: 'y' | 'x';
 }
 
-export const isScroller = (el?: HTMLElement, options?: ScrollerOptions) => {
+export const isScroller = (el?: Element, options?: ScrollerOptions) => {
 	if (IS_SERVER || !el) return false;
 
 	const { className, direction } = options || {};

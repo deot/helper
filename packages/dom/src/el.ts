@@ -1,6 +1,6 @@
 import { IS_SERVER } from './_constants';
 
-export const el = (v: string | HTMLElement) => {
+export const el = (v: string | Element) => {
 	if (IS_SERVER) return null;
 
 	let target: any;

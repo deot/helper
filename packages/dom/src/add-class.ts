@@ -1,11 +1,11 @@
 import { IS_SERVER } from './_constants';
 import { hasClass } from './has-class';
 
-export const addClass = (el: HTMLElement, cls?: string) => {
+export const addClass = (el: Element, cls?: string) => {
 	if (IS_SERVER || !cls) return;
 
 	let curClass = el.className;
-	const classes = cls.split(' ');
+	const classes = cls.split(/\s+/);
 
 	for (let i = 0, j = classes.length; i < j; i++) {
 		const clsName = classes[i];

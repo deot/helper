@@ -1,7 +1,7 @@
 import { IS_SERVER } from './_constants';
 
 export const off = (
-	el: HTMLElement,
+	el: EventTarget,
 	event: string,
 	handler: (...args: any[]) => any,
 	options?: boolean | AddEventListenerOptions

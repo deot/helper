@@ -1,10 +1,10 @@
 import { IS_SERVER } from './_constants';
 import { hasClass } from './has-class';
 
-export const removeClass = (el: HTMLElement, cls?: string) => {
+export const removeClass = (el: Element, cls?: string) => {
 	if (IS_SERVER || !cls) return;
 
-	const classes = cls.split(' ');
+	const classes = cls.split(/\s+/);
 	let curClass = ' ' + el.className + ' ';
 
 	for (let i = 0, j = classes.length; i < j; i++) {
@@ -12,7 +12,7 @@ export const removeClass = (el: HTMLElement, cls?: string) => {
 		if (clsName) {
 			if (el.classList) {
 				el.classList.remove(clsName);
-				// eslint-disable-next-line no-continue
+
 				continue;
 			}
 			/* istanbul ignore next -- @preserve */

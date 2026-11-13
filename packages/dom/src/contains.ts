@@ -1,12 +1,12 @@
 import { IS_SERVER } from './_constants';
 
-export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Document, child?: HTMLElement) => {
+export const contains = (el?: Element | Window | Document, child?: Element) => {
 	if (IS_SERVER || !child) return false;
 
 	const childRect = child.getBoundingClientRect();
 	let elRect: { top: number; right: number; bottom: number; left: number };
 
-	if (!el || [window, document, document.documentElement].includes(el)) {
+	if (!el || el === window || el === document || el === document.documentElement) {
 		elRect = {
 			top: 0,
 			right: window.innerWidth,
@@ -14,7 +14,7 @@ export const contains = (el?: HTMLElement | (Window & typeof globalThis) | Docum
 			left: 0
 		};
 	} else {
-		elRect = (el as HTMLElement).getBoundingClientRect();
+		elRect = (el as Element).getBoundingClientRect();
 	}
 
 	return childRect.top < elRect.bottom

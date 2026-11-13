@@ -1,6 +1,6 @@
 import { IS_SERVER } from './_constants';
 
-export const hasClass = (el: HTMLElement, cls?: string) => {
+export const hasClass = (el: Element, cls?: string) => {
 	if (IS_SERVER || !cls) return false;
 
 	if (cls.includes(' ')) {

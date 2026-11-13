@@ -37,7 +37,7 @@ const target = $.el('#app');
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `value` | `string \| HTMLElement` | `HTMLElement \| null` |
+| `value` | `string \| Element` | `HTMLElement \| null` |
 
 输入 CSS 选择器，查看 `el()` 返回的元素信息和错误：
 
@@ -90,11 +90,11 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `on(el, event, handler, options?)`
 
-注册事件并返回解绑函数
+注册事件并返回解绑函数；`el` 可以是元素、`window`、`document` 等任意 `EventTarget`
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
-| `el` / `event` / `handler` / `options` | `HTMLElement` / `string` / `(...args: any[]) => any` / `boolean \| AddEventListenerOptions` | `false` | `() => void` |
+| `el` / `event` / `handler` / `options` | `EventTarget` / `string` / `(...args: any[]) => any` / `boolean \| AddEventListenerOptions` | `false` | `() => void` |
 
 #### `off(el, event, handler, options?)`
 
@@ -106,7 +106,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `once(el, event, handler, options?)`
 
-注册执行一次后自动解绑的事件，并返回手动解绑函数
+注册执行一次后自动解绑的事件，并返回手动解绑函数。执行 handler 前就已解绑，handler 抛错或在内部再次触发同一事件时也只执行一次
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `composedPath(event)`
 
-获取事件传播路径，并兼容 `composedPath()` 返回空数组的环境
+获取事件传播路径，并兼容 `composedPath()` 返回空数组的情况（旧版 iOS，或事件派发结束后再读取）；兜底路径从 `event.target` 开始逐级向上，不含 `window`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -122,19 +122,19 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `addClass(el, className?)`
 
-添加一个或多个空格分隔的 class
+添加一个或多个以空白字符（空格、制表符、换行）分隔的 class
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `className` | `HTMLElement` / `string` | `void` |
+| `el` / `className` | `Element` / `string` | `void` |
 
 #### `removeClass(el, className?)`
 
-删除一个或多个空格分隔的 class
+删除一个或多个以空白字符（空格、制表符、换行）分隔的 class
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `className` | `HTMLElement` / `string` | `void` |
+| `el` / `className` | `Element` / `string` | `void` |
 
 #### `hasClass(el, className?)`
 
@@ -142,35 +142,42 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `className` | `HTMLElement` / `string` | `boolean` |
+| `el` / `className` | `Element` / `string` | `boolean` |
 
 #### `getStyle(el, name?)`
 
-读取行内样式或计算样式；`float` 会映射为 `cssFloat`
+读取行内样式或计算样式；`float` 会映射为 `cssFloat`，`--*` 自定义属性通过 `getPropertyValue` 读取（结果去掉首尾空白）
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `name` | `HTMLElement` / `string` | `string` |
+| `el` / `name` | `Element` / `string` | `string` |
 
 #### `setStyle(el, name, value?)`
 
-设置单个样式
+设置单个样式；`--*` 自定义属性通过 `setProperty` 写入，值为 `null` / `undefined` / `''` 时移除该属性
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `name` / `value` | `HTMLElement` / `string` / `any` | `void` |
+| `el` / `name` / `value` | `HTMLElement \| SVGElement` / `string` / `any` | `void` |
 
 #### `setStyle(el, styles)`
 
-批量设置样式对象
+批量设置样式对象，键同样可以是 `--*` 自定义属性
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `styles` | `HTMLElement` / `Record<string, any>` | `void` |
+| `el` / `styles` | `HTMLElement \| SVGElement` / `Record<string, any>` | `void` |
 
 #### `prefixStyle(name)`
 
-返回当前环境的 camelCase 和 kebab-case 前缀属性名
+逐个属性探测并返回当前环境可用的 camelCase 和 kebab-case 属性名：支持标准属性（或标准、前缀属性都不支持）时不加前缀，仅前缀属性可用时才返回带 `webkit` / `Moz` / `ms` / `O` 前缀的名字。入参可以是 camelCase 或 kebab-case；`--*` 自定义属性和已带前缀的 `-webkit-*` 等原样返回。探测在首次调用时进行并按属性缓存，SSR 下不加前缀
+
+```ts
+prefixStyle('transform'); // { camel: 'transform', kebab: 'transform' }
+prefixStyle('user-select'); // { camel: 'userSelect', kebab: 'user-select' }
+// 仅支持前缀属性的环境
+prefixStyle('lineClamp'); // { camel: 'webkitLineClamp', kebab: '-webkit-line-clamp' }
+```
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
@@ -182,15 +189,15 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `options` | `HTMLElement` / `ScrollerOptions` | `boolean` |
+| `el` / `options` | `Element` / `ScrollerOptions` | `boolean` |
 
 #### `getScroller(el?, options?)`
 
-向上查找最近的滚动容器
+向上查找最近的滚动容器；会穿过 Shadow DOM（slot 分发的节点先查 slot 所在的 shadow 树，再到宿主），未挂载到文档时返回 `null`
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `el` / `options` | `HTMLElement` / `ScrollerOptions` | `HTMLElement \| Window \| null` |
+| `el` / `options` | `Element` / `ScrollerOptions` | `HTMLElement \| Window \| null` |
 
 #### `contains(container?, child?)`
 
@@ -198,15 +205,15 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
-| `container` / `child` | `HTMLElement \| Window \| Document` / `HTMLElement` | viewport / — | `boolean` |
+| `container` / `child` | `Element \| Window \| Document` / `Element` | viewport / — | `boolean` |
 
 #### `scrollIntoView(el, options?)`
 
-使用 requestAnimationFrame 从 `from` 动画滚动到 `to`，`axis: 'x'` 时为横向（`scrollLeft`），默认纵向（`scrollTop`）。同一元素同一方向上的新调用会取消未完成的旧动画，横纵向动画互不影响；取消后（含 `signal` 中止）Promise 立即 resolve
+使用 requestAnimationFrame 从 `from` 动画滚动到 `to`，按经过的时间线性推进，耗时即 `duration`，与屏幕刷新率无关；`axis: 'x'` 时为横向（`scrollLeft`），默认纵向（`scrollTop`）。同一元素同一方向上的新调用会取消未完成的旧动画，横纵向动画互不影响；取消后（含 `signal` 中止）Promise 立即 resolve
 
 | 参数 | 类型 | 默认值 | 返回值 |
 | --- | --- | --- | --- |
-| `el` / `options` | `HTMLElement \| Window` / `ScrollOptions` | 见下表 | `Promise<any>` |
+| `el` / `options` | `Element \| Window` / `ScrollOptions` | 见下表 | `Promise<void>` |
 
 点击滚动后可主动中止，或再次点击另一方向替换旧动画；输出记录每次调用的完成原因和实际位置：
 
@@ -304,7 +311,7 @@ ScrollerOptions 的配置字段。
 | --- | --- | --- | --- |
 | `from` | `number` | `0` | 起始滚动位置 |
 | `to` | `number` | `0` | 目标滚动位置 |
-| `duration` | `number` | `300` | 动画时长，单位毫秒 |
+| `duration` | `number` | `300` | 动画时长，单位毫秒；不大于 `0` 时直接滚动到 `to` |
 | `signal` | `AbortSignal` | — | 中止时停止动画，已中止则不滚动 |
 | `axis` | `'x' \| 'y'` | `'y'` | 滚动方向：`'x'` 写 `scrollLeft`，`'y'` 写 `scrollTop`；`el` 为 `window` 时只改对应方向，另一方向保持不变 |
 
