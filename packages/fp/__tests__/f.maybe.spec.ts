@@ -3,7 +3,7 @@ import * as FP from '@deot/helper-fp';
 const { Maybe, Monad } = FP;
 const R = {
 	toUpper: (x: string) => x.toUpperCase(),
-	addSuffix: (x: string) => x += '!',
+	addSuffix: (x: string) => x + '!',
 	identity: (x: any) => x
 };
 
@@ -38,12 +38,39 @@ describe('maybe.ts', () => {
 		expect(current.flatMap(R.identity).valueOf()).toBe(null);
 	});
 
-	it('Monadic: map / flatMap / valueOf / toString', () => {
+	it('flatMap, chain', () => {
+		const safeProp = (key: string) => (x: any) => Maybe.of(x[key]);
+
+		const just = Maybe.of({ a: { b: 'Hello Maybes!' } })
+			.flatMap(safeProp('a'))
+			.flatMap(safeProp('b'))
+			.map(R.toUpper);
+		expect(just.toString()).toBe(`Maybe.Just(HELLO MAYBES!)`);
+
+		// 中途为空时后续不再执行
+		const nothing = Maybe.of({ a: null })
+			.flatMap(safeProp('a'))
+			.flatMap(safeProp('b'))
+			.map(R.toUpper);
+		expect(nothing.toString()).toBe(`Maybe.Nothing`);
+	});
+
+	it('Monadic: map / flatten / valueOf / toString', () => {
 		const current = Maybe.of(Maybe.of(Monad.of(Maybe.of(null))))
-			.flatMap(R.toUpper)
+			.flatten()
+			.map(R.toUpper)
 			.map(R.identity);
 
 		expect(current.valueOf()).toBe(null);
 		expect(current.toString()).toBe(`Maybe.Nothing`);
+	});
+
+	it('types', () => {
+		expectTypeOf(Maybe.of('Hello Maybes!').map(x => x.length)).toEqualTypeOf<FP.Maybe<number>>();
+		// map的回调拿到的是非空值
+		Maybe.of('Hello Maybes!' as string | null).map((x) => {
+			expectTypeOf(x).toEqualTypeOf<string>();
+			return x;
+		});
 	});
 });

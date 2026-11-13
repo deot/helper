@@ -1,6 +1,19 @@
 import { curry } from './curry';
 
-export const filter = curry((fn: Function, value: Array<any> | Object) => {
+type Dict<T = any> = Record<string, T>;
+
+export interface FilterFn {
+	<T>(fn: (value: T) => any, value: T[]): T[];
+	<T>(fn: (value: T) => any, value: Dict<T>): Dict<T>;
+	<T>(fn: (value: T) => any): {
+		(value: T[]): T[];
+		(value: Dict<T>): Dict<T>;
+		(value: any): any;
+	};
+	(...args: any[]): any;
+}
+
+export const filter: FilterFn = curry((fn: Function, value: Array<any> | Object) => {
 	if (value instanceof Array) {
 		return value.filter(i => fn(i));
 	} else {

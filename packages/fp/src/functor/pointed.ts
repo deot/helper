@@ -5,12 +5,12 @@ import { APointed } from './abstract';
  * 而 Monad 函子不仅具有提升值的能力，还提供了扁平化操作的能力。
  * Monad 函子是 Pointed 函子的扩展。
  */
-export class Pointed extends APointed {
-	static of(value: any) {
-		return new Pointed(value);
+export class Pointed<T = any> extends APointed<T> {
+	static of<T>(value: T) {
+		return new Pointed<T>(value);
 	}
 
-	map(fn: Function) {
+	map<R>(fn: (value: T) => R): Pointed<R> {
 		return Pointed.of(fn(this.value));
 	}
 

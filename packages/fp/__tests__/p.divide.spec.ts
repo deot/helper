@@ -49,4 +49,16 @@ describe('divide.ts', () => {
 		// Decimal.div(5e-7, 0.13).valueOf() => 0.000003846153846153846
 		expect(FP.divide(a, b)).toBe(Number('0.0000038461538461538461538'));
 	});
+
+	it('float/4', () => {
+		// 缩放时不能用浮点乘法：0.57 * 100 = 56.99999999999999
+		expect(0.57 / 0.01).toBe(56.99999999999999);
+		expect(FP.divide(0.57, 0.01)).toBe(57);
+		expect(1.15 / 0.05).toBe(22.999999999999996);
+		expect(FP.divide(1.15, 0.05)).toBe(23);
+	});
+
+	it('curry', () => {
+		expect(FP.divide(6)(2)).toBe(3);
+	});
 });

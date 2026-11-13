@@ -1,4 +1,11 @@
 import { curry } from '../pipeline';
+
+export interface TapFn {
+	<T>(fn: (x: T) => any, x: T): T;
+	<T>(fn: (x: T) => any): (x: T) => T;
+	(...args: any[]): any;
+}
+
 /**
  * tap（K-组合子）
  * 能够将无返回值的函数（例如记录日志、修改文件或HTML页面的函数）
@@ -6,7 +13,7 @@ import { curry } from '../pipeline';
  * tap :: (a -> *) -> a -> a
  */
 
-export const tap = curry((fn: Function, x: any) => {
+export const tap: TapFn = curry((fn: Function, x: any) => {
 	fn(x);
 	return x;
 });

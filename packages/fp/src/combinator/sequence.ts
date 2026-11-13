@@ -4,8 +4,8 @@
  * 会用相同的值顺序调用所有这些函数
  */
 
-export const sequence = (...funcs: Function[]) => {
-	return (x?: any) => {
-		funcs.forEach(fn => fn(x));
+export const sequence = <T = any>(...funcs: Array<(x: T) => any>) => {
+	return (x?: T) => {
+		funcs.forEach(fn => fn(x as T));
 	};
 };

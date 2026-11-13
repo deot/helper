@@ -1,6 +1,8 @@
 # @deot/helper-fp
 
-函数式编程工具集合，包含函数管道、组合子、基础函子以及可暂停、取消或并发执行的任务类型。
+函数式编程工具集合，包含函数管道、组合子与基础函子。所有导出都带有类型推导，包本身没有运行时依赖，可按需摇树。
+
+> `Task`、`Job`、`Parallel` 已迁移到 [`@deot/helper-scheduler`](../scheduler/README.md)。
 
 ## 安装
 
@@ -11,18 +13,16 @@ pnpm add @deot/helper-fp
 ## 使用
 
 ```ts
-import { pipe, map, filter, Maybe, Task } from '@deot/helper-fp';
+import { pipe, map, filter, add, Maybe } from '@deot/helper-fp';
 
 const select = pipe(
 	map((value: number) => value * 2),
 	filter((value: number) => value > 4)
 );
 
-select([1, 2, 3]);
+select([1, 2, 3]); // [6]，类型为 number[]
+add(0.1)(0.2); // 0.3，柯里化调用同样有类型
 Maybe.of(null).map(() => '不会执行').valueOf('fallback');
-
-const task = Task.of(1).map(async value => value + 1);
-const result = await task.toPromise();
 ```
 
 聚合包以 `FP` 命名空间提供这些导出：
@@ -43,7 +43,9 @@ import { FP } from '@deot/helper';
 
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
-| `fn` | `(...args: any[]) => any` | `Function` |
+| `fn` | `(...args: any[]) => any` | `Curried<Parameters<fn>, ReturnType<fn>>` |
+
+返回值的类型会随已传入的参数逐步收窄，例如 `curry((a: number, b: string) => true)(1)` 的类型是 `(b: string) => boolean`。使用占位符（`curry.placeholder`）时退回宽松签名，返回 `any`。带默认值或剩余参数的形参不计入 `fn.length`。
 
 输入三个数字，查看柯里化函数的分步调用结果：
 
@@ -254,6 +256,8 @@ reduce((sum: number, value: number) => sum + value, 0)([1, 2, 3]); // 6
 | --- | --- | --- |
 | `value` | `any[] \| string` | `any[] \| string` |
 
+`add` / `subtract` / `multiply` / `divide` 先把两个数按小数位数对齐成整数再运算，规避浮点误差；支持科学计数法（如 `1.5e-7`）与数字字符串，`null` 按 `0` 处理。四个函数都已柯里化，`add(1)(2)` 与 `add(1, 2)` 等价。
+
 #### `add(a, b)`
 
 精确处理小数加法
@@ -285,6 +289,16 @@ reduce((sum: number, value: number) => sum + value, 0)([1, 2, 3]); // 6
 | 参数 | 类型 | 返回值 |
 | --- | --- | --- |
 | `a` / `b` | `number` / `number` | `number` |
+
+```ts
+import { add, divide, multiply } from '@deot/helper-fp';
+
+0.1 + 0.2; // 0.30000000000000004
+add(0.1, 0.2); // 0.3
+0.57 / 0.01; // 56.99999999999999
+divide(0.57, 0.01); // 57
+multiply(1.5e-7, 2); // 3e-7
+```
 
 ### Combinator
 
@@ -415,19 +429,27 @@ Monad 函数式容器的创建、映射与取值 API。
 
 #### `Monad.map(fn)` / `Monad.flatMap(fn)`
 
-映射或展开映射结果
+映射；`flatMap` 在映射后再展平一层，用于 `fn` 本身返回 Monad 的情况
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
 | `fn` | `Function` | `Monad` / `any` |
 
-#### `Monad.join()` / `Monad.valueOf()` / `Monad.toString()`
+```ts
+import { Monad } from '@deot/helper-fp';
 
-展开一层、读取值或字符串表示
+Monad.of(1).map(x => Monad.of(x + 1)); // Monad(Monad(2))
+Monad.of(1).flatMap(x => Monad.of(x + 1)); // Monad(2)
+Monad.of(Monad.of(Monad.of(1))).flatten().map(x => x + 1); // Monad(2)
+```
+
+#### `Monad.join()` / `Monad.flatten()` / `Monad.valueOf()` / `Monad.toString()`
+
+展开一层、展开全部层级、读取值或字符串表示
 
 | 返回值 |
 | --- |
-| `any` / `any` / `string` |
+| `any` / `any` / `any` / `string` |
 
 #### `Monad.value`
 
@@ -473,9 +495,9 @@ Maybe 函数式容器的创建、映射与取值 API。
 | --- | --- | --- |
 | `other` | `any` | `any` |
 
-#### `Maybe.flatMap(fn)` / `Maybe.join()` / `Maybe.toString()`
+#### `Maybe.flatMap(fn)` / `Maybe.join()` / `Maybe.flatten()` / `Maybe.toString()`
 
-展开映射、展开嵌套 Monad 或返回字符串表示
+映射后展平一层、展平一层、展平全部层级或返回字符串表示
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -533,9 +555,9 @@ Either 函数式容器的创建、映射与取值 API。
 | --- | --- | --- |
 | `fn` | `Function` | `Either` |
 
-#### `Either.flatMap(fn)` / `Either.join()` / `Either.valueOf()` / `Either.toString()`
+#### `Either.flatMap(fn)` / `Either.join()` / `Either.flatten()` / `Either.valueOf()` / `Either.toString()`
 
-继承的展开、取值和字符串表示能力
+继承的展开、取值和字符串表示能力；Left 不参与映射，它的值也不会被 `join()` 展平
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -555,7 +577,7 @@ IO 函数式容器的创建、映射与取值 API。
 
 #### `IO.of(value)` / `new IO(value)`
 
-创建 IO；`map` 会把普通值包装进惰性计算链
+创建 IO；`map` 会把值包装进惰性计算链。函数作为初始值时同样被当作普通值，不会被执行
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -569,32 +591,32 @@ IO 函数式容器的创建、映射与取值 API。
 | --- | --- | --- |
 | `fn` | `Function` | `IO` |
 
-#### `IO.valueOf()` / `IO.toString()`
+#### `IO.run()` / `IO.valueOf()` / `IO.toString()`
 
-执行计算或返回字符串表示；未经 `map` 的初始值需为函数
+执行计算或返回字符串表示；每次调用都会重新执行整条计算链
 
 | 返回值 |
 | --- |
-| `any` / `string` |
+| `any` / `any` / `string` |
 
-#### `IO.flatMap(fn)` / `IO.join()`
+#### `IO.flatMap(fn)` / `IO.join()` / `IO.flatten()`
 
-继承的展开映射和嵌套 Monad 展开能力
+同样是惰性的：`flatMap` 在 `fn` 返回 IO 时展平一层，`join` 展平一层，`flatten` 展平全部层级
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
-| `fn` | `Function` | `any` |
+| `fn` | `Function` | `IO` |
 
-#### `IO.value`
+#### `IO.value` / `IO.lazy`
 
-当前惰性计算值；映射后通常为函数
+`lazy` 为 `true` 时 `value` 是内部生成的待执行函数，否则是初始值
 
 | 类型 |
 | --- |
-| `any` |
+| `any` / `boolean` |
 
 
-同一输入分别进入 Pointed、Monad、Maybe、Either、IO 和 Task：
+同一输入分别进入 Pointed、Monad、Maybe、Either 和 IO：
 
 :::playground
 <!--
@@ -608,29 +630,30 @@ IO 函数式容器的创建、映射与取值 API。
 <script setup>
 
 import { ref } from 'vue';
-import { Either, IO, Maybe, Monad, Pointed, Task } from '@deot/helper-fp';
+import { Either, IO, Maybe, Monad, Pointed } from '@deot/helper-fp';
 
 const input = ref(2);
 const output = ref({ status: '点击运行' });
 
-const run = async () => {
+const run = () => {
 	const value = Number(input.value) || 0;
 	const either = Either.of(() => {
 		if (value < 0) throw new Error('只接受非负数');
 		return value;
 	}).map(number => number + 1);
-	const task = Task.of(value).map(async number => number * 3);
 
 	output.value = {
 		pointed: Pointed.of(value).map(number => number + 1).valueOf(),
-		monad: Monad.of(Monad.of(value)).join().valueOf(),
+		monad: {
+			join: Monad.of(Monad.of(value)).join().valueOf(),
+			flatMap: Monad.of(value).flatMap(number => Monad.of(number * 2)).valueOf()
+		},
 		maybe: {
 			just: Maybe.of(value).map(number => number * 2).valueOf(),
 			nothing: Maybe.of(null).map(() => '不会执行').valueOf('fallback')
 		},
 		either: { isLeft: either.isLeft, isRight: either.isRight, value: String(either.valueOf()) },
-		io: IO.of(value).map(number => number + 4).valueOf(),
-		task: await task.toPromise()
+		io: IO.of(value).map(number => number + 4).valueOf()
 	};
 };
 </script>
@@ -638,7 +661,7 @@ const run = async () => {
 <template>
 	<div class="demo">
 		<label>数字输入 <input v-model="input" type="number"></label>
-		<button @click="run">运行 Functor / Task</button>
+		<button @click="run">运行 Functor</button>
 		<strong>输出</strong>
 		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
 	</div>
@@ -655,7 +678,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 ```
 :::
 
-`APointed`、`AMonad`、`ATask` 分别是对应容器和任务类型的抽象基类，主要用于扩展现有实现。
+`APointed`、`AMonad` 分别是对应容器的抽象基类，主要用于扩展现有实现。
 
 ### APointed
 
@@ -715,7 +738,7 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `AMonad.flatMap(fn)`
 
-`join()` 后更新 `value`，再调用当前实例的 `map()`
+标准的 chain：等价于 `this.map(fn).join()`，不修改当前实例
 
 | 参数 | 参数类型 | 返回值 |
 | --- | --- | --- |
@@ -723,7 +746,15 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 
 #### `AMonad.join()`
 
-递归展开嵌套的 `AMonad`，非嵌套时返回当前实例
+展平一层：`value` 是 `AMonad` 时返回它，否则返回当前实例
+
+| 返回值 |
+| --- |
+| `any` |
+
+#### `AMonad.flatten()`
+
+展平全部层级，返回最内层的实例；不同 Monad 混用时返回的类型以最内层为准
 
 | 返回值 |
 | --- |
@@ -737,531 +768,6 @@ pre { margin: 0; padding: 12px; border-radius: 8px; background: #f8fafc; }
 | --- |
 | `any` |
 
-### ATask
-
-任务类的事件与中断基类，继承 `Emitter`；暂停方法名沿用源码中的 `pasue()`。
-
-#### `ATask.suspend(value, target?)`
-
-可选等待 target 后原样返回 value
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `value` / `target` | `any` / `PromiseLike<any>` | `Promise<any>` |
-
-#### `ATask.start()` / `ATask.cancel()` / `ATask.pasue()` / `ATask.resume()`
-
-由具体任务类实现的抽象控制方法
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `...args` | `any[]` | `any` |
-
-#### `ATask.setPasueStatus(status)`
-
-更新 `isPasue` 并创建或解除暂停 Promise
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `status` | `boolean` | `void` |
-
-#### `ATask.setCancelStatus(status)`
-
-更新 `isCancel` 并创建永久等待或已完成的取消 Promise
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `status` | `boolean` | `void` |
-
-#### `ATask.end()` / `ATask.immediate()`
-
-分别代理 `cancel()` 与 `start()`
-
-| 返回值 |
-| --- |
-| `any` |
-
-`ATask` 公开 `isCancel`、`isPasue` 状态以及 `pasuer`、`canceler` Promise；`_pasuer` 是解除暂停时使用的实现回调，不建议业务代码直接调用。
-
-
-### Task
-
-支持串行映射、归并、暂停、恢复、取消和重新执行的异步任务链。
-
-#### `Task.of(value, parent?)` / `new Task(value, parent?)`
-
-创建串行任务节点
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `value` / `parent` | `any` / `Task` | `Task` |
-
-#### `Task.map(fn)` / `Task.flatMap(fn)`
-
-追加可取消的异步映射，或执行展开映射
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `fn` | `Function` | `Task` / `any` |
-
-#### `Task.reduce(collection, done)`
-
-串行归并集合
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `collection` / `done` | `any[] \| ((value) => any[] \| Promise<any[]>)` / `Function` | `Task` |
-
-```ts
-import { Task } from '@deot/helper-fp';
-
-await Task.of(10).reduce([1, 2, 3], async (sum, value) => sum + value).toPromise(); // 16
-```
-
-#### `Task.start()` / `Task.immediate()`
-
-从父节点开始任务链
-
-| 返回值 |
-| --- |
-| `Task` |
-
-#### `Task.pasue()` / `Task.resume()`
-
-暂停或恢复任务链
-
-| 返回值 |
-| --- |
-| `Task` |
-
-#### `Task.cancel()` / `Task.end()`
-
-取消当前任务及父链
-
-| 返回值 |
-| --- |
-| `Task` |
-
-#### `Task.restart(value?)`
-
-按已记录的链重新创建并启动任务
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `value` | `any` | `Task` |
-
-#### `Task.toPromise()`
-
-必要时启动任务并返回底层 Promise
-
-| 返回值 |
-| --- |
-| `Promise<any>` |
-
-#### `Task.valueOf()` / `Task.toString()`
-
-读取已完成结果或字符串表示
-
-| 返回值 |
-| --- |
-| `any` / `string` |
-
-#### 公开状态
-
-| 成员 | 类型 | 说明 |
-| --- | --- | --- |
-| `result` | `any` | 已完成节点的结果；未完成时初始为 `''` |
-| `isCancel` / `isComplete` / `isStart` | `boolean` | 当前节点的取消、完成和启动状态 |
-| `parent` / `child` | `Task \| null` | 任务链的相邻节点 |
-| `ready` / `pasuer` | `Promise<any>` / `Promise<void>` | 启动门闩与暂停门闩 |
-| `cancelHooks` | `Function[]` | 当前节点取消时调用的 reject 回调 |
-| `record` | `[string, Function] \| null` | `restart()` 重建任务链时使用的方法记录 |
-| `_ready` / `_pasuer` | `Function` | 解除启动或暂停门闩的实现回调，不建议直接调用 |
-
-输入初始值，串行执行“加一 → 乘二”。运行过程中可以暂停、恢复或取消；`restart()` 会创建并启动一条新链：
-
-:::playground
-<!--
-<config lang="json5">
-{ views: ['runtime', 'files'] }
-</config>
--->
-```vue
-<script setup>
-import { onBeforeUnmount, ref } from 'vue';
-import { Task } from '@deot/helper-fp';
-
-const input = ref(10);
-const status = ref('未开始');
-const isPaused = ref(false);
-const output = ref({});
-let task;
-let generation = 0;
-const wait = () => new Promise(resolve => setTimeout(resolve, 600));
-
-const observe = (node) => {
-	task = node;
-	const id = ++generation;
-	status.value = '运行中';
-	isPaused.value = false;
-	output.value = {};
-	node.toPromise().then((result) => {
-		if (id !== generation) return;
-		status.value = '已完成';
-		output.value = { result, valueOf: node.valueOf(), toString: node.toString(), isComplete: node.isComplete };
-	}, (error) => {
-		if (id === generation) { status.value = '失败'; output.value = { error: String(error) }; }
-	});
-};
-const run = () => {
-	task?.cancel();
-	observe(Task.of(Number(input.value) || 0)
-		.map(async (value) => { await wait(); return value + 1; })
-		.map(async (value) => { await wait(); return value * 2; }));
-};
-const pause = () => { task.pasue(); isPaused.value = true; status.value = '已暂停'; };
-const resume = () => { task.resume(); isPaused.value = false; status.value = '运行中'; };
-const cancel = () => {
-	task.cancel();
-	generation += 1;
-	isPaused.value = false;
-	status.value = '已取消';
-	output.value = { isCancel: task.isCancel, isComplete: task.isComplete };
-};
-const restart = () => observe(task.restart());
-onBeforeUnmount(() => { generation += 1; task?.cancel(); });
-</script>
-
-<template>
-	<div class="demo">
-		<label>初始值 <input v-model.number="input" type="number"></label>
-		<div class="controls">
-			<button @click="run">新建并运行</button>
-			<button :disabled="status !== '运行中'" @click="pause">暂停</button>
-			<button :disabled="!isPaused" @click="resume">恢复</button>
-			<button :disabled="!['运行中', '已暂停'].includes(status)" @click="cancel">取消</button>
-			<button :disabled="!task" @click="restart">restart 原始输入</button>
-		</div>
-		<div>{{ status }}（每一步约 600ms）</div>
-		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
-	</div>
-</template>
-
-<style>
-.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.demo input { width: 100px; }
-.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
-.demo button { cursor: pointer; color: #0f172a; background: #fff; }
-.demo button:disabled { opacity: .5; cursor: default; }
-.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
-</style>
-```
-:::
-
-暂停在任务节点之间生效，不会中止已经进入的异步函数。取消后的原链 Promise 可能保持 pending，不能靠 `await task.toPromise()` 等待取消完成；`restart()` 返回新 Task，必须使用其返回值。底层请求和定时器的清理仍由调用方负责。
-
-### Job
-
-按固定间隔重复执行任务，适合轮询或周期工作。
-
-`TaskSource` 为 `Task | (() => Promise<any>)`；`ParallelSource` 还可以是上述值的数组。
-
-#### `Job.of(task, interval?)` / `new Job(...)`
-
-创建周期任务
-
-| 参数 | 参数类型 | 默认值 | 返回值 |
-| --- | --- | --- | --- |
-| `task` / `interval` | `TaskSource` / `number` | `0` | `Job` |
-
-#### `Job.start()` / `Job.immediate()`
-
-启动任务循环
-
-| 返回值 |
-| --- |
-| `void` |
-
-#### `Job.pasue()` / `Job.resume()`
-
-暂停或恢复任务循环
-
-| 返回值 |
-| --- |
-| `void` |
-
-#### `Job.cancel()` / `Job.end()`
-
-取消任务循环
-
-| 返回值 |
-| --- |
-| `void` |
-
-#### `Job.restart()`
-
-清除取消状态并重新执行；不会自动解除暂停，暂停中的任务应先 `resume()`
-
-| 返回值 |
-| --- |
-| `void` |
-
-#### `Job.process(leaf?)`
-
-执行并递归安排下一轮；属于可见的调度实现方法
-
-| 参数 | 参数类型 | 默认值 | 返回值 |
-| --- | --- | --- | --- |
-| `leaf` | `Task \| (() => Promise<any>)` | 原始任务 | `any` |
-
-`Job` 还公开 `original`、`task`、`interval`、`isStart`，以及继承自 `ATask` 的中断状态。它会发布 `fulfilled`、`rejected` 事件。
-
-下面依次演示启动、暂停、恢复、取消和重启。每一轮输出序号；暂停和取消后等待一个间隔，验证序号停止增长，再进入下一阶段：
-
-:::playground
-<!--
-<config lang="json5">
-{ views: ['runtime', 'files'] }
-</config>
--->
-```vue
-<script setup>
-import { onBeforeUnmount, ref } from 'vue';
-import { Job } from '@deot/helper-fp';
-
-const interval = ref(200);
-const isRunning = ref(false);
-const output = ref([]);
-let job;
-let isDisposed = false;
-
-const run = async () => {
-	isRunning.value = true;
-	output.value = [];
-	let tick = 0;
-	const delay = Math.max(50, Number(interval.value) || 200);
-	const current = Job.of(async () => ++tick, delay);
-	job = current;
-	const next = action => new Promise(resolve => current.once('fulfilled', (value) => { action(); resolve(value); }));
-	const wait = () => new Promise(resolve => setTimeout(resolve, delay + 50));
-	const first = next(() => current.pasue());
-	current.start();
-	output.value.push({ method: 'start → pasue', value: await first });
-	await wait();
-	if (isDisposed) return;
-	output.value.push({ method: '暂停后等待一个间隔', tick, isPasue: current.isPasue });
-	const second = next(() => current.cancel());
-	current.resume();
-	output.value.push({ method: 'resume → cancel', value: await second });
-	await wait();
-	if (isDisposed) return;
-	output.value.push({ method: '取消后等待一个间隔', tick, isCancel: current.isCancel });
-	const third = next(() => current.cancel());
-	current.restart();
-	output.value.push({ method: 'restart → cancel', value: await third });
-	isRunning.value = false;
-};
-
-onBeforeUnmount(() => { isDisposed = true; job?.cancel(); });
-</script>
-
-<template>
-	<div class="demo">
-		<label>间隔毫秒 <input v-model.number="interval" type="number" min="50" :disabled="isRunning"></label>
-		<button :disabled="isRunning" @click="run">{{ isRunning ? '执行中…' : '运行生命周期' }}</button>
-		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
-	</div>
-</template>
-
-<style>
-.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-.demo label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.demo input { width: 100px; }
-.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
-.demo button { width: fit-content; cursor: pointer; color: #0f172a; background: #fff; }
-.demo button:disabled { opacity: .5; }
-.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
-</style>
-```
-:::
-
-`interval` 是每轮任务完成后再等待的时间，不是固定时钟的触发频率。函数形式的任务在暂停或取消时不会中断已进入的函数；不要在上一次调用尚未结束时反复 `restart()`，网络请求仍需自行处理 `AbortSignal`。
-
-### Parallel
-
-按指定并发数调度一组异步任务。
-
-`TaskSource` 为 `Task | (() => Promise<any>)`；`ParallelSource` 还可以是上述值的数组。
-
-#### `Parallel.of(task, concurrency?, options?)` / `new Parallel(...)`
-
-创建并发任务调度器
-
-| 参数 | 参数类型 | 默认值 | 返回值 |
-| --- | --- | --- | --- |
-| `task` / `concurrency` / `options` | `ParallelSource` / `number` / `{ skipError?: boolean }` | `1` / `{ skipError: true }` | `Parallel` |
-
-#### `Parallel.setConcurrency(value)`
-
-设置大于 0 的并发数并返回实际值
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `value` | `number` | `number` |
-
-#### `Parallel.start()` / `Parallel.immediate()`
-
-启动调度，全部完成时 resolve
-
-| 返回值 |
-| --- |
-| `Promise<any>` |
-
-#### `Parallel.pasue()` / `Parallel.resume()`
-
-暂停或恢复当前任务
-
-| 返回值 |
-| --- |
-| `Promise<void>` / `void` |
-
-#### `Parallel.cancel()` / `Parallel.end()`
-
-取消当前调度
-
-| 返回值 |
-| --- |
-| `Promise<void>` |
-
-#### `Parallel.restart()`
-
-取消后恢复原始任务并重新启动；不会自动解除暂停，暂停中的任务应先 `resume()`
-
-| 返回值 |
-| --- |
-| `Promise<any>` |
-
-#### `Parallel.process()`
-
-按 concurrency 填充执行队列；属于可见的调度实现方法
-
-| 返回值 |
-| --- |
-| `void` |
-
-#### `Parallel.onFulfilled(value)` / `Parallel.onRejected(error)`
-
-完成或失败后的内部队列推进回调
-
-| 参数 | 参数类型 | 返回值 |
-| --- | --- | --- |
-| `value` / `error` | `any` | `void` |
-
-`Parallel` 公开 `original`、`task`、`tasks`、`concurrency`、`options`、`isStart`、`target` 和 `_target` 状态。`target` 是当前 `start()` Promise，`_target` 保存其 resolve/reject；后两者属于实现状态，不建议业务代码修改。
-
-调整并发数和错误策略，观察调度完成事件。运行中可以修改并发数、暂停、恢复或取消；结束后 `restart()` 重新执行同一组任务：
-
-:::playground
-<!--
-<config lang="json5">
-{
-	views: ['runtime', 'files']
-}
-</config>
--->
-```vue
-<script setup>
-import { onBeforeUnmount, ref } from 'vue';
-import { Parallel } from '@deot/helper-fp';
-
-const concurrency = ref(2);
-const skipError = ref(true);
-const fail = ref(false);
-const status = ref('未开始');
-const isControlling = ref(false);
-const output = ref([]);
-let parallel;
-
-const run = () => {
-	output.value = [];
-	const shouldFail = fail.value;
-	parallel = Parallel.of(
-		[1, 2, 3, 4, 5, 6].map(id => async () => {
-			await new Promise(resolve => setTimeout(resolve, id % 2 ? 600 : 400));
-			if (shouldFail && id === 4) throw new Error('任务 4 失败');
-			return { id };
-		}),
-		Math.max(1, Math.floor(Number(concurrency.value) || 1)),
-		{ skipError: skipError.value }
-	);
-	parallel.on('fulfilled', value => output.value.push({ event: 'fulfilled', ...value }));
-	parallel.on('rejected', error => output.value.push({ event: 'rejected', message: error.message }));
-	observe(parallel.start());
-};
-const observe = (promise) => {
-	status.value = '运行中';
-	promise.then(() => { status.value = '已完成'; }, (error) => {
-		status.value = '异常结束';
-		output.value.push({ startPromise: 'reject', message: error.message });
-	});
-};
-const setConcurrency = () => {
-	const actual = parallel.setConcurrency(Math.max(1, Math.floor(Number(concurrency.value) || 1)));
-	output.value.push({ method: 'setConcurrency', value: actual });
-};
-const pause = () => { parallel.pasue(); status.value = '已暂停'; };
-const resume = () => { parallel.resume(); status.value = '运行中'; };
-const cancel = async () => {
-	isControlling.value = true;
-	if (parallel.isPasue) parallel.resume();
-	await parallel.cancel();
-	status.value = '已取消';
-	isControlling.value = false;
-};
-const restart = () => { output.value = []; observe(parallel.restart()); };
-onBeforeUnmount(() => parallel?.cancel());
-</script>
-
-<template>
-	<div class="demo">
-		<label>并发数 <input v-model.number="concurrency" type="number" min="1" max="6"></label>
-		<div class="controls">
-			<label><input v-model="skipError" type="checkbox">skipError</label>
-			<label><input v-model="fail" type="checkbox">让任务 4 失败</label>
-		</div>
-		<div class="controls">
-			<button :disabled="isControlling || ['运行中', '已暂停'].includes(status)" @click="run">新建并运行</button>
-			<button :disabled="status !== '运行中' || isControlling" @click="setConcurrency">应用并发数</button>
-			<button :disabled="status !== '运行中' || isControlling" @click="pause">暂停</button>
-			<button :disabled="status !== '已暂停' || isControlling" @click="resume">恢复</button>
-			<button :disabled="!['运行中', '已暂停'].includes(status) || isControlling" @click="cancel">取消</button>
-			<button :disabled="!['已完成', '已取消'].includes(status) || isControlling" @click="restart">restart</button>
-		</div>
-		<div>{{ status }}；每个任务耗时约 400–600ms，错误策略在新建时读取。</div>
-		<pre>{{ JSON.stringify(output, null, 2) }}</pre>
-	</div>
-</template>
-
-<style>
-.demo { display: grid; width: min(100%, 640px); gap: 10px; padding: 12px; box-sizing: border-box; font: 14px/1.5 sans-serif; }
-.demo label, .demo .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.demo input[type="number"] { width: 100px; }
-.demo input[type="checkbox"] { width: auto; padding: 0; }
-.demo input, .demo button { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
-.demo button { cursor: pointer; color: #0f172a; background: #fff; }
-.demo button:disabled { opacity: .5; cursor: default; }
-.demo pre { margin: 0; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; color: #0f172a; background: #f8fafc; }
-</style>
-```
-:::
-
-数组任务通过 `pop()` 从末尾取出，事件按实际完成顺序发出，不保证与输入数组同序。`skipError: true` 会发出 `rejected` 后继续；`false` 会使 `start()` reject，已经开始的函数不会因此被自动中止。
-
-暂停会延后结果通知与后续调度，但不能撤销已发出的请求；不要在暂停期间提高并发数，`setConcurrency()` 本身会立即尝试补充队列。取消后原来的 `start()` Promise 保持 pending，`await cancel()` 与等待原 Promise 是两回事。
-
 ## 参考
 
 设计参考《JavaScript 函数式编程指南》；combinator 与 pipeline 场景也可结合 Ramda 等专用函数式库评估使用。
-
-为保持现有 API 兼容，任务类型的暂停方法名是源码中的 `pasue()`（而非 `pause()`）。

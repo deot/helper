@@ -1,21 +1,8 @@
 import { curry } from './curry';
+import type { Curried } from './curry';
+import { align } from './internal/decimal';
 
-type Subtract = (arg1: number, arg2: number) => number;
-export const subtract: Subtract = curry((arg1, arg2) => {
-	let r1: number;
-	let r2: number;
-
-	try {
-		r1 = arg1.toString().split('.')[1].length;
-	} catch (e) {
-		r1 = 0;
-	}
-	try {
-		r2 = arg2.toString().split('.')[1].length;
-	} catch (e) {
-		r2 = 0;
-	}
-	const m = 10 ** Math.max(r1, r2);
-	const n = (r1 >= r2) ? r1 : r2;
-	return +((arg1 * m - arg2 * m) / m).toFixed(n);
+export const subtract: Curried<[arg1: number, arg2: number], number> = curry((arg1: number, arg2: number) => {
+	const { int1, int2, scale } = align(arg1, arg2);
+	return (int1 - int2) / (10 ** scale);
 });

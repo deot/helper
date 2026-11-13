@@ -15,4 +15,13 @@ describe('filter.ts', () => {
 
 		expect(fn({ a: 1, b: 2, c: 3 })).toEqual({ b: 2 });
 	});
+
+	it('types', () => {
+		const fn = filter(isEven);
+
+		expectTypeOf(fn([1, 2, 3])).toEqualTypeOf<number[]>();
+		expectTypeOf(fn({ a: 1 })).toEqualTypeOf<Record<string, number>>();
+		expectTypeOf(filter(isEven, [1, 2, 3])).toEqualTypeOf<number[]>();
+		expect(filter(isEven, [1, 2, 3])).toEqual([2]);
+	});
 });

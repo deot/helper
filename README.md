@@ -56,7 +56,7 @@
 | [device](packages/device) | [![npm][npm-device-image]][npm-device-url] | 设备与 User-Agent 信息 |
 | [dom](packages/dom) | [![npm][npm-dom-image]][npm-dom-url] | DOM 查询、事件、样式和滚动工具 |
 | [emitter](packages/emitter) | [![npm][npm-emitter-image]][npm-emitter-url] | 轻量发布订阅器 |
-| [fp](packages/fp) | [![npm][npm-fp-image]][npm-fp-url] | 函数组合、函子和任务管理 |
+| [fp](packages/fp) | [![npm][npm-fp-image]][npm-fp-url] | 函数组合、组合子和函子 |
 | [index](packages/index) | [![npm][npm-index-image]][npm-index-url] | 全部子包的聚合入口 |
 | [is](packages/is) | [![npm][npm-is-image]][npm-is-url] | 类型与实例判断 |
 | [load](packages/load) | [![npm][npm-load-image]][npm-load-url] | 脚本、样式和图片加载 |

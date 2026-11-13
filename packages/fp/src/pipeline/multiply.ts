@@ -1,16 +1,9 @@
 import { curry } from './curry';
+import type { Curried } from './curry';
+import { toDecimal } from './internal/decimal';
 
-type Multiply = (arg1: number, arg2: number) => number;
-export const multiply: Multiply = curry((arg1: number, arg2: number) => {
-	let m = 0;
-	const s1 = arg1.toString();
-	const s2 = arg2.toString();
-	try {
-		m += s1.split('.')[1].length;
-	} catch (e) { /* empty */ }
-	try {
-		m += s2.split('.')[1].length;
-	} catch (e) { /* empty */ }
-
-	return (Number(s1.replace('.', '')) * Number(s2.replace('.', ''))) / (10 ** m);
+export const multiply: Curried<[arg1: number, arg2: number], number> = curry((arg1: number, arg2: number) => {
+	const d1 = toDecimal(arg1);
+	const d2 = toDecimal(arg2);
+	return (d1.int * d2.int) / (10 ** (d1.scale + d2.scale));
 });

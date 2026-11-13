@@ -1,14 +1,14 @@
 import { AMonad } from './abstract';
 
-const right = (value: any) => {
-	return new Either(value);
+const right = <R>(value: R) => {
+	return new Either<never, R>(value);
 };
 
-const left = (value: any) => {
-	return new Either(value, true);
+const left = <L>(value: L) => {
+	return new Either<L, never>(value, true);
 };
 
-const try$ = (fn: Function) => {
+const try$ = <R>(fn: () => R): Either<any, R> => {
 	try {
 		return right(fn());
 	} catch (e) {
@@ -22,7 +22,7 @@ const try$ = (fn: Function) => {
  * ok/right = Right类
  * error/left = Left类
  */
-export class Either extends AMonad {
+export class Either<L = any, R = any> extends AMonad<L | R> {
 	static of = try$;
 
 	static try = try$;
@@ -39,16 +39,21 @@ export class Either extends AMonad {
 
 	isRight: boolean;
 
-	constructor(value: any, isError?: boolean) {
+	constructor(value: L | R, isError?: boolean) {
 		super(value);
 		this.isLeft = !!isError;
 		this.isRight = !isError;
 	}
 
-	map(fn: Function) {
+	map<R2>(fn: (value: R) => R2): Either<L, R2> {
 		return this.isLeft
-			? Either.left(this.value)
-			: Either.right(fn(this.value));
+			? Either.left(this.value as L)
+			: Either.right(fn(this.value as R));
+	}
+
+	// Left的值不参与展平
+	join(): any {
+		return this.isLeft ? this : super.join();
 	}
 
 	toString() {

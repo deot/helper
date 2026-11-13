@@ -3,10 +3,17 @@
  */
 import { mergeArgs } from './internal/merge-args';
 
-export const partial = (fn: (...args: any[]) => any, ...partialArgs: any[]) => {
+type AnyFn = (...args: any[]) => any;
+
+export interface Partial$ {
+	<F extends AnyFn>(fn: F, ...partialArgs: any[]): (...args: any[]) => ReturnType<F>;
+	placeholder: Partial$;
+}
+
+export const partial = ((fn: AnyFn, ...partialArgs: any[]) => {
 	return function (this: any, ...nextArgs: any[]) {
 		return fn.apply(this, mergeArgs(partialArgs, nextArgs, partial));
 	};
-};
+}) as Partial$;
 
 partial.placeholder = partial;

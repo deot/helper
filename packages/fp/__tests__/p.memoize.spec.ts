@@ -8,11 +8,11 @@ describe('memoize.ts', () => {
 			return Math.random();
 		});
 
-		factorial(1);
-		factorial(1);
-		factorial(1);
-		factorial(1);
-		factorial(1);
+		factorial();
+		factorial();
+		factorial();
+		factorial();
+		factorial();
 		expect(count).toBe(5);
 	});
 

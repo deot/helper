@@ -58,13 +58,43 @@ describe('either.ts', () => {
 		run(Either.of(() => R.parse(json)));
 	});
 
-	it('Monadic: map / flatMap / valueOf / toString', () => {
+	it('flatMap, chain', () => {
+		const right = Either.right('{"name":"deot"}')
+			.flatMap(parseJSON)
+			.map((x: any) => x.name);
+		expect(right.toString()).toBe(`Either.Right(deot)`);
+
+		// 中途出错时后续不再执行
+		const fn = vi.fn();
+		const left = Either.right('{name:deot}')
+			.flatMap(parseJSON)
+			.map(fn);
+		expect(left.isLeft).toBe(true);
+		expect(fn).toBeCalledTimes(0);
+	});
+
+	it('join, left', () => {
+		// Left的值不参与展平
+		const inner = Either.right(1);
+		const left = Either.left(inner);
+
+		expect(left.join()).toBe(left);
+		expect(Either.right(inner).join()).toBe(inner);
+	});
+
+	it('Monadic: map / flatten / valueOf / toString', () => {
 		const current = Either.right(Either.right(Monad.of(Either.of(() => 1))))
-			.flatMap(R.add(1))
+			.flatten()
+			.map(R.add(1))
 			.map(R.add(1))
 			.map(R.identity);
 
 		expect(current.valueOf()).toBe(3);
 		expect(current.toString()).toBe(`Either.Right(3)`);
+	});
+
+	it('types', () => {
+		expectTypeOf(Either.right(1).map(x => String(x))).toEqualTypeOf<FP.Either<never, string>>();
+		expectTypeOf(Either.of(() => 1)).toEqualTypeOf<FP.Either<any, number>>();
 	});
 });

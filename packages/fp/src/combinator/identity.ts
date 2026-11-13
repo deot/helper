@@ -4,4 +4,4 @@
  * identity :: (a) -> a
  */
 
-export const identity = (x: any) => x;
+export const identity = <T>(x: T): T => x;

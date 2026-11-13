@@ -37,4 +37,23 @@ describe('curry.ts', () => {
 		// 以最后绑定的this为主
 		expect(g.call(ctx1, 2).call(ctx2, 3)).toBe(expected);
 	});
+
+	it('types', () => {
+		const __ = curry;
+		const g = curry((a: number, b: string, c: boolean) => `${a}${b}${c}`);
+
+		expectTypeOf(g(1, '2', true)).toEqualTypeOf<string>();
+		expectTypeOf(g(1, '2')(true)).toEqualTypeOf<string>();
+		expectTypeOf(g(1)('2')(true)).toEqualTypeOf<string>();
+		expectTypeOf(g(1)('2', true)).toEqualTypeOf<string>();
+		expectTypeOf(g()(1)()('2')(true)).toEqualTypeOf<string>();
+
+		// 使用占位符时退回宽松签名
+		expectTypeOf(g(__, '2')).toEqualTypeOf<any>();
+		expect(g(__, '2')(1, true)).toBe('12true');
+
+		// 无形参时直接执行
+		expectTypeOf(curry(() => 1)()).toEqualTypeOf<number>();
+		expect(curry(() => 1)()).toBe(1);
+	});
 });

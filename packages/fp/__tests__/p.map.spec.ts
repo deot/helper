@@ -20,6 +20,15 @@ describe('map.ts', () => {
 		expect(fn({ d: { a: 1 } })).toEqual({ d: NaN });
 	});
 
+	it('types', () => {
+		const fn = map((x: number) => String(x));
+
+		expectTypeOf(fn([1, 2, 3])).toEqualTypeOf<string[]>();
+		expectTypeOf(fn({ a: 1 })).toEqualTypeOf<Record<string, string>>();
+		expectTypeOf(map((x: number) => x > 1, [1, 2, 3])).toEqualTypeOf<boolean[]>();
+		expect(map((x: number) => x > 1, [1, 2, 3])).toEqual([false, true, true]);
+	});
+
 	it('no index', () => {
 		const fn = map((x: number, i?: any) => {
 			expect(i).toBe(undefined);

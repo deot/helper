@@ -8,5 +8,5 @@
 | [identity](/identity)       | I-组合子         |
 | [tap](/tap)                 | K-组合子         |
 | [alternation](/alternation) | OR-组合子        |
-| [sequence](/sequence)       | OR-组合子        |
+| [sequence](/sequence)       | S-组合子         |
 | [fork (join)](/fork)        | fork（join）组合子 |

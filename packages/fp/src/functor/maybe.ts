@@ -3,15 +3,15 @@ import { AMonad } from './abstract';
 /**
  * 这里不区分Just类和Nothing类，由toString处理
  */
-export class Maybe extends AMonad {
-	static of(value: any) {
-		return new Maybe(value);
+export class Maybe<T = any> extends AMonad<T> {
+	static of<T>(value: T) {
+		return new Maybe<T>(value);
 	}
 
-	map(fn: Function) {
+	map<R>(fn: (value: NonNullable<T>) => R): Maybe<R> {
 		return this.isNothing()
-			? Maybe.of(this.value)
-			: Maybe.of(fn(this.value));
+			? Maybe.of(this.value as any)
+			: Maybe.of(fn(this.value as NonNullable<T>));
 	}
 
 	toString() {
@@ -27,7 +27,7 @@ export class Maybe extends AMonad {
 		return !this.isNothing();
 	}
 
-	valueOf(other?: any) {
+	valueOf(other?: any): any {
 		return typeof other !== 'undefined' && this.isNothing()
 			? other
 			: this.value;

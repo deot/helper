@@ -24,6 +24,12 @@ describe('compose/pipe.ts', () => {
 		// (5 + 2) * 3 - 10 = 11
 		expect(piped(5)).toBe(11);
 
+		// types
+		expectTypeOf(composed).toEqualTypeOf<(x: number) => number>();
+		expectTypeOf(piped).toEqualTypeOf<(x: number) => number>();
+		expectTypeOf(pipe((x: number, y: number) => x + y, String, (x: string) => x.length)).toEqualTypeOf<(x: number, y: number) => number>();
+		expectTypeOf(compose((x: string) => x.length, String, (x: number, y: number) => x + y)).toEqualTypeOf<(x: number, y: number) => number>();
+
 		// other
 		expect(compose(add)(1)).toBe(3);
 		try {

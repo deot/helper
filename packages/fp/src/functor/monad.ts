@@ -1,11 +1,11 @@
 import { AMonad } from './abstract';
 
-export class Monad extends AMonad {
-	static of(value: any) {
-		return new Monad(value);
+export class Monad<T = any> extends AMonad<T> {
+	static of<T>(value: T) {
+		return new Monad<T>(value);
 	}
 
-	map(fn: Function) {
+	map<R>(fn: (value: T) => R): Monad<R> {
 		return Monad.of(fn(this.value));
 	}
 
